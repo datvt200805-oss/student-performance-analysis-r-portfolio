@@ -1,19 +1,67 @@
 ---
 title: "Student Performance Analysis"
 author: "Le Vu Thanh Dat"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
 ---
 
 # Phân tích hiệu suất học tập của sinh viên
 
-Mô tả chi tiết về **nguồn dữ liệu** và **ý nghĩa của từng biến** trong bộ dữ liệu được trình bày tại **Phụ lục A**
+```{r setup, include=FALSE}
+invisible(Sys.setlocale("LC_CTYPE", "English_United States.utf8"))
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5
+)
+
+required_packages <- c(
+  "tidyverse", "rstatix", "car", "patchwork", "knitr", "kableExtra"
+)
+invisible(lapply(required_packages, library, character.only = TRUE))
+```
+
+> **Nguồn và giới hạn dữ liệu:** Phân tích sử dụng bộ dữ liệu mô phỏng
+> [*Student Habits vs Academic Performance*](https://www.kaggle.com/datasets/jayaantanaath/student-habits-vs-academic-performance)
+> gồm 1.000 hồ sơ sinh viên, do
+> Jayanta Nath công bố trên Kaggle theo giấy phép Apache 2.0. Vì dữ liệu là
+> dữ liệu mô phỏng và nghiên cứu không có thiết kế thực nghiệm, các kết quả
+> bên dưới chỉ thể hiện **mối liên hệ thống kê**, không chứng minh quan hệ nhân quả.
+> Mô tả biến và các kiểm tra bổ sung được trình bày trong
+> [phụ lục public](https://github.com/datvt200805-oss/student-performance-analysis-r-portfolio/blob/main/output/pdf/appendix-public.pdf).
 
 ## **(a): Tiền xử lý dữ liệu**
 
 #### **Đọc dữ liệu**
 
-```{r}
-data <- read.csv("StudentHabitsPerformance.csv", stringsAsFactors = TRUE)
+```{r import-data}
+data_path <- file.path("..", "data", "student_habits_performance.csv")
+stopifnot(file.exists(data_path))
+data <- read.csv(data_path, stringsAsFactors = TRUE)
+
+expected_columns <- c(
+  "student_id", "age", "gender", "study_hours_per_day",
+  "social_media_hours", "netflix_hours", "part_time_job",
+  "attendance_percentage", "sleep_hours", "diet_quality",
+  "exercise_frequency", "parental_education_level", "internet_quality",
+  "mental_health_rating", "extracurricular_participation", "exam_score"
+)
+
+stopifnot(
+  identical(names(data), expected_columns),
+  nrow(data) == 1000,
+  !anyDuplicated(data$student_id),
+  !anyNA(data),
+  all(data$exam_score >= 0 & data$exam_score <= 100)
+)
+
 # Kiểm tra kích thước 
 dim(data)
 ```
@@ -71,7 +119,7 @@ Trước khi lựa chọn phương pháp phân tích chính, nghiên cứu đã 
 
 Bộ dữ liệu **Student Habits Performance** bao gồm nhiều biến định tính phản ánh đặc điểm cá nhân, điều kiện học tập và lối sống của sinh viên, đồng thời chứa nhiều biến định lượng phản ánh kết quả học tập. Để khai thác toàn diện bộ dữ liệu, nghiên cứu sử dụng **hai phương pháp phân tích thống kê**, gồm **MANOVA (Multivariate Analysis of Variance)** và **Multiple Linear Regression (Hồi quy tuyến tính bội)**.
 
-Phương pháp **MANOVA** được sử dụng nhằm đánh giá sự khác biệt đồng thời của nhiều chỉ tiêu học tập giữa các nhóm sinh viên được phân chia theo các yếu tố phân loại. Trong khi đó, **Multiple Linear Regression** được sử dụng để xác định mức độ và chiều hướng ảnh hưởng của các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập đến **điểm thi cuối kỳ (`exam_score`)**, đồng thời xây dựng mô hình dự báo kết quả học tập.
+Phương pháp **MANOVA** được sử dụng nhằm đánh giá sự khác biệt đồng thời của nhiều chỉ tiêu học tập giữa các nhóm sinh viên được phân chia theo các yếu tố phân loại. Trong khi đó, **Multiple Linear Regression** được sử dụng để ước lượng mức độ và chiều hướng liên hệ giữa các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe, điều kiện học tập và **điểm thi cuối kỳ (`exam_score`)**.
 
 Trong thực tế, hiệu suất học tập không chỉ được phản ánh thông qua điểm số cuối kỳ mà còn thể hiện qua quá trình học tập hằng ngày và mức độ tham gia học tập. Vì vậy, để đánh giá hiệu suất học tập một cách toàn diện trong phần MANOVA, nghiên cứu lựa chọn ba chỉ tiêu:
 
@@ -83,19 +131,19 @@ Trong thực tế, hiệu suất học tập không chỉ được phản ánh t
 
 Từ đó, nghiên cứu thực hiện hai mục tiêu chính:
 
-> **Mục tiêu 1 (MANOVA):** Xác định các yếu tố phân loại có ảnh hưởng đáng kể đến hiệu suất học tập của sinh viên thông qua ba chỉ tiêu gồm `study_hours_per_day`, `attendance_percentage` và `exam_score`, đồng thời khảo sát ảnh hưởng của **mức độ sức khỏe tinh thần**, **tần suất tập thể dục** và ảnh hưởng tương tác giữa hai yếu tố này.
+> **Mục tiêu 1 (MANOVA):** Xác định các yếu tố phân loại có liên hệ với sự khác biệt về hiệu suất học tập thông qua ba chỉ tiêu gồm `study_hours_per_day`, `attendance_percentage` và `exam_score`, đồng thời khảo sát tương tác thống kê giữa **mức độ sức khỏe tinh thần** và **tần suất tập thể dục**.
 >
-> **Mục tiêu 2 (Multiple Linear Regression):** Xác định những yếu tố ảnh hưởng đến **điểm thi cuối kỳ (`exam_score`)**, đánh giá mức độ và chiều hướng tác động của từng biến khi các yếu tố khác được giữ không đổi, đồng thời xây dựng mô hình dự báo kết quả học tập của sinh viên.
+> **Mục tiêu 2 (Multiple Linear Regression):** Xác định những biến có liên hệ tuyến tính với **điểm thi cuối kỳ (`exam_score`)**, đồng thời ước lượng mức độ và chiều hướng của mối liên hệ khi các biến khác được giữ không đổi.
 
 ## **(c)/(d): Kiểm tra giả định, đánh giá tính phù hợp và thực hiện phân tích bằng phương pháp đã chọn**
 
 ### **Bài toán 1 (One-Way MANOVA)**
 
-Trước khi xây dựng mô hình One-way MANOVA, nghiên cứu thực hiện bước sàng lọc các biến độc lập bằng các kiểm định MANOVA sơ bộ nhằm lựa chọn biến phù hợp. Kết quả sàng lọc bằng MANOVA **(Phụ lục C.1)** cho thấy chỉ có biến `parental_education_level` có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phản ánh hiệu suất học tập.
+Trước khi xây dựng mô hình One-way MANOVA, nghiên cứu thực hiện bước sàng lọc các biến độc lập bằng các kiểm định MANOVA sơ bộ nhằm lựa chọn biến phù hợp. Kết quả sàng lọc bằng MANOVA **(Phụ lục C.1)** cho thấy chỉ có biến `parental_education_level` gắn với khác biệt có ý nghĩa thống kê ở vector trung bình của ba biến phản ánh hiệu suất học tập.
 
 Do đó, bài toán thứ nhất tập trung trả lời câu hỏi:
 
-> **Liệu trình độ học vấn của phụ huynh có ảnh hưởng đến mức độ đầu tư học tập, tỷ lệ chuyên cần và kết quả học tập của sinh viên hay không?**
+> **Mức độ đầu tư học tập, tỷ lệ chuyên cần và kết quả học tập có khác biệt theo trình độ học vấn của phụ huynh hay không?**
 
 Mô hình One-Way MANOVA gồm:
 
@@ -143,9 +191,6 @@ print(summary_stats, n = 12)
 #### **Trực quan hóa bằng Box-plot**
 
 ```{r, echo = FALSE}
-library(ggplot2)
-library(patchwork)
-
 my_theme <- theme_minimal(base_size = 12) +
   theme(
     legend.position = "none",
@@ -266,7 +311,7 @@ print(box_m_result)
 
 **Đặt giả thuyết:**
 
--   $H_0$: Trình độ học vấn của cha mẹ không ảnh hưởng đến vector trung bình của các biến hiệu suất học tập.
+-   $H_0$: Vector trung bình của các biến hiệu suất học tập bằng nhau giữa các nhóm trình độ học vấn của cha mẹ.
 
 -   $H_1$: Có sự khác biệt về vector trung bình của ít nhất một nhóm trình độ học vấn của cha mẹ.
 
@@ -282,7 +327,7 @@ print(res_manova)
 
 **Nhận xét:**
 
-Kết quả kiểm định MANOVA sử dụng thống kê **Wilks' Lambda** cho giá trị Wilks' Lambda = **0.97718**, giá trị thống kê **F = 2.5616** và **p-value = 0.006244**. Với mức ý nghĩa $\alpha = 0.05$, ta có: $p\text{-value} = 0.006244 < 0.05$ Do đó, **bác bỏ giả thuyết** $H_0$. Kết quả này cho thấy trình độ học vấn của cha mẹ có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc gồm `study_hours_per_day`, `attendance_percentage` và `exam_score` khi được xem xét đồng thời.
+Kết quả kiểm định MANOVA sử dụng thống kê **Wilks' Lambda** cho giá trị Wilks' Lambda = **0.97718**, giá trị thống kê **F = 2.5616** và **p-value = 0.006244**. Với mức ý nghĩa $\alpha = 0.05$, ta có: $p\text{-value} = 0.006244 < 0.05$. Do đó, **bác bỏ giả thuyết** $H_0$: vector trung bình của `study_hours_per_day`, `attendance_percentage` và `exam_score` có khác biệt giữa ít nhất hai nhóm trình độ học vấn của cha mẹ.
 
 Nói cách khác, khi đánh giá tổng thể trên cả ba khía cạnh là t**hời gian học tập**, **mức độ chuyên cần** và **kết quả học tập**, tồn tại **sự khác biệt** giữa các nhóm sinh viên có t**rình độ học vấn của cha mẹ khác nhau.** Mặc dù kết quả MANOVA có ý nghĩa thống kê, giá trị Wilks' Lambda = 0.977 cho thấy mức độ khác biệt tổng thể giữa các nhóm tương đối nhỏ. Điều này hàm ý rằng trình độ học vấn của phụ huynh chỉ giải thích một phần nhỏ sự khác biệt trong hiệu suất học tập của sinh viên.
 
@@ -353,7 +398,7 @@ Bên cạnh yếu tố gia đình, các yếu tố thuộc về sức khỏe và
 
 Bài toán thứ hai nhằm trả lời câu hỏi:
 
-> **Liệu mức độ sức khỏe tinh thần và tần suất tập thể dục có ảnh hưởng đồng thời đến hiệu suất học tập của sinh viên, và hai yếu tố này có tồn tại ảnh hưởng tương tác hay không?**
+> **Hiệu suất học tập có khác biệt theo mức độ sức khỏe tinh thần và tần suất tập thể dục hay không, và có tồn tại tương tác thống kê giữa hai yếu tố không?**
 
 Mô hình Two-Way MANOVA gồm:
 
@@ -597,7 +642,7 @@ Manova(model_two_way, test.statistic = "Wilks")
 
 -   **Tương tác giữa sức khỏe tinh thần và tần suất tập thể dục** (`mental_group:exercise_group`) có **p-value = 0.302 \> 0.05**, nên không có đủ bằng chứng để bác bỏ giả thuyết $H_0$. Điều này cho thấy **không tồn tại ảnh hưởng tương tác có ý nghĩa thống kê** giữa hai yếu tố đối với hiệu suất học tập.
 
-**Kết luận:** Hiệu suất học tập của sinh viên chịu ảnh hưởng độc lập bởi mức độ sức khỏe tinh thần và tần suất tập thể dục, nhưng không có bằng chứng cho thấy sự kết hợp giữa hai yếu tố này tạo ra ảnh hưởng tương tác đáng kể.
+**Kết luận:** Hiệu suất học tập có khác biệt theo mức độ sức khỏe tinh thần và tần suất tập thể dục, nhưng chưa có bằng chứng về tương tác có ý nghĩa thống kê giữa hai yếu tố.
 
 #### **Phân tích phương sai hai nhân tố đơn biến (Two-Way Univariate ANOVAs)**
 
@@ -698,7 +743,7 @@ kable(tukey_exam_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.si
 
 -   Trong khi đó, giữa nhóm Ít vận động và Vận động vừa phải **không có sự khác biệt** về điểm thi ($\text{estimate} = 1.16,\ p_{adj} = 0.637 > 0.05$).
 
-$\rightarrow$ **Kết luận**: Hoạt động thể chất chỉ thực sự tạo ra tác động cải thiện điểm số thi cử khi sinh viên duy trì ở tần suất thường xuyên (5–7 lần/tuần).
+$\rightarrow$ **Kết luận**: Trong dữ liệu này, nhóm vận động thường xuyên (5–7 lần/tuần) có điểm thi trung bình cao hơn hai nhóm còn lại; kết quả không chứng minh vận động là nguyên nhân làm tăng điểm.
 
 ```{r, echo = FALSE}
 kable(tukey_study_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
@@ -721,7 +766,7 @@ Khi đối chiếu đồng thời kết quả kiểm định giữa **Bảng 5**
 
 ### **(e): Đánh giá mô hình và kết quả phân tích, diễn giải kết quả và thảo luận ý nghĩa thực tiễn**
 
-Các giả định quan trọng của mô hình MANOVA đều được thỏa mãn ở cả hai bài toán, giúp các kết luận có độ tin cậy thống kê cao. Đáng chú ý, mức độ ảnh hưởng giữa hai nhóm yếu tố không đồng đều: yếu tố gia đình (Bài toán 1) chỉ giải thích một phần nhỏ sự khác biệt, trong khi yếu tố lối sống – sức khỏe (Bài toán 2) có tác động rõ rệt hơn nhiều.
+Các giả định quan trọng của mô hình MANOVA được đáp ứng ở mức chấp nhận được trong cả hai bài toán. Đáng chú ý, khác biệt gắn với yếu tố gia đình (Bài toán 1) có quy mô nhỏ, trong khi khác biệt giữa các nhóm lối sống – sức khỏe (Bài toán 2) rõ hơn trong dữ liệu.
 
 Về ý nghĩa thực tiễn, kết quả nghiên cứu cho thấy **trình độ học vấn của cha mẹ** chủ yếu **liên quan đến mức độ chuyên cần của sinh viên**, nhưng **không tạo ra sự khác biệt đáng kể về thời gian tự học và điểm thi cuối kỳ**. Điều này cho thấy môi trường giáo dục gia đình có thể góp phần hình thành tính kỷ luật và ý thức học tập, song thành tích học tập ở bậc đại học còn phụ thuộc vào nhiều yếu tố cá nhân khác.
 
@@ -731,15 +776,15 @@ Kết quả nghiên cứu cũng cho thấy việc **dành nhiều thời gian h�
 
 ### **Phương pháp 2: Multiple Linear Regression**
 
-Bên cạnh việc đánh giá sự khác biệt về kết quả học tập giữa các nhóm sinh viên bằng phương pháp MANOVA, nghiên cứu tiếp tục sử dụng hồi quy tuyến tính bội nhằm xác định các yếu tố ảnh hưởng đến điểm thi cuối kỳ của sinh viên.
+Bên cạnh việc đánh giá sự khác biệt giữa các nhóm bằng MANOVA, nghiên cứu tiếp tục sử dụng hồi quy tuyến tính bội nhằm ước lượng mối liên hệ giữa các biến giải thích và điểm thi cuối kỳ.
 
-Cụ thể, nghiên cứu xem xét đồng thời toàn bộ các biến có trong bộ dữ liệu (ngoại trừ `student_id`) để đánh giá mức độ tác động của từng yếu tố đến biến phụ thuộc là điểm thi cuối kỳ (`exam_score`). Các biến giải thích bao gồm các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập của sinh viên.
+Cụ thể, nghiên cứu xem xét đồng thời toàn bộ các biến có trong bộ dữ liệu (ngoại trừ `student_id`) để đánh giá mức độ và chiều hướng liên hệ của từng biến với điểm thi cuối kỳ (`exam_score`). Các biến giải thích bao gồm đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập.
 
 Mục tiêu của mô hình hồi quy là:
 
--   Xác định những yếu tố có ảnh hưởng đáng kể đến điểm thi cuối kỳ của sinh viên.
+-   Xác định những biến có liên hệ tuyến tính đáng kể với điểm thi cuối kỳ.
 
--   Đánh giá chiều hướng và mức độ tác động của từng yếu tố đến kết quả học tập khi các yếu tố khác được giữ không đổi.
+-   Đánh giá chiều hướng và mức độ của từng hệ số khi các biến khác được giữ không đổi.
 
 -   Xây dựng mô hình dự báo điểm thi cuối kỳ dựa trên các đặc điểm của sinh viên.
 
@@ -855,11 +900,11 @@ kable(
 
 Kết quả phân tích hồi quy tuyến tính bội cho thấy mô hình có khả năng giải thích tốt sự biến thiên của điểm thi cuối kỳ của sinh viên ( $R^2=0.9018$) và đáp ứng các giả định cần thiết để đưa ra các kết luận thống kê đáng tin cậy.
 
-Phân tích chỉ ra rằng **thời gian học tập mỗi ngày** là yếu tố có ảnh hưởng tích cực mạnh nhất đến điểm thi cuối kỳ. Bên cạnh đó, **tỷ lệ chuyên cần**, **thời gian ngủ**, **tần suất tập thể dục** và **mức độ sức khỏe tinh thần** cũng có tác động tích cực và có ý nghĩa thống kê đến kết quả học tập. Ngược lại, việc dành nhiều thời gian cho **mạng xã hội** và **Netflix** có xu hướng làm giảm điểm thi cuối kỳ.
+Phân tích chỉ ra rằng **thời gian học tập mỗi ngày** có hệ số dương lớn nhất trong mô hình. **Tỷ lệ chuyên cần**, **thời gian ngủ**, **tần suất tập thể dục** và **mức độ sức khỏe tinh thần** cũng có hệ số dương và có ý nghĩa thống kê. Ngược lại, thời gian dành cho **mạng xã hội** và **Netflix** có hệ số âm.
 
-Đối với các yếu tố như **tuổi**, **giới tính**, **trình độ học vấn của phụ huynh**, **chất lượng chế độ ăn**, **chất lượng Internet**, **việc làm bán thời gian** và **tham gia hoạt động ngoại khóa**, nghiên cứu chưa tìm thấy bằng chứng thống kê cho thấy chúng ảnh hưởng đáng kể đến điểm thi cuối kỳ khi đã kiểm soát các yếu tố khác trong mô hình.
+Đối với các yếu tố như **tuổi**, **giới tính**, **trình độ học vấn của phụ huynh**, **chất lượng chế độ ăn**, **chất lượng Internet**, **việc làm bán thời gian** và **tham gia hoạt động ngoại khóa**, nghiên cứu chưa tìm thấy bằng chứng về mối liên hệ tuyến tính có ý nghĩa thống kê với điểm thi khi đã kiểm soát các biến khác trong mô hình.
 
-Nhìn chung, kết quả nghiên cứu cho thấy **thói quen học tập và lối sống của sinh viên có vai trò quan trọng hơn các đặc điểm nhân khẩu học và điều kiện cá nhân trong việc dự đoán kết quả học tập**. Điều này cho thấy rằng việc duy trì thời gian học hợp lý, nâng cao tỷ lệ chuyên cần, đảm bảo giấc ngủ, rèn luyện thể chất và chăm sóc sức khỏe tinh thần, đồng thời hạn chế thời gian dành cho các hoạt động giải trí trực tuyến, có thể góp phần cải thiện kết quả học tập của sinh viên.
+Nhìn chung, trong bộ dữ liệu mô phỏng này, **các biến về thói quen học tập và lối sống có liên hệ thống kê rõ hơn với điểm thi so với phần lớn biến nhân khẩu học**. Đây là kết quả mô tả trong mẫu; cần dữ liệu thực tế và đánh giá ngoài mẫu trước khi dùng mô hình để dự báo hoặc đưa ra khuyến nghị.
 
 ## **(f): Đề xuất các phương pháp khác có thể cho kết quả tốt hơn**
 
@@ -877,40 +922,11 @@ Nhìn chung, việc lựa chọn phương pháp phân tích phụ thuộc vào m
 
 ## **(g): Kết luận**
 
-\renewcommand{\arraystretch}{1.4}
+| Nội dung | MANOVA | Hồi quy tuyến tính bội |
+|---|---|---|
+| Mục tiêu | So sánh đồng thời ba chỉ tiêu học tập giữa các nhóm | Ước lượng mối liên hệ riêng của từng biến với `exam_score` khi giữ các biến khác cố định |
+| Kết quả tổng quát | Học vấn phụ huynh: Wilks' $\Lambda=0.977$, $p=0.006$, hiệu ứng nhỏ. Sức khỏe tinh thần và vận động: $p<2\times10^{-16}$; tương tác: $p=0.302$ | $R^2=0.902$, Adjusted $R^2=0.900$, $F=473.9$, $p<2.2\times10^{-16}$ |
+| Mối liên hệ đáng chú ý | Khác biệt theo học vấn phụ huynh chủ yếu xuất hiện ở chuyên cần; điểm thi khác biệt theo nhóm sức khỏe tinh thần và vận động | Hệ số dương: giờ học, giấc ngủ, sức khỏe tinh thần, vận động, chuyên cần. Hệ số âm: mạng xã hội và Netflix |
+| Hạn chế | Một số tổ hợp nhóm lệch chuẩn nhẹ; cỡ mẫu giữa nhóm không cân bằng | Điểm thi bị chặn tại 100; $R^2$ là kết quả trong mẫu, chưa phải hiệu năng dự báo ngoài mẫu |
 
-\begin{longtable}{|>{\raggedright\arraybackslash\color{RoyalBlue}\bfseries}p{2.8cm}|>{\raggedright\arraybackslash}p{6.3cm}|>{\raggedright\arraybackslash}p{6.3cm}|}
-\hline
-\rowcolor{RoyalBlue!60}
-\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
-\endfirsthead
-
-\hline
-\rowcolor{RoyalBlue!60}
-\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
-\endhead
-
-Mục tiêu & Xác định các yếu tố phân loại có ảnh hưởng \textbf{đồng thời} đến ba chỉ tiêu hiệu suất học tập & Xác định mức độ và \textbf{chiều hướng} ảnh hưởng riêng lẻ của từng yếu tố đến điểm thi, xây dựng mô hình dự báo \\ \hline
-
-Biến phụ thuộc & Vector 3 biến: \newline \texttt{study\_hours\_per\_day}, \newline \texttt{attendance\_percentage}, \newline \texttt{exam\_score} & 1 biến: \texttt{exam\_score} \\ \hline
-
-Biến độc lập được xét & \textbullet~\textbf{Bài toán 1:} \texttt{parental\_education\_level} (sàng lọc từ 6 biến phân loại bằng Bonferroni) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group}, \texttt{exercise\_group} và tương tác giữa hai yếu tố & Toàn bộ 14 biến: nhân khẩu học, thói quen học tập, giải trí, sức khỏe, điều kiện học tập, ngoại khóa \\ \hline
-
-Giả định đã kiểm tra & Phân phối chuẩn nhiều chiều (Shapiro-Wilk), đồng nhất hiệp phương sai (Box's M) & Đa cộng tuyến (VIF), chuẩn phần dư (Shapiro-Wilk), đồng nhất phương sai (Breusch-Pagan), độc lập sai số (Durbin-Watson) \\ \hline
-
-Kết quả kiểm định tổng quát & \textbullet~\textbf{Bài toán 1:} Wilks' $\Lambda = 0.977$, $p = 0.006$ (có ý nghĩa nhưng effect size nhỏ) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group} và \texttt{exercise\_group} đều $p < 2 \times 10^{-16}$; tương tác không ý nghĩa ($p = 0.302$) & $R^2 = 0.902$, Adjusted $R^2 = 0.900$, $F = 473.9$, $p < 2.2 \times 10^{-16}$ \\ \hline
-
-Yếu tố có ý nghĩa thống kê & \textbullet~Trình độ học vấn cha mẹ $\rightarrow$ chỉ ảnh hưởng đến \textbf{chuyên cần} (không ảnh hưởng giờ học, điểm thi) \newline \newline \textbullet~Sức khỏe tinh thần \& tần suất vận động $\rightarrow$ ảnh hưởng mạnh đến \textbf{điểm thi} \newline \newline \textbullet~Vận động $\rightarrow$ ảnh hưởng cả \textbf{giờ học} & \textbullet~\textbf{Tác động dương:} \texttt{study\_hours\_per\_day} ($\beta=9.575$), \texttt{sleep\_hours} ($\beta=1.992$), \texttt{mental\_health\_rating} ($\beta=1.944$), \texttt{exercise\_frequency} ($\beta=1.450$), \texttt{attendance\_percentage} ($\beta=0.143$) \newline \newline \textbullet~\textbf{Tác động âm:} \texttt{social\_media\_hours} ($\beta=-2.602$), \texttt{netflix\_hours} ($\beta=-2.282$) \\ \hline
-
-Yếu tố không có ý nghĩa thống kê & Giới tính, việc làm thêm, chế độ ăn, chất lượng Internet, ngoại khóa (khi sàng lọc sơ bộ) & Tuổi, giới tính, trình độ học vấn cha mẹ, chế độ ăn, chất lượng Internet, việc làm thêm, ngoại khóa \\ \hline
-
-Post-hoc / diễn giải chiều hướng & Tukey HSD: Master/High School $>$ None (chuyên cần); Tâm lý vững vàng $>$ ổn định $>$ yếu (điểm thi); Vận động thường xuyên $>$ hai nhóm còn lại (điểm thi) & Không áp dụng post-hoc; diễn giải trực tiếp qua dấu và độ lớn hệ số hồi quy khi kiểm soát các biến khác \\ \hline
-
-Ý nghĩa thống kê & Chứng minh \textbf{có tồn tại khác biệt nhóm} khi xét đồng thời nhiều chỉ tiêu; phân biệt được yếu tố ảnh hưởng mạnh (sức khỏe – lối sống) và yếu (gia đình); không có tương tác giữa sức khỏe tinh thần và vận động & Định lượng chính xác \textbf{mức độ và chiều hướng} tác động của từng biến khi kiểm soát các biến còn lại; mô hình giải thích được $\sim$ 90\% biến thiên điểm thi \\ \hline
-
-Ý nghĩa thực tiễn & Môi trường giáo dục gia đình góp phần hình thành tính kỷ luật (chuyên cần) nhưng không quyết định kết quả học tập; sức khỏe tinh thần tốt và vận động đều đặn là yếu tố thực sự cải thiện thành tích, học nhiều giờ mà thiếu vận động không hiệu quả & Thói quen học tập và lối sống (học tập, ngủ, vận động, sức khỏe tinh thần) quan trọng hơn đặc điểm nhân khẩu học/gia đình; hạn chế mạng xã hội và Netflix có thể cải thiện điểm số \\ \hline
-
-Hạn chế & Một số tổ hợp nhóm vi phạm nhẹ giả định chuẩn nhiều chiều; cỡ mẫu không hoàn toàn cân bằng giữa các nhóm & \texttt{exam\_score} bị chặn trần tại 100 gây phần dư âm bất thường ở nhóm điểm tối đa (censored data) \\ \hline
-\end{longtable}
-
-**Kết luận chung:** Hai phương pháp có tính bổ sung lẫn nhau — MANOVA giúp xác định những yếu tố phân loại tạo ra sự khác biệt về hiệu suất học tập khi xem xét đồng thời nhiều chỉ tiêu, trong khi Multiple Linear Regression giúp định lượng chính xác mức độ và chiều hướng tác động của từng yếu tố đến điểm thi cuối kỳ. Kết quả của cả hai phương pháp đều đồng thuận rằng thói quen học tập, giấc ngủ, vận động thể chất và sức khỏe tinh thần đóng vai trò quan trọng hơn các đặc điểm nhân khẩu học hay điều kiện gia đình trong việc cải thiện hiệu suất học tập của sinh viên.
+**Kết luận chung:** MANOVA và hồi quy tuyến tính bội cung cấp hai góc nhìn bổ sung. Trong bộ dữ liệu mô phỏng này, các biến về thói quen học tập, giấc ngủ, vận động và sức khỏe tinh thần có liên hệ thống kê rõ hơn với điểm thi so với phần lớn biến nhân khẩu học. Kết quả không nên được diễn giải thành khuyến nghị nhân quả nếu chưa có dữ liệu thực tế và thiết kế nghiên cứu phù hợp.
