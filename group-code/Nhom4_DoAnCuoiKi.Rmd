@@ -1,0 +1,2955 @@
+---
+bibliography: ref.bib
+csl: apa-6th-edition.csl
+nocite: |
+  @*
+output:
+  pdf_document:
+    latex_engine: lualatex
+    toc: false
+    keep_tex: true
+    highlight: tango
+fontsize: 11pt
+linestretch: 1.05
+geometry: "top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm"
+mainfont: Times New Roman 
+header-includes: |
+  \let\maxwidth\undefined
+  \usepackage{amsmath, amssymb, amsfonts}
+  \usepackage{graphicx}
+  \usepackage{float}
+  \usepackage{enumitem}
+  \usepackage{tabularx, booktabs, colortbl, tabu, longtable, multirow}
+  \usepackage{listings}
+  \usepackage{caption}
+  \usepackage{fancyhdr}
+  \usepackage{tikz}
+  \usepackage{etoolbox}
+  \usepackage{media9} 
+  
+  % --- CẤU HÌNH MỤC LỤC & GIÃN DÒNG ---
+  \usepackage[titles]{tocloft}
+  \usepackage{parskip}
+  \setlength{\parindent}{0pt}
+  
+  % --- MÀU SẮC CHỦ ĐẠO (ROYAL BLUE THEME) ---
+  \definecolor{RoyalBlue}{RGB}{0, 50, 120}
+  \colorlet{ROYALBLUE}{RoyalBlue}             
+  \definecolor{CrimsonRed}{RGB}{160, 0, 0}     
+  \definecolor{LightBlueBG}{RGB}{240, 245, 255}
+  \definecolor{CodeGray}{RGB}{245, 245, 245}   
+  \definecolor{GoldenBrown}{RGB}{184,134,11}
+  \definecolor{DarkTeal}{RGB}{0, 90, 112}
+  \definecolor{TealGreen}{RGB}{0,128,128}
+  \definecolor{ForestGreen}{RGB}{27, 94, 32}
+
+  \renewcommand{\cftsecfont}{\bfseries\color{RoyalBlue}}
+  \renewcommand{\cftsecpagefont}{\bfseries\color{RoyalBlue}}
+  \renewcommand{\cftsubsecfont}{\color{black!80}}
+
+  \usepackage{hyperref}
+  \hypersetup{
+      colorlinks=true,
+      linkcolor=RoyalBlue,
+      filecolor=magenta,
+      urlcolor=RoyalBlue,
+      citecolor=CrimsonRed,
+      pdfborder={0 0 0}
+  }
+
+  % ===================================================
+  % 2. CÁC HỘP (BOX) & TIÊU ĐỀ ĐẸP (TCOLORBOX)
+  % ===================================================
+  \usepackage[most]{tcolorbox}
+  \tcbuselibrary{skins, breakable}
+  \usepackage{titlesec}
+
+  % Header 1 (#) - Tương ứng với \section
+  \titleformat{\section}
+  {\huge\bfseries\color{black}}
+  {\thesection}
+  {0.5em}
+  {}
+
+  % Header 2 (##) - Tương ứng với \subsection
+  \titleformat{\subsection}
+  {\Large\bfseries\color{CrimsonRed}}
+  {\thesubsection}
+  {0.5em}
+  {}
+  [\color{CrimsonRed}\titlerule]
+
+  % Header 3 (###) - Tương ứng với \subsubsection
+  \titleformat{\subsubsection}
+  {\large\bfseries\color{RoyalBlue}}
+  {\thesubsubsection}
+  {0.5em}
+  {}
+
+  % Header 4 (####) - Tương ứng với \paragraph
+  \titleformat{\paragraph}
+  {\normalsize\bfseries\color{GoldenBrown}}
+  {\theparagraph}
+  {0.5em}
+  {}
+  \titlespacing*{\paragraph}{0pt}{1ex plus 0.5ex minus .2ex}{1ex plus .2ex}
+
+  % Header 5 (#####) - Tương ứng với \subparagraph
+  \titleformat{\subparagraph}[runin]
+  {\bfseries\color{RoyalBlue!70!black}}
+  {}
+  {0pt}
+  {}
+  \titlespacing*{\subparagraph}{0pt}{1em}{0.5em}
+
+  % --- ĐỊNH NGHĨA HỘP BÀI TẬP (PROBLEMBOX) ---
+  \newtcolorbox{problembox}[2]{
+      enhanced, breakable,
+      colback=LightBlueBG, colframe=RoyalBlue,
+      title={\bfseries #1},
+      fonttitle=\bfseries,
+      boxrule=1.2pt, arc=5pt,
+      attach boxed title to top left={yshift=-2mm, xshift=5mm},
+      boxed title style={colback=RoyalBlue, arc=3pt, outer arc=3pt, boxrule=0pt},
+      drop fuzzy shadow,
+      #2
+  }
+  % ===================================================
+  % HỘP TIÊU ĐỀ CANH GIỮA MÀU ĐỎ CHO TỪNG BÀI (KHÔNG TỰ ĐÁNH SỐ)
+  % ===================================================
+  \newcommand{\baibox}[1]{
+      \phantomsection
+      \addcontentsline{toc}{section}{#1}
+      \vspace{1.5em}
+      \begin{center}
+          \begin{tcolorbox}[
+              enhanced, breakable=false,
+              colback=white, colframe=CrimsonRed,
+              boxrule=1.5pt, arc=8pt,
+              top=12pt, bottom=12pt,
+              width=0.65\textwidth,
+              halign=center,
+              drop fuzzy shadow
+              ]
+              \LARGE \bfseries \color{CrimsonRed} #1
+          \end{tcolorbox}
+      \end{center}
+      \vspace{0.5em}
+  }
+
+  % ===================================================
+  % 3. CẤU HÌNH CODE R / MATLAB 
+  % ===================================================
+  \lstdefinestyle{RStyle}{
+      backgroundcolor=\color{CodeGray},
+      basicstyle=\ttfamily\small,
+      numbers=left,
+      numberstyle=\tiny\color{gray},
+      keywordstyle=\color{RoyalBlue}\bfseries,
+      commentstyle=\color{green!40!black}\itshape,
+      stringstyle=\color{orange!90!black},
+      breaklines=true,
+      frame=none, 
+      showstringspaces=false,
+      captionpos=b,
+      tabsize=2
+  }
+  \lstset{style=RStyle}
+  \captionsetup{font={small,bf}, labelfont={color=RoyalBlue}}
+
+  % ===================================================
+  % 4. CẤU HÌNH TRANG & HEADER
+  % ===================================================
+  \setlength{\headheight}{23pt} 
+
+  \pagestyle{fancy}
+  \fancyhf{} 
+
+  \fancyhead[L]{\normalsize \bfseries \color{RoyalBlue} Multivariate Statistical Analysis}
+  \fancyhead[R]{\normalsize \bfseries \color{RoyalBlue} HK2 2025-2026}
+  \fancyfoot[C]{\thepage}
+
+  \renewcommand{\headrulewidth}{1pt}
+  \renewcommand{\headrule}{%
+      \vspace{-8pt}% 
+      \hbox to\headwidth{\color{RoyalBlue}\leaders\hrule height \headrulewidth\hfill}} 
+
+  \setcounter{secnumdepth}{0}
+  \setcounter{tocdepth}{3}
+
+  \newcommand{\parttitle}[1]{
+      \clearpage
+      \phantomsection
+      \vspace*{0.5cm}
+      \begin{center}
+          \begin{tcolorbox}[
+              enhanced,
+              colback=white,
+              colframe=CrimsonRed,
+              boxrule=1.5pt,
+              arc=0pt,
+              top=15pt, bottom=15pt,
+              width=0.9\textwidth,
+              halign=center,
+              drop fuzzy shadow
+              ]
+              \Huge \bfseries \color{CrimsonRed} \MakeUppercase{#1}
+          \end{tcolorbox}
+      \end{center}
+      \addcontentsline{toc}{section}{#1}
+      \vspace{0.5cm}
+  }
+
+  % ===================================================
+  % 5. ĐỊNH NGHĨA LẠI CÁC LỆNH TỪ MATLAB EXPORT
+  % ===================================================
+  \lstnewenvironment{matlabcode}{\lstset{style=RStyle, language=Matlab}}{}
+  \lstnewenvironment{matlaboutput}{\lstset{basicstyle=\small\ttfamily\color{gray}, breaklines=true}}{}
+  \lstnewenvironment{matlabsymbolicoutput}{\lstset{basicstyle=\small\ttfamily\color{black}, breaklines=true}}{}
+
+  \newcommand{\matlabtitle}[1]{
+      \phantomsection
+      \addcontentsline{toc}{section}{#1}
+      \vspace{1em}\noindent\textbf{\Large\color{CrimsonRed} #1}\par\vspace{0.5em}
+  }
+  \newcommand{\matlabheading}[1]{\vspace{0.8em}\noindent\textbf{\large\color{RoyalBlue} #1}\par\vspace{0.5em}}
+  \newcommand{\matlabstep}[1]{\vspace{0.6em}\noindent\textbf{\normalsize #1}\par\vspace{0.3em}}
+  \newcommand{\maxwidth}[1]{0.8\linewidth}
+  
+  % ===================================================
+  % LÀM ĐẸP HỘP CODE R MARKDOWN (PHONG CÁCH HIỆN ĐẠI, TỐI GIẢN)
+  % ===================================================
+  \definecolor{RCodeBG}{RGB}{248, 249, 250} % Màu nền xám siêu nhạt
+  \AtBeginDocument{
+      \renewenvironment{Shaded}{
+          \vspace{0.5em}
+          \begin{tcolorbox}[
+              enhanced, breakable,
+              colback=RCodeBG,          
+              colframe=RCodeBG,         
+              boxrule=0pt,              
+              borderline west={3pt}{0pt}{RoyalBlue}, 
+              arc=2pt,                  
+              left=8pt, right=4pt, top=6pt, bottom=6pt
+          ]
+      }{
+          \end{tcolorbox}
+          \vspace{0.2em}
+      }
+  }
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  tidy = "styler",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "65%",
+  fig.width = 8,
+  fig.height = 5,
+  fig.align = "center",
+  fig.showtext = TRUE,
+  fig_crop = FALSE
+)
+
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(dplyr)
+    library(kableExtra)
+    library(visdat)
+    library(naniar)
+    library(tidyr)
+    library(mice)
+    library(tibble)
+    library(knitr)
+    library(readr)
+    library(readxl)
+    library(ggplot2)
+    library(corrplot)
+    library(tseries)
+    library(skedastic)
+    library(showtext)
+    library(Metrics)
+    library(janitor) 
+    library(car)
+    library(ellipse)
+    library(rstatix)
+    library(ggpubr)
+    library(factoextra)
+    library(survival)
+    library(asaur)
+    library(psych)
+    library(scales)
+    library(patchwork)
+    library(ggforce)
+    library(janitor)
+    library(caret)
+    library(randomForest)
+    library(nnet)
+    library(pROC)
+    showtext_auto()
+  })
+  
+  ## Thiết lập tiếng Việt
+  Sys.setlocale("LC_ALL", "vi_VN.UTF-8")
+required_packages <- c(
+  "tidyverse", "janitor", "caret", "randomForest", "rpart", "rpart.plot",
+  "nnet", "e1071", "pROC", "knitr", "MLmetrics"
+)
+missing_packages <- required_packages[!required_packages %in% rownames(installed.packages())]
+if (length(missing_packages) > 0) {
+  install.packages(missing_packages, dependencies = TRUE)
+}
+```
+
+\begin{titlepage} 
+\pagenumbering{gobble} 
+\thispagestyle{empty} 
+
+\begin{tikzpicture}[remember picture, overlay]
+    \draw[line width=2.5pt, RoyalBlue, rounded corners=15pt] 
+    ([xshift=2cm, yshift=-2cm]current page.north west) 
+    rectangle 
+    ([xshift=-2cm, yshift=2cm]current page.south east);
+    
+    \draw[line width=1pt, RoyalBlue!50, rounded corners=12pt] 
+    ([xshift=2.3cm, yshift=-2.3cm]current page.north west) 
+    rectangle 
+    ([xshift=-2.3cm, yshift=2.3cm]current page.south east);
+    
+    \node[anchor=north west, opacity=0.8] at ([xshift=2.5cm, yshift=-2.5cm]current page.north west) {\color{RoyalBlue}\LARGE $\diamond$};
+    \node[anchor=south east, opacity=0.8] at ([xshift=-2.5cm, yshift=2.5cm]current page.south east) {\color{RoyalBlue}\LARGE $\diamond$};
+\end{tikzpicture}
+
+\begin{center}
+    \vspace*{-0.2cm} 
+    
+    {\normalsize\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH} \\ \vspace{0.1cm}
+    {\Large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN} \\ \vspace{0.1cm}
+    {\large\bfseries\color{RoyalBlue} KHOA TOÁN - TIN HỌC}
+    
+    \vspace{0.2cm}
+    \textcolor{RoyalBlue}{\rule{0.6\textwidth}{1.5pt}} 
+    \vspace{0.4cm}
+    
+    \includegraphics[width=0.3\textwidth]{logo.png} 
+    
+    \vspace{0.6cm}
+    
+    \begin{tcolorbox}[
+        enhanced, colback=white, colframe=RoyalBlue, boxrule=1.5pt, arc=5pt, 
+        drop fuzzy shadow, width=0.9\textwidth, top=8pt, bottom=8pt, halign=center
+        ]
+        {\Large\bfseries\color{RoyalBlue} MÔN HỌC: THỐNG KÊ NHIỀU CHIỀU}\\[0.3cm]
+        {\Huge\bfseries\color{CrimsonRed} ĐỒ ÁN CUỐI KÌ}
+    \end{tcolorbox}
+    
+    \vspace{0.8cm}
+    
+    \begin{minipage}{0.9\textwidth}
+        \begin{center}
+            {\large \textbf{Giảng viên hướng dẫn:}} \\ \vspace{0.1cm}
+            {\Large \textbf{\color{RoyalBlue} TS. Nguyễn Thị Mộng Ngọc}}
+        \end{center}
+        
+        \vspace{0.5cm} 
+        
+  % --- BẮT ĐẦU PHẦN DANH SÁCH THÀNH VIÊN ---
+        \begin{center}
+            \textbf{\large \color{RoyalBlue} Danh sách thành viên thực hiện - Nhóm 4}
+            \vspace{0.3cm}
+            
+            % Cấu hình bảng
+            \arrayrulecolor{RoyalBlue}         % Màu đường kẻ bảng
+            \setlength{\arrayrulewidth}{0.8pt} % Độ dày đường kẻ
+            \renewcommand{\arraystretch}{1.5}  % Chiều cao dòng
+            
+            % Tạo bảng có kẻ khung (Grid)
+            \begin{tabular}{|c|p{11cm}|}
+                \hline
+                % Dòng tiêu đề tô màu nền
+                \rowcolor{RoyalBlue!15} 
+                \textbf{STT} & \textbf{Thành viên và vai trò} \\
+                \hline
+                
+                % Nội dung
+                1 & Thành viên A (ẩn danh) - Phụ trách chính Data 3; rà soát Data 1-2; thực hiện slide thuyết trình \\
+                \hline
+                2 & Thành viên B (ẩn danh) - Phụ trách chính Data 1; rà soát Data 2-3 \\
+                \hline
+                3 & Lê Vũ Thành Đạt - Phụ trách chính Data 2; rà soát Data 1-3; tổng hợp báo cáo cuối \\
+                \hline
+            \end{tabular}
+        \end{center}
+    \end{minipage}
+    
+    \vfill
+    
+\end{center}
+\end{titlepage}
+
+\pagenumbering{arabic}
+
+\clearpage
+\thispagestyle{empty}
+\vspace*{-1cm}
+\begingroup
+    \hypersetup{linkcolor=black} 
+    \renewcommand{\contentsname}{\centering \color{RoyalBlue}\Huge\bfseries MỤC LỤC}
+    \setlength{\cftbeforesecskip}{10pt} 
+    \tableofcontents
+\endgroup
+\clearpage
+\setcounter{page}{1}
+
+\baibox{Bài 1: Dataset "SleepHealthLifestyle.csv"}
+
+Mô tả chi tiết về **nguồn dữ liệu** và **ý nghĩa của từng biến** trong bộ dữ liệu được trình bày tại **Phụ lục A.1**
+
+## **(a): Tiền xử lý dữ liệu**
+
+#### Đọc dữ liệu
+
+```{r}
+data <- read.csv("SleepHealthLifestyle.csv")
+dim(data)
+data <- data %>%janitor::clean_names()
+```
+
+Bộ dữ liệu gồm 374 quan trắc và 13 biến, hàm `clean_name` dùng để đặt lại tên bộ dữ liệu cho sạch. Cấu trúc chi tiết của dữ liệu ban đầu được trình bày tại **Phụ lục A.2**.
+
+#### Xử lí dữ liệu
+
+Tiền xử lý bao gồm: bóc tách `blood_pressure` thành `systolic_bp` và `diastolic_bp`, chuyển các biến phân loại sang `factor`, và gộp nhãn `"Normal Weight"` / `"Normal"` thành `"Normal"` (chi tiết tại **Phụ lục A.2 và A.9**).
+
+```{r}
+data_raw <- read.csv("SleepHealthLifestyle.csv") %>% janitor::clean_names()
+sleep_data_cleaned <- data_raw %>%
+  separate(
+    blood_pressure,
+    into = c("systolic_bp", "diastolic_bp"),
+    sep = "\\s*/\\s*",
+    convert = TRUE
+  ) %>%
+  mutate(
+    gender = as.factor(gender),
+    bmi_category = as.factor(bmi_category),
+    occupation = as.factor(occupation),
+    sleep_disorder = as.factor(ifelse(is.na(sleep_disorder) | sleep_disorder == "",
+                                       "None", sleep_disorder))
+  )
+data <- sleep_data_cleaned %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(bmi_category, levels = c("Normal", "Overweight", "Obese"))
+  ) %>%
+  select(-person_id)
+
+# Giữ lại bản dữ liệu GỐC (chưa chuẩn hóa) để dùng cho MANOVA và diễn giải thực tế
+data_original <- data
+```
+
+#### Kiểm tra giá trị khuyết (missing values)
+
+-   Biến `sleep_disorder`: Trong bộ dữ liệu, giá trị `"None"` là một **chuỗi ký tự**, đại diện cho việc cá nhân\
+    *không mắc rối loạn giấc ngủ nào*, là một level của biên phân loại, khác với `NA` (giá trị bị thiếu/không xác định do dữ liệu không được ghi nhận). Vì vậy, hàm `is.na()` sẽ **không** đếm các dòng `"None"` này là thiếu dữ liệu
+
+**Kết quả: Bộ dữ liệu không có giá trị khuyết.** (Biểu đồ trực quan `vis_miss` được trình bày tại **Phụ lục A.7.**)
+
+#### Kiểm tra dữ liệu trùng lặp
+
+**Kết quả:** Trong 374 quan sát, có **242 dòng** có toàn bộ giá trị giống y hệt một dòng khác đã xuất hiện trước đó, chỉ khác `person_id`. Đây **không phải lỗi dữ liệu** mà do các biến trong bộ dữ liệu có rất ít giá trị khả dĩ (thang điểm 1–10, 11 nghề, 3 nhóm BMI,...). Các dòng này **không bị loại bỏ**, vì `person_id` khác nhau tức 242 cá nhân riêng biệt, không phải một người bị nhập trùng hai lần. Trùng lặp ở đây chỉ là trùng *giá trị thuộc tính*, không phải trùng *bản ghi của cùng một người*. (Chi tiết mã kiểm tra và diễn giải đầy đủ tại **Phụ lục A.6.**)
+
+#### Chuẩn hóa nhãn biến phân loại `bmi_category`
+
+Biến `bmi_category` có 4 mức nhưng `"Normal"` và `"Normal Weight"` cùng thể hiện một nhóm (Bình thường). Cần gộp 2 nhãn này lại thành một mức duy nhất để tránh sai lệch khi phân tích theo nhóm. (Chi tiết mã và kết quả kiểm tra levels tại **Phụ lục A.9.**)
+
+#### Thống kê mô tả
+
+*(Bảng `summary()` đầy đủ và nhận xét chi tiết được trình bày tại **Phụ lục A.8.**)*
+
+**Tóm tắt kết quả:**
+
+-   Ở biến `age`: Độ tuổi trải dài từ 27 đến 59 tuổi, tuổi trung bình rơi vào khoảng `mean= 42.18`) và trung vị là 43, cho thấy bộ dữ liệu khảo sát nhiều người thuộc nhóm trung niên hơn. Bên cạnh đó, số lượng nam nữ gần như tương đương nhau (189 nam, 185 nữ) cho thấy nếu xét về giới tính thì đây là thí nghiệm cân bằng.
+
+-   Biến `sleep_duration` thể hiện thời lượng ngủ trung bình của một quan trắc là khoảng **7.13 giờ/ngày**, chất lượng giấc ngủ trung bình `quality_of_sleep`) đạt **7.31**
+
+-   Biến `stress_level` có trung bình khoảng **5.39/10**, cho thấy mức stress của những người được khảo sát ở trong bộ dữ liệu ở mức trung bình.
+
+-   Số phút vận động trung bình (mean của biến `physical_activity_level`) là khoảng **59.17 phút/ngày**, và số bước chân trung bình `daily_steps`) khoảng **6817 bước/ngày**
+
+-   Huyết áp tâm thu `systolic_bp`) và tâm trương `diastolic_bp`) có trung bình lần lượt khoảng **128.6** và **84.65**, nhịp tim trung bình `heart_rate`) là **70.17 bpm**
+
+-   Về biến `sleep_disorder` thể hiện rối loạn giấc ngủ, nhóm `None` chiếm đa số (219 quan trắc), còn `Insomnia` và `Sleep Apnea` có số lượng gần tương đương nhau (77 và 78 quan trắc).
+
+#### Biểu đồ Boxplot và kiểm tra giá trị ngoại lai
+
+*(Chi tiết biểu đồ Boxplot (chưa chuẩn hóa và đã chuẩn hóa), kiểm tra ngoại lai IQR, phân tích ngoại lai heart_rate, kiểm tra ngoại lai đơn biến Z-score và ngoại lai đa biến Mahalanobis được trình bày tại **Phụ lục A.3–A.5.**)*
+
+**Tóm tắt kết quả:**
+
+-   Các biến định lượng có phân bố khá ổn định và không có nhiều giá trị ngoại lai. Biến `heart_rate` là biến duy nhất có **15 giá trị ngoại lai** theo quy tắc IQR, nằm trong khoảng 80–86 bpm — thuộc phạm vi nhịp tim nghỉ bình thường của người trưởng thành (60–100 bpm), nên được giữ lại.
+
+-   Phương pháp Z-score phát hiện **9 quan sát ngoại lai đơn biến** vượt ngưỡng $|Z| > 3$, tất cả đều thuộc biến `heart_rate`, được giữ lại vì nằm trong khoảng hợp lý.
+
+-   Khoảng cách Mahalanobis phát hiện **11 quan trắc ngoại lai đa biến** ($\alpha = 0.001$), nhưng vẫn **giữ lại** vì phản ánh đặc điểm thực tế của một nhóm nhỏ khác biệt.
+
+#### Chuẩn hóa các biến định lượng
+
+Các biến trong bộ dữ liệu đang **không cùng thang đo**, nên cần chuẩn hóa dữ liệu về Z-score trước khi thực hiện các mô hình
+
+```{r}
+# 1. Chuẩn hóa và lưu trực tiếp vào bộ dữ liệu 'data'
+data <- data %>%
+  mutate(across(c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+                  stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps), 
+                ~ as.numeric(scale(.))))
+
+data_scaled <- data %>%
+  mutate(across(
+    c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+      stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps),
+    ~ as.numeric(scale(.))
+  ))
+```
+
+**Nhận xét**
+
+-   **Phân phối chung:** Hầu hết các biến `age`, `daily_steps`, `sleep_duration`,...) đều có phân phối khá cân đối, đối xứng và tập trung quanh giá trị trung tâm (vạch 0) sau khi chuẩn hóa.
+
+-   Biến `quality_of_sleep` có xu hướng lệch nhẹ về phía giá trị âm, cho thấy có một nhóm nhỏ có chất lượng giấc ngủ thấp hơn hẳn mức trung bình.
+
+#### Bộ dữ liệu sau khi tiền xử lý
+
+*(Bảng `str()`, `summary()` đầy đủ và nhận xét chi tiết được trình bày tại **Phụ lục A.8**.)*
+
+**Tóm tắt kết quả:** Bộ dữ liệu sau khi tiền xử lý gồm 374 quan trắc và 13 biến, các biến định tính được chuyển thành kiểu `factor` và đã được chuẩn hóa theo z-score. Các biến định lượng sau chuẩn hóa đều có giá trị nằm quanh 0. Biến `heart_rate` vẫn có giá trị lớn nhất khá cao (khoảng **3.83**), phù hợp với kết quả kiểm tra trước đó rằng biến này có một số quan sát ngoại lai đơn biến. Ở các biến phân loại, `bmi_category` chủ yếu tập trung ở nhóm `Normal` và `Overweight`, `sleep_disorder` có số lượng lớn nhất ở nhóm `None`, và `occupation` gồm 11 mức.
+
+Tổng quát, dữ liệu sau tiền xử lý đã ở trạng thái phù hợp để tiếp tục thực hiện các phân tích khám phá và mô hình hóa như PCA, EFA hoặc MANOVA.
+
+## **(b): Vấn đề và phương pháp nghiên cứu**
+
+#### Vấn đề nghiên cứu
+
+Rối loạn giấc ngủ (mất ngủ và ngưng thở khi ngủ) ngày càng phổ biến, làm suy giảm chất lượng cuộc sống và gia tăng nguy cơ bệnh tim mạch–chuyển hóa. Sàng lọc sớm dựa trên các chỉ số sinh lý và thói quen sinh hoạt hằng ngày có ý nghĩa quan trọng, nhưng mối liên hệ giữa các yếu tố này với rối loạn giấc ngủ vẫn chưa được phân tích hệ thống theo hướng đa biến trên nhóm người trưởng thành. Từ thực tiễn trên, nghiên cứu này đặt ra **vấn đề nghiên cứu** như sau: *"Các đặc điểm sinh lý (tuổi, huyết áp, nhịp tim) và thói quen sinh hoạt hằng ngày (thời lượng ngủ, chất lượng giấc ngủ, mức độ vận động thể chất, mức độ căng thẳng) có mối liên hệ như thế nào với tình trạng rối loạn giấc ngủ? Có thể xây dựng được mô hình dự đoán khả năng mắc các chứng rối loạn giấc ngủ dựa trên các chỉ số này hay không?"* với các mục tiêu cụ thể như sau:
+
+- **Mục tiêu 1 (Khám phá):** Xác định cấu trúc/nhân tố tiềm ẩn từ 9 biến sức khỏe, lối sống và đánh giá khả năng áp dụng các kỹ thuật giảm chiều.
+
+- **Mục tiêu 2 (Suy luận):** Kiểm định sự khác biệt đa biến giữa ba nhóm `None`, `Insomnia`, `Sleep Apnea`, đồng thời xác định khía cạnh phân biệt nhóm rõ nhất.
+
+- **Mục tiêu 3 (Dự đoán):** Xây dựng và đánh giá mô hình **phân loại đa lớp** để dự đoán nhóm rối loạn giấc ngủ từ các chỉ số đầu vào.
+
+#### Phương pháp nghiên cứu
+
+- **Bước 1**: Tiền xử lý dữ liệu bao gồm kiểm tra giá trị khuyết, giá trị trùng lặp, xử lý ngoại lai và chuẩn hóa biến về cùng thang đo z-score
+
+- **Bước 2**: Khám phá cấu trúc dữ liệu bao gồm thực hiện các phương pháp phân tích thành phần chính và phân tích nhân tố (PCA và EFA), chọn số nhân tố dựa trên Parallel Analysis và Scree plot cùng tiêu chuẩn Kaiser, so sánh xoay trực giao (`Varimax`) và xoay xiên (`Oblimin`, `Promax`) và quyết định lựa chọn **EFA xoay Varimax**, rút gọn 9 biến thành 3 nhân tố: *(1) Giấc ngủ & Căng thẳng, (2) Vận động thể chất, (3) Sinh lý và Tim mạch*. Cuối cùng là phân cụm dựa trên k-means và trục quan hóa bằng biplot để đánh giá muccws độ phân tách nhóm
+
+- **Bước 3**: Thống kê kiểm định bao gồm kiểm định khác biệt của vector trung bình của 9 biến sức khỏe giữa 3 nhóm `sleep_disorder` bằng **One-way MANOVA**. Bên cạnh đó thực hiện kiểm tra giả định phương sai đồng nhất bằng **Levene's test** và sử dụng **Pillai's Trace** trong trường hợp vi phạm giả định. Tiếp theo đó, báo cáo sử dụng **ANOVA đơn biến** và dùng chỉ số *eta-squared* để đánh giá mức độ đóng góp của từng biến riêng lẻ vào sự khác biệt giữa các nhóm. Cuối cùng là thực hiện **hậu kiểm Games-Howell**
+
+- **Bước 4**: Xây dựng mô hình học máy với các mô hình cụ thể là **Multinomial Logistic Regression** và **Random Forest**. Đánh giá hiệu năng trên tập test dựa trên các chỉ số `Accuracy`, `Kappa`, `Sensitivity`, `Specificity`, `multiclass AUC` và `Confusion Matrix` đồng thời trích xuất `Variable Importance` từ Random Forest để đối chiếu với kết quả EFA/MANOVA.
+
+## **(c): Kiểm tra giả định và đánh giá tính phù hợp của dữ liệu đối với phương pháp đã chọn.**
+
+#### Kiểm tra điều kiện trước khi thực hiện PCA/EFA
+
+Biến `person_id` được loại bỏ vì chỉ là mã định danh, không mang ý nghĩa phân tích. Các biến định tính như `gender`, `occupation`, `bmi_category` và `sleep_disorder` cũng không đưa vào PCA/EFA.
+
+```{r}
+library(dplyr)
+library(psych)
+library(corrplot)
+bien_so <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+```
+
+#### Ma trận tương quan
+
+```{r, echo = FALSE}
+library(dplyr)
+library(ggcorrplot)
+cor_mat <- cor(bien_so, use = "pairwise.complete.obs", method = "pearson")
+ggcorrplot(
+  cor_mat,
+  hc.order = TRUE,
+  type = "lower",
+  lab = TRUE,
+  lab_size = 3,
+  colors = c("#6D9EC1", "white", "#E46726"),
+  title = "Ma trận tương quan giữa các biến định lượng",
+  ggtheme = theme_minimal()
+)
+```
+
+**Nhận xét**:
+
+-   `stress_level` có tương quan âm khá mạnh với `sleep_duration` (r = -0.81) và `quality_of_sleep` (r = -0.90), cho thấy mức độ căng thẳng càng cao thì thời lượng ngủ và chất lượng giấc ngủ càng giảm.
+
+-   `sleep_duration` và `quality_of_sleep` có tương quan dương rất mạnh (r = 0.88), phản ánh rằng ngủ lâu hơn thường đi kèm với chất lượng giấc ngủ tốt hơn.
+
+-   `heart_rate` có tương quan dương với `stress_level` (r = 0.67) và tương quan âm với `sleep_duration` (r = -0.52) cũng như `quality_of_sleep` (r = -0.66), điều này cho thấy nhịp tim càng cao thì tình trạng chất ngủ càng giảm và căng thẳng càng nhiều.
+
+-   `daily_steps` và `physical_activity_level` có tương quan dương khá mạnh (r = 0.77), cho thấy hai biến này cùng phản ánh mức độ vận động thể chất của cá nhân.
+
+-   `systolic_bp` và `diastolic_bp` có tương quan rất cao (r = 0.97), gần như là quan hệ tuyến tính. Khi đưa vào mô hình hồi quy hoặc các phân tích đa biến, cặp biến này có thể gây ra hiện tượng đa cộng tuyến.
+
+-   `age` có tương quan dương với cả hai thành phần huyết áp `systolic_bp`: r = 0.61; `diastolic_bp`: r = 0.59), cho thấy huyết áp có xu hướng tăng theo tuổi. Ngoài ra, tuổi cũng có tương quan âm với `stress_level` (r = -0.42), `sleep_duration` (r = -0.18) và `quality_of_sleep` (r = -0.12), nhưng mức độ không quá mạnh.
+
+#### Kiểm định KMO và Bartlett
+
+**Kiểm định Bartlett:**
+
+$H_0$: Ma trận tương quan của tổng thể là ma trận đơn vị (Các biến quan sát hoàn toàn độc lập, không có tương quan tuyến tính với nhau).
+
+$H_1$: Ma trận tương quan của tổng thể khác ma trận đơn vị (Các biến quan sát có sự tương quan tuyến tính với nhau).
+
+**Kết quả:** $\chi^2 = 3992.346$, p_value $\approx$ 0 \< 0.05. Bác bỏ $H_0$: các biến có tương quan với nhau và dữ liệu phù hợp để thực hiện PCA/EFA. (Chi tiết output tại **Phụ lục B.1.**)
+
+**Kiểm định KMO:** KMO tổng thể = **0.61** (mức **chấp nhận được nhưng chưa thật sự tốt**). Một số biến có MSA khá tốt (`age`: 0.85, `sleep_duration`: 0.83, `quality_of_sleep`: 0.68), nhưng `daily_steps` (0.31) và `physical_activity_level` (0.48) có MSA thấp. (Chi tiết output theo từng biến tại **Phụ lục B.2.**)
+
+Tóm lại, bộ dữ liệu **có thể** được dùng cho PCA/EFA, vì kiểm định Bartlett có ý nghĩa thống kê và KMO tổng thể vượt ngưỡng 0.5.
+
+#### Scree plot / Parallel Analysis
+
+```{r scree-parallel, fig.width=8, fig.height=5, echo = FALSE}
+ev <- eigen(cor_mat)$values
+scree_df <- tibble(
+  component = 1:length(ev),
+  eigenvalue = ev
+)
+
+ggplot(scree_df, aes(x = component, y = eigenvalue)) +
+  geom_line(color = "steelblue") +
+  geom_point(size = 2, color = "steelblue") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  scale_x_continuous(breaks = 1:length(ev)) +
+  labs(
+    title = "Scree plot - Eigenvalue của các thành phần",
+    x = "Thành phần (Component)", y = "Eigenvalue"
+  ) +
+  theme_minimal()
+
+# Parallel Analysis
+fa.parallel(bien_so, fa = "both", n.iter = 100,
+            main = "Parallel Analysis - PCA & EFA")
+```
+
+**Nhận xét:** Đường eigenvalue "gãy khúc" rõ (điểm khuỷu tay - elbow) sau thành phần thứ 3, và có 3 thành phần có trị riêng \> 1 theo tiêu chí Kaiser. Kết quả Parallel Analysis cũng cho thấy việc giữ lại **3 nhân tố**.
+
+Thực hiện Phân tích thành phần chính (PCA) để giảm số chiều dữ liệu và tối đa hóa phương sai để so sánh và cũng cố kết quả lẫn nhau
+
+## **(d): Thực hiện phân tích bằng phương pháp đã chọn**
+
+### **Phân tích thành phần chính (PCA)**
+
+#### Thực hiện PCA
+
+```{r pca-execute}
+pca_result <- prcomp(bien_so, center = TRUE, scale. = TRUE)
+summary(pca_result)
+```
+
+Theo tiêu chí Kaiser (chỉ giữ thành phần có eigenvalue \> 1), có đúng **3 thành phần chính (PC1, PC2, PC3)** đủ điều kiện giữ lại. Ba thành phần này giải thích tổng cộng khoảng **87.1%** phương sai của toàn bộ 9 biến gốc. Đây là kết quả khá tốt thể hiện mức độ giải thích cao, cho thấy việc rút gọn từ 9 biến xuống thành 3 thành phần chính vẫn giữ lại được phần lớn thông tin của dữ liệu gốc. Đồng thời PCA còn giúp làm mất hiện tượng đa cộng tuyến giữa các biến có mối tương quan cao (như cặp `systolic_bp` và `diastolic_bp`). (Bảng eigenvalue đầy đủ 9 thành phần tại **Phụ lục C.1.**)
+
+#### Scree Plot và Loadings PCA
+
+*(Chi tiết Scree Plot fviz_eig, bảng loadings PCA đầy đủ, Contribution Plot và Correlation Circle được trình bày tại **Phụ lục C.2–C.5.**)*
+
+**Kết quả chính:**
+
+* **PC1** (38.9% phương sai): Có hệ số tải cao ở `quality_of_sleep` (0.966) và `sleep_duration` (0.900), đồng thời tải cao nhưng ngược chiều ở `stress_level` (-0.940) và `heart_rate` (-0.769). Trục này thể hiện sự đối lập giữa trạng thái ngủ ngon, ngủ đủ và tình trạng căng thẳng cao, nhịp tim cao, phản ánh nhân tố **"Chất lượng giấc ngủ và Căng thẳng"**.
+
+* **PC2** (31.0% phương sai): Có hệ số tải cao ở `diastolic_bp` (0.928), `systolic_bp` (0.882) và `age` (0.699). Thành phần chính này phản ánh khía cạnh **"Huyết áp và Tuổi tác"**.
+
+* **PC3** (17.2% phương sai): Có hệ số tải cao ở `daily_steps` (-0.819) và `physical_activity_level` (-0.710), phản ánh khía cạnh **"Vận động thể chất"**.
+
+- Biến `age` có tải tương đối ở cả PC2 (0.699) lẫn PC1 (0.449).
+
+**Contribution Plot:** `quality_of_sleep`, `stress_level`, `sleep_duration`, `heart_rate` đóng góp chính vào PC1; `diastolic_bp`, `systolic_bp`, `age` vào PC2; `daily_steps` và `physical_activity_level` vào PC3. (Chi tiết tại **Phụ lục C.4.**)
+
+**Correlation Circle:** Trục PC1 phản ánh sự cân bằng giữa nghỉ ngơi và áp lực cuộc sống, phía dương là ngủ đủ/giấc ngủ tốt, phía âm là căng thẳng cao/nhịp tim tăng. Trục PC2 đại diện cho khía cạnh sinh lý tách biệt với giấc ngủ (lão hóa tự nhiên đi kèm huyết áp tăng). Vector `daily_steps`, `physical_activity_level` gần vuông góc với nhóm giấc ngủ/stress, vận động nhiều hơn chưa chắc cải thiện trực tiếp chất lượng giấc ngủ hay giảm stress. (Chi tiết tại **Phụ lục C.5.**)
+
+#### Biểu đồ Biplot kết hợp với phân cụm
+
+*(Chi tiết xác định số cụm tối ưu (Elbow method), Biplot PCA kết hợp K-means và bảng chéo cụm–sleep_disorder được trình bày tại Phụ lục C.6.)*
+
+**Kết quả:** Phân cụm K-means (k = 3) trên không gian PCA cho thấy:
+
+* **Cụm 1 ("Nhóm nguy cơ cao"):** Nằm lệch về phía âm của PC1, tập trung các cá nhân có `stress_level` và `heart_rate` cao, đồng thời `sleep_duration` và `quality_of_sleep` thấp. Đây là nhóm chịu ảnh hưởng rõ rệt của mối liên hệ giữa căng thẳng, thiếu ngủ và các yếu tố tim mạch.
+
+* **Cụm 2 và 3 ("Nhóm ngủ tốt"):** Nằm về phía dương của PC1, bao gồm các cá nhân có thời lượng và chất lượng giấc ngủ tốt cùng mức độ căng thẳng thấp. Hai cụm được phân tách chủ yếu theo PC2, phản ánh sự khác biệt về tuổi và huyết áp. Trong đó, cụm 2 gồm những người lớn tuổi hơn với huyết áp cao hơn, còn cụm 3 bao gồm các cá nhân có các chỉ số sinh lý ổn định hơn.
+
+* Bảng chéo cho thấy cụm 1 có tỷ lệ mắc `Insomnia` và `Sleep Apnea` cao hơn so với các cụm còn lại, trong khi cụm 3 chủ yếu là những người không mắc rối loạn giấc ngủ (`None`). Mặc dù đã xuất hiện sự khác biệt giữa các cụm, mức độ phân tách vẫn chưa thật sự rõ ràng. Vì vậy, cần thực hiện **kiểm định MANOVA** để đánh giá liệu sự khác biệt này có ý nghĩa thống kê hay không.
+
+#### Xoay Varimax
+
+```{r efa-varimax}
+efa_varimax <- fa(bien_so, nfactors = 3, rotate = "varimax", fm = "ml")
+print(efa_varimax$loadings, digits = 3, cut = 0.3, sort = TRUE)
+```
+
+**Nhận xét**
+
+-   **ML2**: Gồm các biến `quality_of_sleep` (0.991), `sleep_duration` (0.890), `stress_level` (-0.914) và `heart_rate` (-0.669). Nhóm này phản ánh mối liên hệ tỉ lệ nghịch giữa thời gian, chất lượng giấc ngủ với mức độ căng thẳng và nhịp tim lúc nghỉ ngơi.
+
+-   **ML3:** Gồm `systolic_bp` (0.977) và `diastolic_bp` (0.950), đại diện cho chỉ số huyết áp và trạng thái tim mạch.
+
+-   **ML1 (Hoạt động thể chất):** Gồm `daily_steps` (0.995) và `physical_activity_level` (0.780), đại diện cho mức độ vận động hàng ngày.
+
+**Trường hợp biến tải kép:** Biến `age` tải lên cả hai nhân tố: ML3 (0.691) và ML2 (0.437). Kết quả này phù hợp với thực tế khi tuổi tác ảnh hưởng đến cả huyết áp và chất lượng giấc ngủ.
+
+**Mức độ giải thích phương sai:** Ba nhân tố ML2, ML1 và ML3 lần lượt giải thích được 37.0%, 27.1% và 18.7% phương sai. Tổng phương sai giải thích tích lũy đạt 82.7%, cho thấy cấu trúc 3 nhân tố này giữ lại được phần lớn thông tin của các biến gốc.
+
+#### Đối chiếu với xoay Oblimin và Promax
+
+*(Chi tiết kết quả xoay Oblimin, Promax, ma trận* $\Phi$, và so sánh chỉ số phù hợp RMSEA/TLI/BIC được trình bày tại **Phụ lục C.7–C.9.**)
+
+**Kết quả tóm tắt:** Cả Oblimin và Promax cho cấu trúc nhân tố gần như identical với Varimax. Ma trận $\Phi$ cho thấy các nhân tố gần như độc lập (hệ số tương quan lớn nhất ≈ 0.19–0.23). Các chỉ số phù hợp (RMSEA = 0.287, TLI = 0.717, BIC = 311.47) hoàn toàn giống nhau giữa 3 phép xoay. Vì vậy, **Varimax** được chọn làm phép xoay chính.
+
+#### Cải thiện mô hình bằng cách thử loại biến age
+
+*(Chi tiết quá trình thử nghiệm và kết quả được trình bày tại Phụ lục C.10.)*
+
+**Kết quả:** Khi loại biến `age`, cấu trúc các nhân tố trở nên rõ ràng hơn do hiện tượng tải kép không còn xuất hiện, đồng thời tổng phương sai tăng từ 82.7% lên 84.8%. Tuy nhiên, các chỉ số đánh giá mức độ phù hợp của mô hình lại kém hơn, thể hiện qua việc RMSEA tăng từ 0.287 lên 0.355 và TLI giảm từ 0.717 xuống 0.623. Do đó, mặc dù việc loại `age` giúp cải thiện khả năng diễn giải các nhân tố, biến này vẫn được giữ lại trong mô hình chính thức để đảm bảo mức độ phù hợp tổng thể của mô hình
+
+#### Lựa chọn mô hình EFA tối ưu
+
+Mô hình EFA được chọn có:
+
+-   **Số nhân tố:** 3.
+
+-   **Phép xoay:** Varimax.
+
+-   **Biến `age`:** Được giữ lại, xếp vào nhân tố **Sinh lý** (ML3) do có hệ số tải lớn hơn.
+
+```{r efa-final, echo = FALSE}
+efa_final <- efa_varimax
+final_loadings <- as.data.frame(unclass(efa_final$loadings))
+colnames(final_loadings) <- c("Van_dong (ML1)", "GiacNgu_CangThang (ML2)", 
+                              "SinhLy_HuyetAp (ML3)")
+kable(round(final_loadings, 2), 
+  caption = "Bảng hệ số tải nhân tố - Mô hình EFA cuối cùng (3 nhân tố, Varimax)")
+kable(round(data.frame(Communality = efa_final$communality), 3),
+  caption = "Communality (h²) của từng biến trong mô hình EFA cuối cùng")
+```
+
+**Nhận xét:**
+
+-   Hầu hết các biến đều có communality cao. Các biến `daily_steps` (0.995), `quality_of_sleep` (0.992), `systolic_bp` (0.989) và `diastolic_bp` (0.977) đều có giá trị gần 1, cho thấy ba nhân tố giải thích rất tốt các biến này. `stress_level` (0.858) và `sleep_duration` (0.792) cũng có communality khá cao, phản ánh mối liên hệ chặt chẽ với nhân tố giấc ngủ và căng thẳng.
+
+-   Trong khi đó, `age` (0.674) và `physical_activity_level` (0.679) có communality ở mức trung bình, còn `heart_rate` có giá trị thấp nhất (0.487), cho thấy biến này vẫn còn một phần phương sai chưa được ba nhân tố giải thích.
+
+-   Riêng biến `heart_rate` có communality thấp nhất (0.487), nghĩa là biến này vẫn còn một phần phương sai chưa được ba nhân tố giải thích. Nhìn chung, mô hình EFA với 3 nhân tố và phép xoay Varimax được xem là phù hợp.
+
+#### Diễn giải kết quả EFA
+
+-   **Nhân tố 1 (Giấc ngủ và căng thẳng)** gồm các biến `sleep_duration`, `quality_of_sleep` và `stress_level`. Nhân tố này phản ánh chất lượng giấc ngủ và trạng thái tâm lý của đối tượng. Thời lượng ngủ và chất lượng giấc ngủ càng cao thì mức độ căng thẳng có xu hướng càng thấp.
+
+-   **Nhân tố 2 (Vận động thể chất)** gồm hai biến `physical_activity_level` và `daily_steps`. Nhân tố này thể hiện mức độ hoạt động và vận động thể chất hằng ngày của mỗi cá nhân.
+
+-   **Nhân tố 3 (Sinh lý và tim mạch)** gồm các biến `systolic_bp`, `diastolic_bp`, `heart_rate` và `age`. Nhân tố này phản ánh các chỉ số sinh lý cơ bản liên quan đến sức khỏe tim mạch, trong đó tuổi có xu hướng gắn với sự thay đổi của các chỉ số này.
+
+*(Chi tiết bảng điểm nhân tố (factor scores) được trình bày tại **Phụ lục C.11**. Kết quả cho thấy các đối tượng có rối loạn giấc ngủ thường có điểm nhân tố giấc ngủ và vận động thấp hơn, đồng thời điểm nhân tố sinh lý cao hơn, nhưng ba điểm nhân tố chưa đủ để phân biệt rõ từng loại rối loạn.)*
+
+### **Phương pháp so sánh/đối chiếu: ONE-WAY MANOVA**
+
+- PCA và EFA được sử dụng để khám phá mối quan hệ giữa các biến định lượng và rút gọn chúng thành các nhân tố đại diện. Tuy nhiên, hai phương pháp này không cho biết các đặc điểm đó có khác nhau giữa các nhóm `sleep_disorder` (`None`, `Insomnia` và `Sleep Apnea`) hay không.
+
+- Vì vậy, MANOVA được áp dụng để kiểm định xem các nhóm `sleep_disorder` có khác biệt về đặc điểm của nhiều biến định lượng cùng lúc hay không. Khác với việc kiểm định từng biến riêng lẻ, MANOVA còn xem xét mối tương quan giữa các biến, giúp kết quả đánh giá toàn diện hơn.
+
+- Sau khi thực hiện MANOVA, kết quả sẽ được đối chiếu với các nhân tố đã rút trích từ EFA. Nếu những biến thuộc cùng một nhân tố cũng là các biến có sự khác biệt đáng kể giữa các nhóm `sleep_disorder`, điều này cho thấy nhân tố đó không chỉ có ý nghĩa về mặt thống kê mà còn có giá trị trong việc phân biệt các nhóm rối loạn giấc ngủ.
+
+#### Kiểm tra giả định MANOVA
+
+*(Chi tiết kiểm định Levene cho từng biến được trình bày tại **Phụ lục D.1**.)*
+
+**Kết quả:** 8/9 biến có p-value \< 0.001, cho thấy giả định đồng nhất phương sai bị vi phạm ở hầu hết các biến. Chỉ có `diastolic_bp` đáp ứng giả định này (p-value = 0.637). Do đó, MANOVA sẽ được diễn giải chủ yếu dựa trên thống kê **Pillai's Trace**.
+
+#### Chạy mô hình MANOVA
+
+```{r manova}
+manova_model <- manova(
+  cbind(sleep_duration, quality_of_sleep, physical_activity_level,
+        stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps, age)
+  ~ sleep_disorder,
+  data = data_scaled
+)
+summary(manova_model, test = "Pillai")
+```
+
+**Nhận xét:** Kiểm định Pillai's Trace cho kết quả p-value \< 0.001, nên bác bỏ giả thuyết $H_0$ ở mức ý nghĩa 5%. Có đủ bằng chứng thống kê để kết luận rằng vector trung bình của 9 biến sức khỏe và lối sống khác nhau giữa các nhóm `sleep_disorder`.
+
+#### Phân tích ANOVA đơn biến và Eta-squared
+
+MANOVA cho biết có sự khác biệt tổng thể, nhưng không cho biết *biến nào* đóng góp vào khác biệt đó. Chạy ANOVA riêng cho từng biến phụ thuộc (kèm hiệu chỉnh Bonferroni) giúp xác định các biến phân biệt nhóm rõ nhất.
+
+*(Chi tiết bảng summary.aov và eta-squared đầy đủ được trình bày tại Phụ lục D.2–D.3.)*
+
+**Kết quả chính:**
+
+- Kết quả cho thấy nhóm biến sinh lý và huyết áp (`diastolic_bp`, `systolic_bp`, `age`) cho thấy khả năng phân biệt ba nhóm `sleep_disorder` rõ rệt nhất. Hơn nữa, `diastolic_bp` và `systolic_bp` có chỉ số eta-squared lớn, cho thấy hai biến này giải thích được hơn một nửa mức độ khác biệt giữa các nhóm rối loạn giấc ngủ.
+
+**Đối chiếu với các nhân tố từ EFA:** Nhân tố **Sinh lý và Huyết áp** đóng vai trò quan trọng nhất trong việc phân tách các nhóm bệnh lý. Nhân tố **Giấc ngủ và Căng thẳng** có mức độ đóng góp trung bình. Nhân tố **Vận động** đóng vai trò phân biệt ở mức độ vừa phải.
+
+#### Trực quan hóa: điểm nhân tố theo nhóm sleep_disorder
+
+```{r factor-boxplot, fig.width=9, fig.height=4, echo = FALSE}
+factor_scores <- as.data.frame(efa_final$scores)
+colnames(factor_scores) <- c("F_GiacNgu_CangThang", "F_SinhLy_HuyetAp", 
+                             "F_VanDong")
+data_with_scores <- bind_cols(data, factor_scores)
+
+data_with_scores %>%
+  select(sleep_disorder, F_GiacNgu_CangThang, F_VanDong, F_SinhLy_HuyetAp) %>%
+  pivot_longer(-sleep_disorder, names_to = "nhan_to", values_to = "diem") %>%
+  ggplot(aes(x = sleep_disorder, y = diem, fill = sleep_disorder)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~nhan_to, scales = "free_y") +
+  labs(title = "Phân bố điểm nhân tố theo nhóm Sleep Disorder",
+       x = "Nhóm rối loạn giấc ngủ", y = "Điểm nhân tố") +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+**Nhận xét:**
+
+* **Đối với nhân tố Giấc ngủ và Căng thẳng**, nhóm `None` có median cao nhất, khoảng **0.5**, trong khi hai nhóm `Insomnia` và `Sleep Apnea` đều có trung vị thấp hơn. Mặc dù vậy, nhóm `Sleep Apnea` có khoảng phân bố khá rộng và chồng lấn đáng kể với hai nhóm còn lại. Điều này cho thấy nhân tố này phản ánh được xu hướng khác biệt giữa các nhóm, nhưng khả năng phân biệt vẫn chưa thật sự rõ ràng.
+
+* **Đối với nhân tố Sinh lý và Huyết áp**, nhóm `Sleep Apnea` có trung vị cao nhất, khoảng **1.3**, trong khi nhóm `None` có trung vị thấp nhất, khoảng **-0.5**. Đồng thời, mức độ chồng lấn giữa các nhóm cũng ít hơn so với hai nhân tố còn lại, cho thấy đây là nhân tố có khả năng phân biệt các nhóm `sleep_disorder` rõ.
+
+* **Đối với nhân tố Vận động**, nhóm `Insomnia` có trung vị thấp hơn hai nhóm còn lại, còn `None` và `Sleep Apnea` có phân bố khá tương đồng và chồng lấn nhiều. Vì vậy, nhân tố này hỗ trợ nhận diện nhóm `Insomnia` tương đối tốt, nhưng chưa đủ để phân biệt rõ giữa hai nhóm `None` và `Sleep Apnea`.
+
+Nhìn chung, kết quả quan sát từ boxplot cho thấy **nhân tố Sinh lý và Huyết áp** có khả năng phân biệt các nhóm `sleep_disorder` rõ ràng nhất, tiếp đến là **Giấc ngủ và Căng thẳng**, còn **Vận động** là nhân tố có mức độ phân tách thấp hơn. Kết quả này cũng phù hợp với phân tích ANOVA trước đó
+
+#### Hậu Kiểm Games-Howell
+
+Báo cáo lựa chọn **Games-Howell** thay vì **Tukey HSD** vì kiểm định Levene cho thấy phần lớn các biến không thỏa giả định đồng nhất phương sai, và kích thước mẫu giữa các nhóm không cân bằng (`None`: 219, `Insomnia`: 77, `Sleep Apnea`: 78).
+
+```{r games-howell-function, echo = FALSE}
+games_howell <- function(x, group) {
+  group <- factor(group)
+  lv <- levels(group)
+  k <- length(lv)
+  means <- tapply(x, group, mean, na.rm = TRUE)
+  vars  <- tapply(x, group, var,  na.rm = TRUE)
+  ns    <- tapply(x, group, length)
+  res <- data.frame()
+  for (i in 1:(k - 1)) {
+    for (j in (i + 1):k) {
+      m1 <- means[i]; m2 <- means[j]
+      v1 <- vars[i];  v2 <- vars[j]
+      n1 <- ns[i];    n2 <- ns[j]
+      se <- sqrt(v1 / n1 + v2 / n2)
+      md <- m1 - m2
+      df <- (v1 / n1 + v2 / n2)^2 /
+        ((v1 / n1)^2 / (n1 - 1) + (v2 / n2)^2 / (n2 - 1))
+      t_stat <- abs(md) / se
+      p_val  <- ptukey(t_stat * sqrt(2), nmeans = k, df = df, lower.tail = FALSE)
+      ci_mult  <- qtukey(0.95, nmeans = k, df = df) / sqrt(2)
+      ci_lower <- md - ci_mult * se
+      ci_upper <- md + ci_mult * se
+      res <- rbind(res, data.frame(
+        Nhom_1 = lv[i], Nhom_2 = lv[j],
+        Chenh_lech_trung_binh = round(md, 3),
+        CI_95_duoi = round(ci_lower, 3),
+        CI_95_tren = round(ci_upper, 3),
+        p_value_hieu_chinh = round(p_val, 4)
+      ))
+    }
+  }
+  res
+}
+```
+
+```{r games-howell-apply, echo = FALSE}
+bien_can_hau_kiem <- c("systolic_bp", "diastolic_bp", "age", "physical_activity_level")
+gh_results <- lapply(bien_can_hau_kiem, function(v) {
+  res <- games_howell(data_scaled[[v]], data_scaled$sleep_disorder)
+  res$Bien <- v
+  res
+})
+gh_all <- do.call(rbind, gh_results)
+gh_all <- gh_all[, c("Bien", "Nhom_1", "Nhom_2", "Chenh_lech_trung_binh",
+                      "CI_95_duoi", "CI_95_tren", "p_value_hieu_chinh")]
+knitr::kable(gh_all, 
+  caption = "Kết quả hậu kiểm Games-Howell cho các biến có eta-squared cao nhất")
+```
+
+**Nhận xét**:
+
+* Khoảng tin cậy 95% của tất cả các cặp so sánh trên bốn biến đều không chứa giá trị 0, đồng thời các p-value đều nhỏ hơn 0.05. Điều này cho thấy các cặp nhóm `None`, `Insomnia` và `Sleep Apnea` đều khác biệt có ý nghĩa thống kê trên các biến được xét.
+
+* Đối với `systolic_bp`, `diastolic_bp` và `age`, giá trị trung bình tăng dần từ nhóm `None` đến `Insomnia` rồi đến `Sleep Apnea`. Cụ thể, nhóm `Sleep Apnea` có `systolic_bp` cao hơn nhóm `None` **1.771** đơn vị chuẩn hóa và cao hơn nhóm `Insomnia` **0.740** đơn vị. Tương tự, `age` của nhóm `Sleep Apnea` cũng cao hơn nhóm `None` **1.230** đơn vị chuẩn hóa.
+
+* Đối với `physical_activity_level`, thứ tự lại là `Insomnia` < `None` < `Sleep Apnea`. Nhóm `Sleep Apnea` có mức độ hoạt động thể chất cao hơn `None` **0.809** đơn vị và cao hơn `Insomnia` **1.343** đơn vị, trong khi `None` cao hơn `Insomnia` **0.534** đơn vị.
+
+Nhìn chung, kết quả Games-Howell cho thấy các nhóm `sleep_disorder` khác biệt rõ rệt về tuổi, huyết áp và mức độ hoạt động thể chất, phù hợp với kết quả ANOVA và MANOVA trước đó.
+
+### **(e): Kết luận chung cho PCA, EFA, MANOVA**
+
+-   **PCA và EFA** đều rút gọn 9 biến thành **3 nhân tố** gồm **Giấc ngủ & Căng thẳng**, **Vận động thể chất** và **Sinh lý/Tim mạch**, đồng thời giải thích được phần lớn phương sai của dữ liệu.
+
+-   **MANOVA** cho thấy có sự khác biệt có ý nghĩa thống kê giữa các nhóm `sleep_disorder`. Kết quả ANOVA tiếp theo cho thấy nhân tố **Giấc ngủ & Căng thẳng** và **Sinh lý/Tim mạch** là hai nhân tố phân biệt các nhóm rõ nhất.
+
+-   Nhìn chung, kết quả phân tích cho thấy mô hình ba nhân tố là phù hợp và có khả năng phản ánh tốt đặc điểm sức khỏe của các nhóm `sleep_disorder`.
+
+### **Mô hình Hồi quy Logistic đa thức (Multinomial Logistic Regression) và Random Forest**
+
+#### Đặt vấn đề và cơ sở lý thuyết
+
+Ở các phần trước, kỹ thuật giảm chiều dữ liệu (PCA/EFA) đã làm rõ **cấu trúc** của 9 biến định lượng (rút gọn thành 3 nhân tố: Giấc ngủ & Căng thẳng, Vận động, Sinh lý). Tiếp đó, kiểm định MANOVA đã xác nhận sự khác biệt có ý nghĩa thống kê về hồ sơ sức khỏe đa biến giữa 3 nhóm `sleep_disorder` (None, Insomnia, Sleep Apnea).
+
+Tiếp theo, xây dựng một mô hình học máy có khả năng dự báo xác suất một cá nhân mắc `Insomnia`, `Sleep Apnea` hay `None`, dựa trên các đặc điểm lối sống và sức khỏe đầu vào. Đây là bài toán **phân loại đa lớp (multiclass classification)** do biến mục tiêu có 3 trạng thái độc lập, không phân bậc.
+
+**Lý do chọn `sleep_disorder` làm biến mục tiêu:**\
+Biến sleep_disorder được chọn vì có ý nghĩa thực tiễn và giúp đảm bảo tính nhất quán giữa bước kiểm định MANOVA và mô hình phân loại.
+
+#### Lựa chọn thuật toán phân loại
+
+| Thuật toán | Ý tưởng nền tảng | Ưu điểm | Nhược điểm |
+|:-----------------|:-----------------|:-----------------|:-----------------|
+| **Hồi quy Logistic đa thức (Multinomial Logistic Regression)** | Mở rộng từ logistic nhị phân; mô hình hóa log-odds tương đối của từng lớp so với lớp tham chiếu thông qua tổ hợp tuyến tính các biến độc lập. | Đơn giản; hệ số hồi quy dễ diễn giải (cho biết mức độ và chiều tác động của từng biến); cung cấp xác suất dự đoán rõ ràng; là mô hình "baseline" chuẩn mực. | Bị ràng buộc bởi giả định tuyến tính giữa biến độc lập và log-odds; nhạy cảm với hiện tượng đa cộng tuyến. |
+| **Random Forest** | Thuật toán học tập hợp (ensemble - bagging); xây dựng nhiều cây quyết định trên các mẫu bootstrap, mỗi cây xét một tập con biến ngẫu nhiên; dự đoán kết quả theo đa số phiếu (majority vote). | Thường cho độ chính xác cao; hạn chế overfitting so với cây đơn lẻ; xử lý tốt dữ liệu phi tuyến và tương tác biến; cung cấp chỉ số mức độ quan trọng của biến (variable importance). | Kém trực quan, chi phí tính toán cao hơn; khó giải thích cơ chế tác động chi tiết của từng biến. |
+
+```{r read-data, echo = FALSE}
+data_raw <- read.csv("SleepHealthLifestyle.csv") %>% janitor::clean_names()
+sleep_data_cleaned <- data_raw %>%
+  separate(
+    blood_pressure,
+    into = c("systolic_bp", "diastolic_bp"),
+    sep = "\\s*/\\s*",
+    convert = TRUE
+  ) %>%
+  mutate(
+    gender = as.factor(gender),
+    bmi_category = as.factor(bmi_category),
+    occupation = as.factor(occupation),
+    sleep_disorder = as.factor(ifelse(is.na(sleep_disorder) | sleep_disorder == "",
+                                       "None", sleep_disorder))
+  )
+data_original <- sleep_data_cleaned %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(bmi_category, levels = c("Normal", "Overweight", "Obese"))
+  ) %>%
+  select(-person_id)
+```
+
+#### Chuẩn bị dữ liệu mô hình hóa với 9 biến định lượng gốc + biến phân loại
+
+Lấy toàn bộ các biến của bộ dữ liệu, bao gồm các biến định tính
+
+```{r select-features}
+model_data <- data_original %>%
+  select(
+    gender, age, occupation, sleep_duration, quality_of_sleep,
+    physical_activity_level, stress_level, bmi_category,
+    systolic_bp, diastolic_bp, heart_rate, daily_steps,
+    sleep_disorder
+  )
+levels(model_data$sleep_disorder) <- make.names(levels(model_data$sleep_disorder))
+str(model_data)
+```
+
+#### Chia dữ liệu Train/Test
+
+Chia bộ dữ liệu thành tập train và test với tỉ lệ **75% train / 25% test**.
+
+```{r train-test-split}
+set.seed(2024)
+train_index <- createDataPartition(model_data$sleep_disorder, p = 0.75, list = FALSE)
+train_data <- model_data[train_index, ]
+test_data  <- model_data[-train_index, ]
+cat("Số quan sát tập train:", nrow(train_data), "\n")
+cat("Số quan sát tập test :", nrow(test_data), "\n")
+```
+
+**Nhận xét:** Tỷ lệ các lớp ở tập train (`r nrow(train_data)` quan sát) và tập test (`r nrow(test_data)` quan sát) gần như tương đồng với tỷ lệ tổng thể ban đầu, xác nhận việc chia dữ liệu phân tầng đã thực hiện đúng.
+
+#### Tiền xử lý riêng cho mô hình hóa
+
+Tham số chuẩn hóa (trung bình, độ lệch chuẩn) được **tính chỉ trên tập train**, sau đó áp dụng cho cả tập train lẫn test để tránh rò rỉ dữ liệu.
+
+*(Bảng mẫu dữ liệu chuẩn hóa được trình bày tại **Phụ lục E.1.**)*
+
+```{r preprocess}
+numeric_vars <- c("age", "sleep_duration", "quality_of_sleep", "physical_activity_level",
+                   "stress_level", "systolic_bp", "diastolic_bp", "heart_rate", "daily_steps")
+preproc_params <- preProcess(train_data[, numeric_vars], method = c("center", "scale"))
+train_scaled <- train_data
+test_scaled  <- test_data
+train_scaled[, numeric_vars] <- predict(preproc_params, train_data[, numeric_vars])
+test_scaled[, numeric_vars]  <- predict(preproc_params, test_data[, numeric_vars])
+```
+
+#### Huấn luyện 2 mô hình với Cross-Validation
+
+**Lý do sử dụng 5-fold Cross-Validation:** Phương pháp này giúp đánh giá hiệu năng mô hình ổn định hơn so với chỉ chia dữ liệu một lần thành tập huấn luyện và tập kiểm tra. Đồng thời, 5-fold Cross-Validation được sử dụng để lựa chọn giá trị `mtry` tối ưu cho mô hình Random Forest mà không cần sử dụng đến tập kiểm tra.
+
+```{r train-control}
+train_control <- trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = TRUE,                         
+  summaryFunction = multiClassSummary,        
+  savePredictions = "final"
+)
+```
+
+#### Mô hình 1: Hồi quy Logistic đa thức (Multinomial Logistic Regression)
+
+```{r model-multinom-full, results='hide'}
+set.seed(2024)
+model_multinom_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "multinom",
+  trControl = train_control,
+  metric = "Accuracy",
+  trace = FALSE
+)
+```
+
+#### Mô hình 2: Random Forest
+
+```{r model-rf-full}
+set.seed(2024)
+model_rf_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "rf",
+  trControl = train_control,
+  metric = "Accuracy",
+  importance = TRUE
+)
+```
+
+*(Chi tiết kết quả huấn luyện (caret output) cho cả 2 mô hình được trình bày tại **Phụ lục E.2**.)*
+
+#### So sánh 2 mô hình và đánh giá trên tập Test
+
+```{r compare-models-full}
+resamples_full <- resamples(list(
+  Multinomial_Logistic = model_multinom_full,
+  Random_Forest = model_rf_full
+))
+summary_stats_full <- summary(resamples_full)$statistics[c("Accuracy", "Kappa")]
+kable(round(summary_stats_full$Accuracy, 4), 
+      caption = "So sánh Accuracy (5-fold CV) - Mô hình dùng 9 biến gốc")
+```
+
+```{r compare-dotplot-full, fig.width=8, fig.height=4}
+dotplot(resamples_full, metric = "Accuracy",
+        main = "So sánh Accuracy giữa 2 mô hình (5-fold Cross-Validation) - Dùng 9 biến gốc")
+```
+
+**Nhận xét**:
+
+-   Kết quả kiểm chứng chéo cho thấy cả **Multinomial Logistic Regression** và **Random Forest** đều đạt hiệu năng dự đoán cao, với **Median Accuracy** đều bằng **0.9286**. Tuy nhiên, **Random Forest** tốt hơn khi đạt **Accuracy trung bình** là **0.9184** (so với **0.9146** của **Multinomial Logistic Regression**) và **Accuracy thấp nhất** cũng cao hơn (**0.8772** so với **0.8727**), cho thấy mô hình này ổn định hơn trong quá trình kiểm chứng chéo.
+
+*(So sánh Kappa (5-fold CV) chi tiết được trình bày tại **Phụ lục E.3**. Kết quả: cả hai mô hình đều đạt Kappa cao (trung bình 0.8487 và 0.8559), Random Forest nhỉnh hơn về độ ổn định.)*
+
+**Kết luận chung:** **Random Forest** đạt hiệu năng dự đoán và độ ổn định cao hơn **Multinomial Logistic Regression**, nhưng mức chênh lệch không lớn (Accuracy trung bình cao hơn khoảng 0.38%). Cả hai mô hình đều phù hợp với bộ dữ liệu: **Random Forest** phù hợp khi ưu tiên độ chính xác, **Multinomial Logistic Regression** thích hợp khi cần mô hình đơn giản và dễ diễn giải.
+
+#### Dự đoán trên tập Test
+
+*(Chi tiết ma trận nhầm lẫn đầy đủ cho cả 2 mô hình được trình bày tại **Phụ lục E.4**.)*
+
+```{r final-evaluation-full}
+pred_multinom_full <- predict(model_multinom_full, newdata = test_scaled)
+cm_multinom_full <- confusionMatrix(pred_multinom_full, test_scaled$sleep_disorder)
+pred_rf_full <- predict(model_rf_full, newdata = test_scaled)
+cm_rf_full <- confusionMatrix(pred_rf_full, test_scaled$sleep_disorder)
+```
+
+-   **Mô hình Multinomial Logistic Regression trên tập Test:**
+
+    -   Đạt **Accuracy = 85.87%** (KTC 95%: 77.05%–92.26%), cao hơn đáng kể so với No Information Rate = 58.70% (p \< 0.001).
+
+    -   **Kappa = 0.754**. Dự đoán tốt nhất cho `Sleep Apnea` (Sensitivity = 94.74%), tiếp đến `None` (87.04%), `Insomnia` thấp nhất (73.68%). Sai số chủ yếu giữa `None` và `Insomnia`.
+
+-   **Mô hình Random Forest trên tập Test:**
+
+    -   Đạt **Accuracy = 88.04%** (KTC 95%: 79.61%–93.88%).
+
+    -   **Kappa = 0.7888**. Dự đoán tốt nhất cho `Sleep Apnea` (Sensitivity = 94.74%), tiếp đến `None` (90.74%), `Insomnia` thấp nhất (73.68%). Specificity của `Insomnia` đạt 97.26%. Sai số chủ yếu vẫn giữa `None` và `Insomnia`.
+
+```{r roc-auc-full}
+prob_multinom_full <- predict(model_multinom_full, newdata = test_scaled, type = "prob")
+roc_multinom_full <- multiclass.roc(test_scaled$sleep_disorder, prob_multinom_full)
+prob_rf_full <- predict(model_rf_full, newdata = test_scaled, type = "prob")
+roc_rf_full <- multiclass.roc(test_scaled$sleep_disorder, prob_rf_full)
+cat("Multi-class AUC (Multinomial Logistic, tập test):", 
+    round(as.numeric(roc_multinom_full$auc), 4), "\n")
+cat("Multi-class AUC (Random Forest, tập test)       :", 
+    round(as.numeric(roc_rf_full$auc), 4), "\n")
+```
+
+**Nhận xét:**
+
+Multinomial Logistic Regression đạt **AUC = 0.8880**, cao hơn so với **Random Forest** (**0.8809**), nhưng mức chênh lệch rất nhỏ. Trong khi **Random Forest** có Accuracy cao hơn, **Multinomial Logistic Regression** lại nhỉnh hơn về AUC, cho thấy khả năng phân biệt các lớp tốt hơn một chút. Nhìn chung, cả hai mô hình đều đạt **AUC khoảng 0.88**, phản ánh khả năng phân loại tốt.
+
+#### Diễn giải mô hình và đối chiếu với PCA/EFA/MANOVA
+
+```{r variable-importance-full, fig.width=6, fig.height=6}
+var_importance_full <- varImp(model_rf_full)
+plot(var_importance_full, top = 12, main = "Mức độ quan trọng của biến - Random Forest")
+```
+
+**Nhận xét**:
+
+* Biểu đồ thể hiện **mức độ quan trọng của từng biến theo từng lớp**, tức là biến nào đóng góp nhiều hơn vào việc nhận diện đúng từng nhóm `sleep_disorder`.
+
+* Ở cả ba nhóm (`None`, `Insomnia` và `Sleep.Apnea`), `systolic_bp` và `diastolic_bp` đều nằm trong nhóm biến quan trọng nhất, cho thấy huyết áp là yếu tố giúp mô hình phân biệt các nhóm hiệu quả nhất. Đối với `Insomnia`, ngoài huyết áp, `sleep_duration` và `physical_activity_level` cũng có mức độ quan trọng cao. Trong khi đó, ở nhóm `Sleep.Apnea`, `occupationNurse` và `bmi_categoryOverweight` có vai trò nổi bật hơn so với các nhóm còn lại.
+
+* Nhìn chung, kết quả phù hợp với các phân tích trước khi nhóm biến **Sinh lý/Huyết áp** có khả năng phân biệt các nhóm tốt nhất. Đồng thời, Random Forest cũng cho thấy vai trò của một số biến phân loại như **BMI** và **nghề nghiệp**, những biến không được xem xét trong PCA/EFA.
+
+## **(f): Đề xuất những phương pháp phù hợp**
+
+#### Gradient Boosting (XGBoost / LightGBM)
+
+**Gradient Boosting** là một hướng phát triển đáng cân nhắc bên cạnh **Random Forest**. Khác với Random Forest xây dựng các cây độc lập, Gradient Boosting huấn luyện các cây tuần tự để giảm dần sai số của mô hình trước. Với dữ liệu dạng bảng như bộ dữ liệu này, Gradient Boosting thường cho độ chính xác cao hơn. Ngoài ra, các mô hình như **XGBoost** còn hỗ trợ trọng số lớp, giúp xử lý tốt hơn sự mất cân bằng giữa các nhóm `sleep_disorder`.
+
+#### Hồi quy Logistic đa thức có chính quy hóa (Regularized Multinomial Logistic - LASSO/Ridge/Elastic Net)
+
+Ma trận tương quan ở phần PCA/EFA cho thấy `systolic_bp` và `diastolic_bp` có tương quan rất cao (r = 0.97), nên khi đưa đồng thời vào mô hình Multinomial Logistic có thể xảy ra hiện tượng đa cộng tuyến, làm hệ số hồi quy kém ổn định. Một hướng cải thiện là sử dụng **LASSO** hoặc **Ridge** (`glmnet`) để giảm ảnh hưởng của đa cộng tuyến, giúp mô hình ổn định hơn và tăng khả năng tổng quát hóa. Riêng **LASSO** còn có thể tự động chọn lọc biến, giúp đơn giản hóa mô hình.
+
+#### Kỹ thuật xử lý mất cân bằng lớp (SMOTE)
+
+Mặc dù mức mất cân bằng giữa các nhóm `sleep_disorder` không lớn, lớp `Insomnia` vẫn có **Sensitivity** thấp nhất ở cả hai mô hình. Một hướng cải thiện là áp dụng **SMOTE (Synthetic Minority Oversampling Technique)** trên tập huấn luyện để tạo thêm mẫu cho lớp này, giúp mô hình học tốt hơn và giảm số trường hợp `Insomnia` bị bỏ sót.
+
+## **(g): Kết luận và hướng phát triển của đề tài**
+
+#### Kết luận
+
+1.  **Về phân tích PCA/EFA:** Chín biến định lượng ban đầu được rút gọn thành công về ba nhân tố có ý nghĩa diễn giải rõ ràng (Giấc ngủ và Căng thẳng, Sinh lý và Huyết áp, Vận động thể chất), giải thích được khoảng 82.7% tổng phương sai, đồng thời giải quyết được vấn đề đa cộng tuyến nghiêm trọng giữa `systolic_bp` và `diastolic_bp`.
+
+2.  **Về kiểm định MANOVA:** Ba nhóm `sleep_disorder` (Insomnia, None, Sleep Apnea) có sự khác biệt có ý nghĩa thống kê rõ rệt về toàn bộ hồ sơ sức khỏe đa biến, trong đó nhóm biến sinh lý và huyết áp là yếu tố phân biệt mạnh và nhất quán nhất giữa các nhóm, được xác nhận qua cả eta-squared và hậu kiểm Games-Howell.
+
+3.  **Về mô hình dự đoán:** Cả **Multinomial Logistic Regression** và **Random Forest** đều đạt hiệu năng tốt trên tập test độc lập (Accuracy khoảng **0.86–0.88**, AUC đa lớp khoảng **0.88**). Đồng thời, các biến quan trọng của mô hình phù hợp với cấu trúc nhân tố từ PCA/EFA và kết quả MANOVA, khẳng định tính nhất quán của toàn bộ quy trình phân tích.
+
+4.  Việc lựa chọn mô hình cuối cùng để triển khai thực tế nên dựa vào mục tiêu sử dụng cụ thể: ưu tiên **Multinomial Logistic Regression** nếu cần khả năng diễn giải rõ ràng chiều tác động của từng biến, hoặc ưu tiên **Random Forest** nếu mục tiêu là tối đa hóa độ chính xác phân loại trực tiếp.
+
+#### Hướng phát triển nghiên cứu
+
+1.  **Mở rộng và đa dạng hóa mô hình dự đoán:** Triển khai các đề xuất đã nêu ở mục *đề xuất*, đặc biệt là thử nghiệm Gradient Boosting và kỹ thuật SMOTE, nhằm cải thiện khả năng nhận diện lớp `Insomnia`, vốn là điểm yếu chung của cả hai mô hình hiện tại.
+
+2.  **Thu thập thêm dữ liệu:** Tăng cỡ mẫu, đặc biệt là số quan sát thuộc hai lớp thiểu số (`Insomnia`, `Sleep Apnea`), đồng thời bổ sung thêm các biến sinh lý khác (ví dụ chỉ số BMI cụ thể thay vì phân loại, tiền sử bệnh tim mạch, mức độ luyện tập thể thao chuyên sâu) để cải thiện khả năng giải thích cho những biến hiện có communality thấp như `heart_rate`.
+
+3.  **Nghiên cứu theo chiều dọc:** Bộ dữ liệu hiện tại chỉ phản ánh tại một thời điểm, nên chưa thể đánh giá quan hệ nhân quả. Các nghiên cứu tiếp theo có thể thu thập dữ liệu theo thời gian để theo dõi sự thay đổi của các chỉ số sức khỏe và rối loạn giấc ngủ.
+
+4.  **Ứng dụng thực tiễn:** Kết quả nghiên cứu có thể hỗ trợ xây dựng công cụ sàng lọc ban đầu dựa trên các chỉ số lối sống và sinh lý, giúp phát hiện sớm những người có nguy cơ rối loạn giấc ngủ để ưu tiên thăm khám.
+
+\baibox{Bài 2: Dataset "StudentHabitsPerformance.csv"}
+
+Mô tả chi tiết về **nguồn dữ liệu** và **ý nghĩa của từng biến** trong bộ dữ liệu được trình bày tại **Phụ lục A**
+
+## **(a): Tiền xử lý dữ liệu**
+
+#### **Đọc dữ liệu**
+
+```{r}
+data <- read.csv("StudentHabitsPerformance.csv", stringsAsFactors = TRUE)
+# Kiểm tra kích thước 
+dim(data)
+```
+
+**Nhận xét:** Bộ dữ liệu gồm có 1000 quan trắc (tương ứng với 1000 sinh viên) và 16 biến đúng như mô tả.
+
+#### **Xử lí dữ liệu**
+
+```{r}
+data_clean <- data %>%
+  # Loại bỏ biến định danh student_id
+  select(-student_id) %>% 
+  # Chuyển đổi tất cả các biến dạng chuỗi (character) sang dạng thứ bậc (Factor)
+  mutate(across(where(is.character), as.factor))
+```
+
+**Nhận xét:** Sau khi loại bỏ biến định danh, bộ dữ liệu còn lại gồm 1000 quan sát và 15 biến
+
+#### **Kiểm tra và xử lí Missing Values**
+
+```{r}
+any(is.na(data_clean))
+```
+
+**Nhận xét:** Không có dữ liệu khuyết
+
+```{r}
+data_final <- data_clean
+```
+
+**Nhận xét:** Sau khi rà soát và xử lý, tập dữ liệu cuối cùng (`data_final`) được bảo toàn với 1000 quan sát và 15 biến.
+
+Cấu trúc chi tiết của từng biến sau khi xử lý (kiểu dữ liệu, số mức của các biến định tính) được kiểm tra và trình bày tại **Phụ lục B.1**.
+
+#### **Thống kê mô tả bộ dữ liệu gốc**
+
+```{r}
+# Lọc ra các biến định lượng từ tập dữ liệu đã làm sạch
+numeric_vars <- data_clean %>% select(where(is.numeric))
+# Thống kê mô tả các biến định lượng
+summary(numeric_vars)
+```
+
+**Nhận xét:** Các biến phản ánh **thói quen sinh hoạt và học tập** của sinh viên có mức độ biến thiên khá lớn. Trung bình sinh viên học khoảng **3.55 giờ/ngày**, sử dụng **2.51 giờ/ngày** cho mạng xã hội, **1.82 giờ/ngày** xem Netflix, ngủ **6.47 giờ/ngày** và tập thể dục khoảng **3 lần/tuần**. Điều này cho thấy sự khác biệt đáng kể về lối sống và cách phân bổ thời gian giữa các sinh viên.
+
+Đối với **kết quả học tập và sức khỏe**, tỷ lệ chuyên cần trung bình đạt **84.13%**, điểm sức khỏe tinh thần trung bình là **5.44/10**, trong khi điểm thi cuối kỳ trung bình đạt **69.60 điểm** (trung vị **70.5 điểm**), cho thấy kết quả học tập tương đối ổn định và phân phối điểm không bị lệch mạnh. Bên cạnh đó, độ tuổi dao động từ **17–24 tuổi** (trung bình khoảng **20.5 tuổi**), phù hợp với đối tượng sinh viên đại học.
+
+Ngoài ra, các biến định lượng có **thang đo và phạm vi giá trị khác nhau** (ví dụ: `attendance_percentage` từ **56–100**, `mental_health_rating` từ **1–10**, `study_hours_per_day` từ **0–8.3**). Do đó, dữ liệu cần được **chuẩn hóa theo Z-score** trước khi quyết định áp dụng các phương pháp dựa trên phương sai như **PCA** và **EFA**, nhằm tránh các biến có độ lớn lớn hơn chi phối kết quả phân tích.
+
+Trước khi lựa chọn phương pháp phân tích chính, nghiên cứu đã thực hiện các bước khám phá dữ liệu bổ sung: trực quan hóa phân phối biến định lượng trước và sau chuẩn hóa bằng Box-plot **(Phụ lục B.2)**; phát hiện và xử lý ngoại lai đơn biến **(Phụ lục B.3**) và đa biến theo khoảng cách Mahalanobis **(Phụ lục B.4)**; phân tích ma trận tương quan **(Phụ lục B.5)**; kiểm định Bartlett **(Phụ lục B.6)** và KMO **(Phụ lục B.7)** để đánh giá khả năng áp dụng PCA/EFA; và trực quan hóa Scree-plot **(Phụ lục B.8)**. Kết quả cho thấy dữ liệu **không phù hợp để thực hiện PCA/EFA (KMO = 0.17).**
+
+## **(b): Xác định vấn đề nghiên cứu và lựa chọn phương pháp phù hợp**
+
+#### **Lựa chọn phương pháp phân tích và xác định vấn đề nghiên cứu**
+
+Bộ dữ liệu **Student Habits Performance** bao gồm nhiều biến định tính phản ánh đặc điểm cá nhân, điều kiện học tập và lối sống của sinh viên, đồng thời chứa nhiều biến định lượng phản ánh kết quả học tập. Để khai thác toàn diện bộ dữ liệu, nghiên cứu sử dụng **hai phương pháp phân tích thống kê**, gồm **MANOVA (Multivariate Analysis of Variance)** và **Multiple Linear Regression (Hồi quy tuyến tính bội)**.
+
+Phương pháp **MANOVA** được sử dụng nhằm đánh giá sự khác biệt đồng thời của nhiều chỉ tiêu học tập giữa các nhóm sinh viên được phân chia theo các yếu tố phân loại. Trong khi đó, **Multiple Linear Regression** được sử dụng để xác định mức độ và chiều hướng ảnh hưởng của các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập đến **điểm thi cuối kỳ (`exam_score`)**, đồng thời xây dựng mô hình dự báo kết quả học tập.
+
+Trong thực tế, hiệu suất học tập không chỉ được phản ánh thông qua điểm số cuối kỳ mà còn thể hiện qua quá trình học tập hằng ngày và mức độ tham gia học tập. Vì vậy, để đánh giá hiệu suất học tập một cách toàn diện trong phần MANOVA, nghiên cứu lựa chọn ba chỉ tiêu:
+
+-   `study_hours_per_day`: phản ánh mức độ đầu tư thời gian cho việc học;
+
+-   `attendance_percentage`: phản ánh mức độ chuyên cần và ý thức tham gia học tập;
+
+-   `exam_score`: phản ánh kết quả học tập đạt được.
+
+Từ đó, nghiên cứu thực hiện hai mục tiêu chính:
+
+> **Mục tiêu 1 (MANOVA):** Xác định các yếu tố phân loại có ảnh hưởng đáng kể đến hiệu suất học tập của sinh viên thông qua ba chỉ tiêu gồm `study_hours_per_day`, `attendance_percentage` và `exam_score`, đồng thời khảo sát ảnh hưởng của **mức độ sức khỏe tinh thần**, **tần suất tập thể dục** và ảnh hưởng tương tác giữa hai yếu tố này.
+>
+> **Mục tiêu 2 (Multiple Linear Regression):** Xác định những yếu tố ảnh hưởng đến **điểm thi cuối kỳ (`exam_score`)**, đánh giá mức độ và chiều hướng tác động của từng biến khi các yếu tố khác được giữ không đổi, đồng thời xây dựng mô hình dự báo kết quả học tập của sinh viên.
+
+## **(c)/(d): Kiểm tra giả định, đánh giá tính phù hợp và thực hiện phân tích bằng phương pháp đã chọn**
+
+### **Bài toán 1 (One-Way MANOVA)**
+
+Trước khi xây dựng mô hình One-way MANOVA, nghiên cứu thực hiện bước sàng lọc các biến độc lập bằng các kiểm định MANOVA sơ bộ nhằm lựa chọn biến phù hợp. Kết quả sàng lọc bằng MANOVA **(Phụ lục C.1)** cho thấy chỉ có biến `parental_education_level` có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phản ánh hiệu suất học tập.
+
+Do đó, bài toán thứ nhất tập trung trả lời câu hỏi:
+
+> **Liệu trình độ học vấn của phụ huynh có ảnh hưởng đến mức độ đầu tư học tập, tỷ lệ chuyên cần và kết quả học tập của sinh viên hay không?**
+
+Mô hình One-Way MANOVA gồm:
+
+-   **Biến độc lập:** `parental_education_level`
+
+-   **Biến phụ thuộc:** `study_hours_per_day`, `attendance_percentage`, `exam_score`
+
+#### **Lọc tập dữ liệu**
+
+```{r}
+manova_data <- data_final %>%
+  select(parental_education_level,
+         study_hours_per_day,
+         attendance_percentage,
+         exam_score)
+
+dim(manova_data)
+```
+
+**Nhận xét:** Bộ dữ liệu được sử dụng để MANOVA còn lại 1000 quan trắc và 4 biến
+
+#### **Thống kê mô tả**
+
+```{r}
+summary_stats <- manova_data %>%
+  group_by(parental_education_level) %>%
+  get_summary_stats(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score,
+    type = "mean_sd"
+  )
+
+print(summary_stats, n = 12)
+```
+
+**Nhận xét:**
+
+-   Số lượng quan sát giữa các nhóm không hoàn toàn cân bằng. Hai nhóm **High School** (392 quan sát) và **Bachelor** (350 quan sát) chiếm tỷ trọng lớn nhất, trong khi nhóm **None** chỉ có 91 quan sát. Tuy nhiên, tất cả các nhóm đều có cỡ mẫu đủ lớn để thực hiện các phân tích suy luận.
+
+-   Thống kê mô tả cho thấy ba biến phụ thuộc có giá trị trung bình khá tương đồng giữa các nhóm trình độ học vấn của cha mẹ. Cụ thể, số giờ học trung bình dao động từ **3.50–3.66 giờ/ngày**, tỷ lệ chuyên cần từ **82.6–86.6%**, và điểm thi cuối kỳ từ **68.1–70.3 điểm**. Nhóm **None** có số giờ học và tỷ lệ chuyên cần trung bình cao nhất, trong khi nhóm **Bachelor** có điểm thi trung bình cao nhất; tuy nhiên, mức chênh lệch giữa các nhóm đều không lớn.
+
+-   Độ lệch chuẩn của các biến phụ thuộc tương đối tương đồng giữa các nhóm, cho thấy mức độ phân tán dữ liệu không có khác biệt đáng kể. Nhìn chung, các nhóm sinh viên có đặc điểm học tập và kết quả học tập khá giống nhau, mặc dù **tỷ lệ chuyên cần** có xu hướng khác biệt rõ hơn so với số giờ học và điểm thi, gợi ý đây có thể là biến đóng góp nhiều hơn vào sự khác biệt tổng thể giữa các nhóm.
+
+#### **Trực quan hóa bằng Box-plot**
+
+```{r, echo = FALSE}
+library(ggplot2)
+library(patchwork)
+
+my_theme <- theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_blank(),         
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+
+p1 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      exam_score)
+) +
+  geom_boxplot(fill = "#66C2A5") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Exam score",
+    y = "Điểm thi"
+  ) +
+  my_theme
+
+p2 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      attendance_percentage)
+) +
+  geom_boxplot(fill = "#FC8D62") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Attendance",
+    y = "Tỷ lệ chuyên cần (%)"
+  ) +
+  my_theme
+
+p3 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      study_hours_per_day)
+) +
+  geom_boxplot(fill = "#8DA0CB") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Study hours",
+    y = "Số giờ học"
+  ) +
+  my_theme
+
+(p1 | p2 | p3) +
+plot_annotation(
+  caption = "Trình độ học vấn của cha mẹ"
+)
+```
+
+**Nhận xét:** Các biểu đồ boxplot cho thấy phân bố của ba biến phụ thuộc (`exam_score`, `attendance_percentage` và `study_hours_per_day`) giữa các nhóm trình độ học vấn của cha mẹ nhìn chung khá tương đồng, với các khoảng tứ phân vị chồng lấn đáng kể. Tuy nhiên, vẫn có một số khác biệt nhỏ về trung vị giữa các nhóm và xuất hiện một số giá trị ngoại lai ở từng biến.
+
+#### **Kiểm tra phân phối chuẩn nhiều chiều**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Vector chứa ba biến quan sát (`study_hours_per_day`, `attendance_percentage`, `exam_score`) tuân theo phân phối chuẩn nhiều chiều.
+
+-   $H_1$: Vector chứa ba biến quan sát (`study_hours_per_day`, `attendance_percentage`, `exam_score`) không tuân theo phân phối chuẩn nhiều chiều.
+
+```{r}
+# Phân nhóm và kiểm tra mshapiro_test cho từng nhóm trình độ học vấn
+res_mshapiro_grouped <- manova_data %>%
+  group_by(parental_education_level) %>%
+  doo(~ mshapiro_test(data = .[, c("study_hours_per_day", 
+                                   "attendance_percentage", "exam_score")]))
+
+print(res_mshapiro_grouped)
+```
+
+**Nhận xét:** Kết quả kiểm định Shapiro–Wilk nhiều chiều được thực hiện riêng cho từng nhóm trình độ học vấn của phụ huynh. Tất cả các nhóm đều có p-value lớn hơn 0.05 (Bachelor: 0.469; High School: 0.577; Master: 0.674; None: 0.264). Do đó, không có đủ bằng chứng thống kê để bác bỏ giả thuyết dữ liệu tuân theo phân phối chuẩn nhiều chiều trong từng nhóm.
+
+Bên cạnh kiểm định phân phối chuẩn nhiều chiều, kết quả **kiểm định Shapiro–Wilk một chiều** cho từng biến riêng lẻ trong từng nhóm được trình bày chi tiết tại **Phụ lục C.2**, cho thấy giả định chuẩn một chiều không được thỏa mãn hoàn toàn ở một số biến; tuy nhiên điều này không ảnh hưởng đến kết luận MANOVA nhờ cỡ mẫu lớn theo Định lý giới hạn trung tâm.
+
+#### **Kiểm tra tính đồng nhất của ma trận hiệp phương sai (Box's M Test)**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Các ma trận hiệp phương sai tổng thể của các nhóm là đồng nhất.
+
+-   $H_1$: Có ít nhất hai ma trận hiệp phương sai tổng thể không đồng nhất.
+
+```{r}
+# Thực hiện Box's M Test
+box_m_result <- box_m(
+  manova_data[, c("study_hours_per_day",
+                  "attendance_percentage",
+                  "exam_score")],
+  manova_data$parental_education_level
+)
+
+print(box_m_result)
+```
+
+**Nhận xét:** Kết quả kiểm định Box's M cho giá trị thống kê bằng 9.86 và p-value = 0.936. Với mức ý nghĩa $\alpha=0.001$, ta có: **p-value=0.936\>0.001**. Do đó, không bác bỏ giả thuyết $H_0$. Không có đủ bằng chứng thống kê để kết luận rằng ma trận hiệp phương sai của các nhóm trình độ học vấn của cha mẹ là khác nhau.
+
+**Kết luận:** Giả định đồng nhất ma trận hiệp phương sai giữa các nhóm được thỏa mãn. Kết hợp với kết quả kiểm định phân phối chuẩn nhiều chiều ở bước trước, dữ liệu đáp ứng các giả định quan trọng để tiếp tục thực hiện phân tích MANOVA.
+
+#### **Phân tích phương sai Nhiều chiều Một nhân tố (One-Way MANOVA)**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Trình độ học vấn của cha mẹ không ảnh hưởng đến vector trung bình của các biến hiệu suất học tập.
+
+-   $H_1$: Có sự khác biệt về vector trung bình của ít nhất một nhóm trình độ học vấn của cha mẹ.
+
+```{r}
+# Xây dựng mô hình MANOVA
+model_mlm <- lm( cbind(study_hours_per_day, attendance_percentage, exam_score) 
+                 ~ parental_education_level, data = manova_data )
+
+# Thực hiện MANOVA với thống kê Wilks' Lambda
+res_manova <- Manova( model_mlm, test.statistic = "Wilks" ) 
+print(res_manova)
+```
+
+**Nhận xét:**
+
+Kết quả kiểm định MANOVA sử dụng thống kê **Wilks' Lambda** cho giá trị Wilks' Lambda = **0.97718**, giá trị thống kê **F = 2.5616** và **p-value = 0.006244**. Với mức ý nghĩa $\alpha = 0.05$, ta có: $p\text{-value} = 0.006244 < 0.05$ Do đó, **bác bỏ giả thuyết** $H_0$. Kết quả này cho thấy trình độ học vấn của cha mẹ có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc gồm `study_hours_per_day`, `attendance_percentage` và `exam_score` khi được xem xét đồng thời.
+
+Nói cách khác, khi đánh giá tổng thể trên cả ba khía cạnh là t**hời gian học tập**, **mức độ chuyên cần** và **kết quả học tập**, tồn tại **sự khác biệt** giữa các nhóm sinh viên có t**rình độ học vấn của cha mẹ khác nhau.** Mặc dù kết quả MANOVA có ý nghĩa thống kê, giá trị Wilks' Lambda = 0.977 cho thấy mức độ khác biệt tổng thể giữa các nhóm tương đối nhỏ. Điều này hàm ý rằng trình độ học vấn của phụ huynh chỉ giải thích một phần nhỏ sự khác biệt trong hiệu suất học tập của sinh viên.
+
+#### **Phân tích phương sai Một chiều (One-Way ANOVA)**
+
+**Đặt giả thuyết thống kê**
+
+Đối với mỗi biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`), thực hiện kiểm định:
+
+-   $H_0$: Giá trị trung bình của biến phụ thuộc là như nhau giữa các nhóm trình độ học vấn của cha mẹ.
+
+-   $H_1$: Có ít nhất một nhóm có giá trị trung bình khác biệt so với các nhóm còn lại.
+
+```{r}
+# ANOVA cho số giờ học mỗi ngày
+anova_study <- aov( study_hours_per_day ~ parental_education_level, 
+                    data = manova_data ) 
+summary(anova_study) 
+
+# ANOVA cho tỷ lệ chuyên cần 
+anova_attendance <- aov( attendance_percentage ~ parental_education_level, 
+                         data = manova_data)
+summary(anova_attendance) 
+
+# ANOVA cho điểm thi cuối kỳ 
+anova_exam <- aov( exam_score ~ parental_education_level, 
+                   data = manova_data ) 
+summary(anova_exam)
+```
+
+**Nhận xét:**
+
+Kết quả ANOVA cho biến `study_hours_per_day` cho giá trị F = 0.313 và p-value = 0.816. Với mức ý nghĩa ( $\alpha = 0.05$), ta có p-value \> 0.05 nên không bác bỏ giả thuyết $H_0$. Do đó chưa có đủ bằng chứng cho thấy sự khác biệt về số giờ học trung bình giữa các nhóm trình độ học vấn của cha mẹ
+
+-   Đối với biến `attendance_percentage`, kết quả ANOVA cho giá trị F = 4.035 và p-value = 0.00725. Vì p-value \< 0.05 nên bác bỏ giả thuyết $H_0$. Điều này cho thấy **tồn tại sự khác biệt có ý nghĩa thống kê về tỷ lệ chuyên cần giữa các nhóm sinh viên có trình độ học vấn của cha mẹ khác nhau**.
+
+-   Đối với biến `exam_score`, kết quả ANOVA cho giá trị F = 0.653 và p-value = 0.581. Do p-value \> 0.05 nên không bác bỏ giả thuyết $H_0$. Như vậy, chưa có đủ bằng chứng thống kê để khẳng định trình độ học vấn của cha mẹ ảnh hưởng đến điểm thi cuối kỳ của sinh viên.
+
+Tóm lại, trong ba biến phụ thuộc được xem xét, chỉ có biến `attendance_percentage` cho thấy sự khác biệt có ý nghĩa thống kê giữa các nhóm trình độ học vấn của cha mẹ. Do đó, nhóm tiếp tục thực hiện phân tích hậu nghiệm (Post-hoc) bằng phương pháp Tukey HSD đối với biến `attendance_percentage` để xác định cụ thể những nhóm nào khác biệt với nhau.
+
+#### **Phân tích hậu nghiệm (Post-hoc Test)**
+
+**Đặt giả thuyết**
+
+Đối với mỗi cặp nhóm được so sánh:
+
+-   $H_0$: Không có sự khác biệt về tỷ lệ chuyên cần trung bình giữa hai nhóm.
+
+-   $H_1$: Có sự khác biệt về tỷ lệ chuyên cần trung bình giữa hai nhóm.
+
+```{r}
+tukey_result <- manova_data %>% 
+  tukey_hsd(attendance_percentage ~ parental_education_level)
+print(tukey_result)
+```
+
+**Nhận xét:** Kết quả kiểm định hậu nghiệm Tukey HSD cho thấy chỉ có hai cặp nhóm xuất hiện sự khác biệt có ý nghĩa thống kê về tỷ lệ chuyên cần.
+
+Cụ thể, giữa nhóm **High School** và **None**, giá trị (p_adj=0.0478\<0.05) và khoảng tin cậy 95% của chênh lệch trung bình (0.018; 5.62) không chứa giá trị 0. Do đó, có đủ bằng chứng để kết luận tỷ lệ chuyên cần trung bình của hai nhóm này khác nhau.
+
+Tương tự, giữa nhóm **Master** và **None**, giá trị (p_adj=0.00537\<0.05) và khoảng tin cậy 95% (0.896; 7.17) không chứa giá trị 0. Vì vậy, có thể kết luận tỷ lệ chuyên cần trung bình của hai nhóm này khác nhau một cách có ý nghĩa thống kê.
+
+Đối với các cặp nhóm còn lại, giá trị (p_adj\>0.05) và khoảng tin cậy 95% đều chứa giá trị 0. Do đó, không có đủ bằng chứng thống kê để kết luận tồn tại sự khác biệt về tỷ lệ chuyên cần trung bình giữa các nhóm này.
+
+### **Bài toán 2 (Two-way MANOVA)**
+
+Bên cạnh yếu tố gia đình, các yếu tố thuộc về sức khỏe và lối sống cũng có thể ảnh hưởng đến hiệu suất học tập của sinh viên. Vì vậy, nghiên cứu tiếp tục xem xét đồng thời hai yếu tố là **mức độ sức khỏe tinh thần** (`mental_health_rating`) và **tần suất tập thể dục** (`exercise_frequency`).
+
+Bài toán thứ hai nhằm trả lời câu hỏi:
+
+> **Liệu mức độ sức khỏe tinh thần và tần suất tập thể dục có ảnh hưởng đồng thời đến hiệu suất học tập của sinh viên, và hai yếu tố này có tồn tại ảnh hưởng tương tác hay không?**
+
+Mô hình Two-Way MANOVA gồm:
+
+-   **Biến độc lập:** `mental_group`, `exercise_group`
+
+-   **Biến phụ thuộc:** `study_hours_per_day`, `attendance_percentage`, `exam_score`
+
+#### **Phân nhóm dữ liệu**
+
+Do `mental_health_rating` và `exercise_frequency` là hai biến định lượng, nghiên cứu tiến hành phân nhóm hai biến này thành ba mức **Low**, **Medium** và **High** để phù hợp với mô hình **Two-Way MANOVA**. Cụ thể:
+
+`mental_health_rating`:
+
+-   Tâm lý yếu: 1–3
+
+-   Tâm lý ổn định: 4–6
+
+-   Tâm lý vững vàng: 7–10
+
+`exercise_frequency`:
+
+-   Ít vận động: 0–2 lần/tuần
+
+-   Vận động vừa phải: 3–4 lần/tuần
+
+-   Vận động thường xuyên: 5–7 lần/tuần
+
+```{r, echo = FALSE}
+two_way_data <- data_final %>%
+  mutate(
+    mental_group = case_when(
+      mental_health_rating <= 3 ~ "Tâm lý yếu",
+      mental_health_rating <= 6 ~ "Tâm lý ổn định",
+      TRUE ~ "Tâm lý vững vàng"
+    ) %>% factor(levels = c("Tâm lý yếu", "Tâm lý ổn định", "Tâm lý vững vàng")),
+    
+    exercise_group = case_when(
+      exercise_frequency <= 2 ~ "Ít vận động",
+      exercise_frequency <= 4 ~ "Vận động vừa phải",
+      TRUE ~ "Vận động thường xuyên"
+    ) %>% factor(levels = c("Ít vận động", "Vận động vừa phải", "Vận động thường xuyên"))
+  )
+
+kable(
+  as.data.frame(table(two_way_data$mental_group)),
+  col.names = c("Mental group", "Tần số"),
+  caption = "Bảng 1. Số lượng quan sát theo mức độ sức khỏe tinh thần"
+)
+
+kable(
+  as.data.frame(table(two_way_data$exercise_group)),
+  col.names = c("Exercise group", "Tần số"),
+  caption = "Bảng 2. Số lượng quan sát theo tần suất tập thể dục"
+)
+
+kable(
+  as.data.frame(table(two_way_data$mental_group,
+                      two_way_data$exercise_group)),
+  col.names = c("Mental group", "Exercise group", "Tần số"),
+  caption = "Bảng 3. Số lượng quan sát theo từng tổ hợp nhóm"
+)
+```
+
+**Nhận xét:**
+
+-   Cả hai yếu tố sau khi chuyển đổi sang dạng thứ bậc đều đạt kích thước mẫu lớn. Cụ thể, các nhóm thuộc biến Sức khỏe tinh thần (`mental_group`) có tần số dao động từ 301 đến 382 quan sát; các nhóm thuộc biến Tần suất vận động (`exercise_group`) dao động từ 287 đến 412 quan sát.
+
+-   Tổng số $N = 1000$ quan sát được phân bổ trọn vẹn vào 9 ô tổ hợp, trong đó nhóm có quy mô nhỏ nhất đạt $n = 75$ (Tâm lý yếu $\times$ Vận động vừa phải) và lớn nhất đạt $n = 156$ (Tâm lý vững vàng $\times$ Ít vận động).
+
+#### **Thống kê mô tả**
+
+```{r}
+summary_two_way <- two_way_data %>%
+  group_by(mental_group, exercise_group) %>%
+  get_summary_stats(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score,
+    type = "mean_sd"
+  )
+
+print(summary_two_way, n = 30)
+```
+
+**Nhận xét:** Giá trị trung bình của ba biến phụ thuộc có sự khác biệt rõ rệt giữa các tổ hợp nhóm, nhưng mức độ khác biệt không đồng đều giữa ba chỉ tiêu.
+
+Đáng chú ý nhất là **exam_score**: điểm thi có xu hướng tăng dần và khá nhất quán theo chiều sức khỏe tinh thần tốt hơn, từ nhóm Tâm lý yếu (60.7–69.3 điểm) đến Tâm lý ổn định (66.6–69.9 điểm) và cao nhất ở Tâm lý vững vàng (73.5–80.4 điểm). Trong cùng một nhóm tâm lý, điểm thi cũng có xu hướng tăng theo tần suất vận động, và mức tăng này thể hiện rõ nhất ở nhóm Tâm lý vững vàng — từ 73.5 điểm (Ít vận động) lên 80.4 điểm (Vận động thường xuyên), chênh lệch tới 6.9 điểm. Đây là tổ hợp có điểm thi trung bình cao nhất trong toàn bộ 9 nhóm.
+
+Ngược lại, hai biến còn lại biến động khá ít giữa các tổ hợp. **attendance_percentage** chỉ dao động trong khoảng 83.1%–85.4% (chênh lệch tối đa 2.3 điểm phần trăm) và không cho thấy xu hướng tăng/giảm rõ theo mental_group hay exercise_group. Tương tự, **study_hours_per_day** dao động từ 3.28–3.71 giờ/ngày (chênh lệch tối đa chỉ 0.43 giờ), cũng không thể hiện quy luật rõ ràng theo hai yếu tố phân loại.
+
+#### **Interaction plot**
+
+```{r, echo = FALSE}
+plot_data <- two_way_data %>%
+  select(
+    mental_group,
+    exercise_group,
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score
+  ) %>%
+  pivot_longer(
+    cols = c(study_hours_per_day,
+             attendance_percentage,
+             exam_score),
+    names_to = "Variable",
+    values_to = "Value"
+  )
+ggplot(
+  plot_data,
+  aes(
+    x = exercise_group,
+    y = Value,
+    color = mental_group,
+    group = mental_group
+  )
+) +
+  stat_summary(
+    fun = mean,
+    geom = "line",
+    linewidth = 1
+  ) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    size = 2.8
+  ) +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.15,
+    linewidth = 0.6
+  ) +
+  scale_x_discrete(
+    labels = c(
+      "Ít\nvận động",
+      "Vận động\nvừa phải",
+      "Vận động\nthường xuyên"
+    )
+  ) +
+  facet_wrap(
+    ~Variable,
+    scales = "free_y",
+    labeller = as_labeller(c(
+      study_hours_per_day = "Study hours",
+      attendance_percentage = "Attendance",
+      exam_score = "Exam score"
+    ))
+  ) +
+  labs(
+    x = "Tần suất tập thể dục",
+    y = NULL,
+    color = "Sức khỏe tinh thần"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold", size = 12),
+    axis.text.x = element_text(size = 10, lineheight = 0.9),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+```
+
+**Nhận xét:** Giá trị trung bình của ba biến phụ thuộc thay đổi theo từng tổ hợp giữa mức độ sức khỏe tinh thần và tần suất tập thể dục. Cụ thể, đối với điểm thi (Exam score), nhóm sinh viên có tâm lý vững vàng luôn đạt điểm trung bình cao hơn hai nhóm còn lại và mức tăng rõ rệt khi tần suất tập thể dục tăng. Đối với tỷ lệ chuyên cần (Attendance) và số giờ học (Study hours), sự khác biệt giữa các nhóm nhỏ hơn nhưng xu hướng thay đổi theo tần suất tập thể dục không hoàn toàn giống nhau giữa các mức sức khỏe tinh thần.
+
+#### **Kiểm tra phân phối chuẩn nhiều chiều**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Vector các biến phụ thuộc trong mỗi nhóm tuân theo phân phối chuẩn nhiều chiều.
+
+-   $H_1$: Vector các biến phụ thuộc trong ít nhất một nhóm không tuân theo phân phối chuẩn nhiều chiều.
+
+```{r}
+two_way_data %>%
+  group_by(mental_group, exercise_group) %>%
+  doo(~ mshapiro_test(
+    .[, c("study_hours_per_day",
+          "attendance_percentage",
+          "exam_score")]
+  ))
+```
+
+**Nhận xét:** 7/9 nhóm có p-value \> 0.05, nên không bác bỏ $H_0$​, tức chưa có bằng chứng cho thấy dữ liệu của các nhóm này vi phạm giả định phân phối chuẩn nhiều chiều.
+
+Có 2 nhóm có p-value \< 0.05:
+
+-   Tâm lý yếu × Ít vận động: p = 0.0487.
+
+-   Tâm lý vững vàng × Vận động thường xuyên: p = 0.0022.
+
+Do đó, giả định phân phối chuẩn nhiều chiều không được thỏa mãn hoàn toàn ở tất cả các tổ hợp nhóm.
+
+#### **Kiểm tra tính đồng nhất của ma trận hiệp phương sai**
+
+```{r}
+box_m(
+  two_way_data[, c("study_hours_per_day",
+                   "attendance_percentage",
+                   "exam_score")],
+  interaction(two_way_data$mental_group,
+              two_way_data$exercise_group)
+)
+```
+
+**Nhận xét:** Với mức ý nghĩa $\alpha=0.001$ ta có $p-value = 0.641 >0.001$ Do đó, không bác bỏ giả thuyết $H_0$. Không có đủ bằng chứng thống kê để kết luận rằng ma trận hiệp phương sai của các tổ hợp giữa mức độ sức khỏe tinh thần và tần suất tập thể dục là khác nhau.
+
+#### **Phân tích phương sai nhiều chiều hai nhân tố (Two-Way MANOVA)**
+
+Xét đối với (`mental_group`, `exercise_group` và `mental_group × exercise_group`):
+
+-   $H_0$​: Không có sự khác biệt về vector trung bình của các biến phụ thuộc giữa các nhóm.
+
+-   $H_1$​: Có sự khác biệt về vector trung bình của ít nhất một nhóm.
+
+```{r}
+model_two_way <- lm(
+  cbind(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score
+  ) ~ mental_group * exercise_group,
+  data = two_way_data
+)
+
+# Pillai's Trace
+Manova(model_two_way, test.statistic = "Pillai")
+
+# Wilks' Lambda
+Manova(model_two_way, test.statistic = "Wilks")
+```
+
+**Nhận xét:**
+
+-   **Yếu tố mức độ sức khỏe tinh thần (`mental_group`)** có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`) với **p-value \< 2×10⁻¹⁶ \< 0.05**. Do đó, bác bỏ giả thuyết $H_0$​.
+
+-   **Yếu tố tần suất tập thể dục (`exercise_group`)** cũng có ảnh hưởng có ý nghĩa thống kê đến ba biến phụ thuộc với **p-value \< 2×10⁻¹⁶ \< 0.05**. Vì vậy, bác bỏ giả thuyết $H_0$​.
+
+-   **Tương tác giữa sức khỏe tinh thần và tần suất tập thể dục** (`mental_group:exercise_group`) có **p-value = 0.302 \> 0.05**, nên không có đủ bằng chứng để bác bỏ giả thuyết $H_0$. Điều này cho thấy **không tồn tại ảnh hưởng tương tác có ý nghĩa thống kê** giữa hai yếu tố đối với hiệu suất học tập.
+
+**Kết luận:** Hiệu suất học tập của sinh viên chịu ảnh hưởng độc lập bởi mức độ sức khỏe tinh thần và tần suất tập thể dục, nhưng không có bằng chứng cho thấy sự kết hợp giữa hai yếu tố này tạo ra ảnh hưởng tương tác đáng kể.
+
+#### **Phân tích phương sai hai nhân tố đơn biến (Two-Way Univariate ANOVAs)**
+
+Do kết quả MANOVA tổng thể cho thấy cả hai yếu tố `mental_group` và `exercise_group` đều có ảnh hưởng có ý nghĩa thống kê đến vector trung bình, nghiên cứu tiếp tục thực hiện các kiểm định Two-Way ANOVA đơn biến độc lập cho từng biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`) nhằm xác định cụ thể biến nào chịu tác động bởi các yếu tố này.
+
+**Đặt giả thuyết thống kê**
+
+Đối với mỗi biến phụ thuộc, ta tiến hành kiểm định hai nhóm giả thuyết tương ứng với hai hiệu ứng chính:
+
+-   **Hiệu ứng chính của Sức khỏe tinh thần (`mental_group`):**
+
+    -   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa các nhóm sức khỏe tinh thần khác nhau.
+
+    -   $H_1$: Tồn tại ít nhất một nhóm sức khỏe tinh thần có giá trị trung bình khác biệt.
+
+-   **Hiệu ứng chính của Tần suất tập thể dục (`exercise_group`):**
+
+    -   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa các nhóm tần suất tập thể dục khác nhau.
+
+    -   $H_1$: Tồn tại ít nhất một nhóm tần suất tập thể dục có giá trị trung bình khác biệt.
+
+*Mức ý nghĩa được thiết lập ở độ tin cậy* $\alpha = 0.05$.
+
+```{r}
+summary.aov(model_two_way)
+```
+
+**Nhận xét:** Với mức ý nghĩa $\alpha = 0.05$, phân tích tác động riêng lẻ lên từng chỉ tiêu học tập cho thấy:
+
+1.  **Đối với số giờ học mỗi ngày (`study_hours_per_day`):**
+
+    -   **Tần suất tập thể dục** có ảnh hưởng tới số giờ học ($F = 4.333,\ p = 0.0134 < 0.05$).
+
+    -   **Sức khỏe tâm lý** không có tác động đáng kể ($F = 0.825,\ p = 0.4387 > 0.05$).
+
+2.  **Đối với tỷ lệ chuyên cần (`attendance_percentage`):**
+
+    -   Cả hai yếu tố sức khỏe tinh thần ($p = 0.2606$) và tần suất tập thể dục ($p = 0.5399$) **đều không ảnh hưởng tới tỷ lệ chuyên cần** ($p > 0.05$).
+
+3.  **Đối với điểm thi cuối kỳ (`exam_score`):**
+
+    -   Cả **Sức khỏe tâm lý** ($F = 54.904,\ p < 2.2\times10^{-16}$) và **Tần suất tập thể dục** ($F = 14.623,\ p = 5.51\times10^{-7}$) **đều tác động độc lập cực kỳ mạnh mẽ** đến điểm số ($p < 0.001$).
+
+-   **Về ảnh hưởng tương tác (`mental_group : exercise_group`):**
+
+    -   Nhất quán với kết quả MANOVA tổng thể, hiệu ứng tương tác giữa hai yếu tố **không đạt ý nghĩa thống kê trên cả 3 biến phụ thuộc** (các giá trị $p$-value lần lượt là $0.917;\ 0.353;\ 0.367$, đều $> 0.05$).
+
+#### **Phân tích hậu nghiệm (Post-hoc Test)**
+
+Mục đích của bước này nhằm so sánh từng cặp nhóm để chỉ ra cụ thể những trạng thái nào tạo ra sự khác biệt có ý nghĩa thống kê đối với hiệu suất học tập. Theo kết quả ANOVA ở bước trước, các cặp so sánh cần thực hiện bao gồm:
+
+1.  So sánh các cặp mức độ **Sức khỏe tinh thần** (`mental_group`) đối với **Điểm thi cuối kỳ** (`exam_score`).
+
+2.  So sánh các cặp **Tần suất vận động** (`exercise_group`) đối với **Điểm thi cuối kỳ** (`exam_score`).
+
+3.  So sánh các cặp **Tần suất vận động** (`exercise_group`) đối với **Số giờ học mỗi ngày** (`study_hours_per_day`).
+
+**Đặt giả thuyết thống kê:**
+
+Đối với mỗi cặp nhóm phân loại (Ký hiệu là Nhóm $A$ và Nhóm $B$) khi xét trên một biến phụ thuộc cụ thể, các giả thuyết được thiết lập như sau:
+
+-   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa nhóm $A$ và nhóm $B$. ($\mu_A = \mu_B$)
+
+-   $H_1$: Tồn tại sự khác biệt có ý nghĩa thống kê về giá trị trung bình của biến phụ thuộc giữa nhóm $A$ và nhóm $B$. ($\mu_A \neq \mu_B$)
+
+Mức ý nghĩa kiểm định được thiết lập tại độ tin cậy $\alpha = 0.05$.
+
+```{r}
+# 1. Kiểm định hậu nghiệm cho biến Điểm thi cuối kỳ (exam_score)
+tukey_exam_mental <- two_way_data %>% tukey_hsd(exam_score ~ mental_group)
+tukey_exam_exercise <- two_way_data %>% tukey_hsd(exam_score ~ exercise_group)
+
+# 2. Kiểm định hậu nghiệm cho biến Số giờ học mỗi ngày (study_hours_per_day)
+tukey_study_exercise <- two_way_data %>% tukey_hsd(study_hours_per_day ~ exercise_group)
+```
+
+```{r, echo = FALSE}
+kable(tukey_exam_mental[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 4. So sánh cặp Tukey HSD cho Điểm thi theo Sức khỏe tinh thần")
+```
+
+**Nhận xét:** Kết quả kiểm định cho thấy cả 3 cặp nhóm tâm lý đều có sự khác biệt về điểm thi mang ý nghĩa thống kê rất cao ($p_{adj} < 0.01$). Cụ thể:
+
+-   Nhóm **Tâm lý vững vàng** có điểm thi trung bình cao hơn nhóm *Tâm lý ổn định* là **8.04 điểm** ($p_{adj} < 0.001$) và cao hơn nhóm *Tâm lý yếu* tới **12.47 điểm** ($p_{adj} < 0.001$).
+
+-   Nhóm **Tâm lý ổn định** cũng có điểm thi cao hơn nhóm *Tâm lý yếu* là **4.43 điểm** ($p_{adj} = 0.00182$).
+
+$\rightarrow$ ***Kết luận**:* Điểm thi cuối kỳ tăng theo chiều thuận với sức khỏe tinh thần; trạng thái tâm lý càng tốt thì kết quả điểm thi càng cao.
+
+```{r, echo = FALSE}
+kable(tukey_exam_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 5. So sánh cặp Tukey HSD cho Điểm thi theo Tần suất vận động")
+```
+
+**Nhận xét:** Kết quả so sánh cặp cho thấy sự phân hóa rõ rệt đến từ nhóm vận động cường độ cao:
+
+-   Nhóm **Vận động thường xuyên** đạt điểm thi trung bình cao hơn hẳn so với nhóm Ít vận động là **6.26 điểm** ($p_{adj} = 2.60 \times 10^{-6}$) và cao hơn nhóm Vận động vừa phải là **5.10 điểm** ($p_{adj} = 6.52 \times 10^{-4}$).
+
+-   Trong khi đó, giữa nhóm Ít vận động và Vận động vừa phải **không có sự khác biệt** về điểm thi ($\text{estimate} = 1.16,\ p_{adj} = 0.637 > 0.05$).
+
+$\rightarrow$ **Kết luận**: Hoạt động thể chất chỉ thực sự tạo ra tác động cải thiện điểm số thi cử khi sinh viên duy trì ở tần suất thường xuyên (5–7 lần/tuần).
+
+```{r, echo = FALSE}
+kable(tukey_study_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 6. So sánh cặp Tukey HSD cho Số giờ học theo Tần suất vận động")
+```
+
+**Nhận xét:**
+
+-   Giữa nhóm **Ít vận động** và **Vận động vừa phải** có sự khác biệt ($p_{adj} = 0.00974 < 0.01$), trong đó nhóm Vận động vừa phải có số giờ học trung bình mỗi ngày **ít hơn** nhóm Ít vận động là **0.33 giờ** (khoảng 20 phút).
+
+-   Các cặp so sánh còn lại giữa **Vận động thường xuyên** với hai nhóm kia đều không có sự khác biệt ($p_{adj} > 0.05$).
+
+Khi đối chiếu đồng thời kết quả kiểm định giữa **Bảng 5** (Điểm thi) và **Bảng 6** (Số giờ học), nghiên cứu phát hiện một thực tế đáng chú ý ở cặp nhóm **Ít vận động** và **Vận động vừa phải**:
+
+-   Sinh viên Ít vận động dành nhiều thời gian ngồi học hơn sinh viên Vận động vừa phải (nhiều hơn 0.33 giờ/ngày).
+
+-   Tuy nhiên, điểm thi cuối kỳ của hai nhóm này lại **tương đương nhau** ($p_{adj} = 0.637$).
+
+Điều này chỉ ra rằng việc ngồi học lâu nhưng cơ thể thiếu đi sự vận động thể chất tương ứng sẽ không giúp sinh viên cải thiện được điểm số đầu ra.
+
+### **(e): Đánh giá mô hình và kết quả phân tích, diễn giải kết quả và thảo luận ý nghĩa thực tiễn**
+
+Các giả định quan trọng của mô hình MANOVA đều được thỏa mãn ở cả hai bài toán, giúp các kết luận có độ tin cậy thống kê cao. Đáng chú ý, mức độ ảnh hưởng giữa hai nhóm yếu tố không đồng đều: yếu tố gia đình (Bài toán 1) chỉ giải thích một phần nhỏ sự khác biệt, trong khi yếu tố lối sống – sức khỏe (Bài toán 2) có tác động rõ rệt hơn nhiều.
+
+Về ý nghĩa thực tiễn, kết quả nghiên cứu cho thấy **trình độ học vấn của cha mẹ** chủ yếu **liên quan đến mức độ chuyên cần của sinh viên**, nhưng **không tạo ra sự khác biệt đáng kể về thời gian tự học và điểm thi cuối kỳ**. Điều này cho thấy môi trường giáo dục gia đình có thể góp phần hình thành tính kỷ luật và ý thức học tập, song thành tích học tập ở bậc đại học còn phụ thuộc vào nhiều yếu tố cá nhân khác.
+
+Bên cạnh đó, **sức khỏe tinh thần** được xác định là yếu tố có mối liên hệ mạnh với kết quả học tập. Sinh viên có **trạng thái tâm lý tích cực** thường **đạt điểm số cao hơn**, cho thấy việc duy trì sức khỏe tinh thần tốt có thể giúp nâng cao khả năng tập trung, quản lý áp lực học tập và cải thiện hiệu quả tiếp thu kiến thức.
+
+Kết quả nghiên cứu cũng cho thấy việc **dành nhiều thời gian học tập hơn chưa chắc mang lại kết quả học tập tốt hơn**. Ngược lại, sinh viên **duy trì thói quen vận động thường xuyên** có xu hướng **đạt kết quả học tập cao hơn**. Phát hiện này gợi ý rằng việc cân bằng giữa học tập, sức khỏe tinh thần và hoạt động thể chất có thể đóng vai trò quan trọng trong việc nâng cao hiệu suất học tập của sinh viên trong dài hạn.
+
+### **Phương pháp 2: Multiple Linear Regression**
+
+Bên cạnh việc đánh giá sự khác biệt về kết quả học tập giữa các nhóm sinh viên bằng phương pháp MANOVA, nghiên cứu tiếp tục sử dụng hồi quy tuyến tính bội nhằm xác định các yếu tố ảnh hưởng đến điểm thi cuối kỳ của sinh viên.
+
+Cụ thể, nghiên cứu xem xét đồng thời toàn bộ các biến có trong bộ dữ liệu (ngoại trừ `student_id`) để đánh giá mức độ tác động của từng yếu tố đến biến phụ thuộc là điểm thi cuối kỳ (`exam_score`). Các biến giải thích bao gồm các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập của sinh viên.
+
+Mục tiêu của mô hình hồi quy là:
+
+-   Xác định những yếu tố có ảnh hưởng đáng kể đến điểm thi cuối kỳ của sinh viên.
+
+-   Đánh giá chiều hướng và mức độ tác động của từng yếu tố đến kết quả học tập khi các yếu tố khác được giữ không đổi.
+
+-   Xây dựng mô hình dự báo điểm thi cuối kỳ dựa trên các đặc điểm của sinh viên.
+
+**Biến phụ thuộc:** Y= `exam_score`
+
+**Biến độc lập:**
+
+-   Nhóm nhân khẩu học: `age`, `gender` ,`parental_education_level`
+
+-   Nhóm thói quen học tập: `study_hours_per_day`, `attendance_percentage`
+
+-   Nhóm giải trí: `social_media_hours`, `netflix_hours`
+
+-   Nhóm sức khỏe: `sleep_hours`, `exercise_frequency`, `mental_health_rating`, `diet_quality`
+
+-   Nhóm điều kiện học tập: `internet_quality`, `part_time_job`
+
+-   Nhóm hoạt động ngoại khóa: `extracurricular_participation`
+
+Trước khi xây dựng mô hình, các biến định tính được chuyển đổi thành biến giả (dummy variables) như trình bày tại **Phụ lục D.1**, và thống kê mô tả tổng quan của toàn bộ các biến được trình bày tại **Phụ lục D.2**. Mô hình hồi quy tuyến tính bội tổng quát với đầy đủ 14 biến độc lập nêu trên được trình bày chi tiết tại **Phụ lục D.3.**
+
+#### **Kiểm định ý nghĩa tổng thể của mô hình**
+
+$$H_0 : \beta_1 = \beta_2 = \cdots = \beta_{14} = 0$$
+
+(Tất cả các biến độc lập không ảnh hưởng đến `exam_score`.)
+
+$$H_1 : \exists \beta_i \neq 0.$$
+
+(Tồn tại ít nhất một biến độc lập ảnh hưởng đến `exam_score`.)
+
+```{r}
+# Loại bỏ biến định danh
+data <- subset(data, select = -student_id)
+
+# Chuyển các biến định tính thành factor
+cat_vars <- c(
+  "gender",
+  "parental_education_level",
+  "diet_quality",
+  "internet_quality",
+  "part_time_job"
+)
+
+data[cat_vars] <- lapply(data[cat_vars], factor)
+# Xây dựng mô hình hồi quy đầy đủ
+model_full <- lm(exam_score ~ ., data = data)
+
+# Kết quả mô hình
+summary(model_full)
+```
+
+**Nhận xét:** Kết quả hồi quy cho thấy mô hình có ý nghĩa thống kê tổng thể với F = 473.9 và $p < 2.2 \times 10^{-16}$. Do đó, bác bỏ giả thuyết $H_0$, cho thấy **tồn tại ít nhất một biến độc lập có ảnh hưởng đến điểm thi cuối kỳ** (`exam_score`).
+
+Hệ số xác định $R^2 = 0.9018$ cho thấy khoảng **90.18%** sự biến thiên của điểm thi cuối kỳ được giải thích bởi các biến độc lập trong mô hình, trong khi **9.82%** còn lại được giải thích bởi các yếu tố khác chưa được đưa vào mô hình hoặc do sai số ngẫu nhiên. Bên cạnh đó, **Adjusted** $R^2 = 0.8999$ rất gần với $R^2$, chứng tỏ mô hình có khả năng giải thích tốt và việc đưa nhiều biến độc lập vào mô hình không làm giảm chất lượng mô hình do các biến dư thừa.
+
+Các giả định của mô hình hồi quy tuyến tính đã được kiểm tra đầy đủ: kiểm tra đa cộng tuyến thông qua hệ số VIF, cho kết quả toàn bộ hệ số đều nhỏ hơn ngưỡng cho phép **(Phụ lục D.4)**; kiểm tra phân phối chuẩn của phần dư bằng Histogram, QQ-Plot và kiểm định Shapiro–Wilk **(Phụ lục D.5)**; kiểm tra tính đồng nhất phương sai sai số bằng biểu đồ Residuals vs Fitted và kiểm định Breusch–Pagan **(Phụ lục D.6)**; và kiểm tra tính độc lập của sai số bằng kiểm định Durbin–Watson **(Phụ lục D.7)**. Kết quả cho thấy tất cả các giả định trên đều được thỏa mãn ở mức chấp nhận được, đảm bảo độ tin cậy của mô hình hồi quy.
+
+#### **Kiểm định ý nghĩa của từng hệ số hồi quy**
+
+Đối với mỗi biến $X_i$, giả thuyết là:
+
+$$H_0 : \beta_i = 0$$
+
+(Hệ số hồi quy của biến $X_i$ bằng 0, tức là khi giữ các biến khác không đổi, biến đó **không có ảnh hưởng tuyến tính** đến `exam_score`.)
+
+$$H_1 : \beta_i \neq 0$$
+
+(Hệ số hồi quy của biến $X_i$ khác 0, tức là biến đó **có ảnh hưởng tuyến tính** đến `exam_score`.)
+
+```{r, echo = FALSE}
+coef_table <- summary(model_full)$coefficients
+
+result <- data.frame(
+  Variable = rownames(coef_table),
+  Coefficient = round(coef_table[, "Estimate"], 3),
+  P_value = coef_table[, "Pr(>|t|)"],
+  row.names = NULL
+)
+
+result <- subset(result, Variable != "(Intercept)")
+rownames(result) <- NULL
+
+# Hiển thị p-value 
+result$P_value <- ifelse(result$P_value < 0.001,
+                         "<0.001",
+                         sprintf("%.4f", result$P_value))
+
+colnames(result) <- c("Biến", "Hệ số hồi quy", "P-value")
+
+kable(
+  result,
+  align = "lcc",
+  caption = "Hệ số hồi quy và ý nghĩa thống kê của các biến"
+) %>%
+  kable_styling(
+    full_width = FALSE,
+    position = "center"
+  )
+```
+
+**Nhận xét:** Với mức ý nghĩa 5%, các biến `study_hours_per_day`, `social_media_hours`, `netflix_hours`, `attendance_percentage`, `sleep_hours`, `exercise_frequency` và `mental_health_rating` có **ý nghĩa thống kê** ($p < 0.05$). Điều này cho thấy các biến này có ảnh hưởng đáng kể đến điểm thi cuối kỳ khi các yếu tố khác được giữ không đổi. Ngược lại, các biến `age`, `gender`, `part_time_job`, `diet_quality`, `parental_education_level`, `internet_quality` và `extracurricular_participation` đều có $p > 0.05$, nên **chưa có đủ bằng chứng** để kết luận chúng ảnh hưởng đến điểm thi cuối kỳ trong mô hình. Cụ thể:
+
+-   `study_hours_per_day` ($\beta = 9.575$): Khi số giờ học mỗi ngày tăng thêm 1 giờ, điểm thi cuối kỳ dự kiến **tăng khoảng 9.575 điểm**, với điều kiện các yếu tố khác không đổi.
+-   `social_media_hours` ($\beta = -2.602$): Khi thời gian sử dụng mạng xã hội tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **giảm khoảng 2.60 điểm**, nếu các yếu tố khác không đổi.
+-   `netflix_hours` ($\beta = -2.282$): Khi thời gian xem Netflix tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **giảm khoảng 2.28 điểm**, trong điều kiện các yếu tố khác không đổi.
+-   `attendance_percentage` ($\beta = 0.143$): Khi tỷ lệ chuyên cần tăng thêm 1%, điểm thi cuối kỳ dự kiến **tăng khoảng 0.143 điểm**, khi các yếu tố khác không đổi.
+-   `sleep_hours` ($\beta = 1.992$): Khi thời gian ngủ tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **tăng khoảng 1.992 điểm**, với các yếu tố khác được giữ nguyên.
+-   `exercise_frequency` ($\beta = 1.450$): Khi tần suất tập thể dục tăng thêm 1 đơn vị, điểm thi cuối kỳ dự kiến **tăng khoảng 1.45 điểm**, nếu các yếu tố khác không đổi.
+-   `mental_health_rating` ($\beta = 1.944$): Khi mức đánh giá sức khỏe tinh thần tăng thêm 1 đơn vị, điểm thi cuối kỳ dự kiến **tăng khoảng 1.944 điểm**, trong điều kiện các yếu tố khác không đổi.
+
+#### **(e): Đánh giá mô hình và kết quả phân tích, diễn giải kết quả và thảo luận ý nghĩa thực tiễn**
+
+Kết quả phân tích hồi quy tuyến tính bội cho thấy mô hình có khả năng giải thích tốt sự biến thiên của điểm thi cuối kỳ của sinh viên ( $R^2=0.9018$) và đáp ứng các giả định cần thiết để đưa ra các kết luận thống kê đáng tin cậy.
+
+Phân tích chỉ ra rằng **thời gian học tập mỗi ngày** là yếu tố có ảnh hưởng tích cực mạnh nhất đến điểm thi cuối kỳ. Bên cạnh đó, **tỷ lệ chuyên cần**, **thời gian ngủ**, **tần suất tập thể dục** và **mức độ sức khỏe tinh thần** cũng có tác động tích cực và có ý nghĩa thống kê đến kết quả học tập. Ngược lại, việc dành nhiều thời gian cho **mạng xã hội** và **Netflix** có xu hướng làm giảm điểm thi cuối kỳ.
+
+Đối với các yếu tố như **tuổi**, **giới tính**, **trình độ học vấn của phụ huynh**, **chất lượng chế độ ăn**, **chất lượng Internet**, **việc làm bán thời gian** và **tham gia hoạt động ngoại khóa**, nghiên cứu chưa tìm thấy bằng chứng thống kê cho thấy chúng ảnh hưởng đáng kể đến điểm thi cuối kỳ khi đã kiểm soát các yếu tố khác trong mô hình.
+
+Nhìn chung, kết quả nghiên cứu cho thấy **thói quen học tập và lối sống của sinh viên có vai trò quan trọng hơn các đặc điểm nhân khẩu học và điều kiện cá nhân trong việc dự đoán kết quả học tập**. Điều này cho thấy rằng việc duy trì thời gian học hợp lý, nâng cao tỷ lệ chuyên cần, đảm bảo giấc ngủ, rèn luyện thể chất và chăm sóc sức khỏe tinh thần, đồng thời hạn chế thời gian dành cho các hoạt động giải trí trực tuyến, có thể góp phần cải thiện kết quả học tập của sinh viên.
+
+## **(f): Đề xuất các phương pháp khác có thể cho kết quả tốt hơn**
+
+Mặc dù phương pháp **MANOVA** và **Multiple Linear Regression** đã giúp giải quyết các mục tiêu nghiên cứu và cho thấy nhiều kết quả có ý nghĩa thống kê, song vẫn còn một số phương pháp phân tích khác có thể được xem xét trong các nghiên cứu tiếp theo nhằm khai thác dữ liệu sâu hơn và nâng cao khả năng giải thích mô hình.
+
+Đối với bài toán so sánh sự khác biệt giữa các nhóm sinh viên, **MANCOVA (Multivariate Analysis of Covariance)** là một lựa chọn phù hợp. Phương pháp này cho phép đánh giá ảnh hưởng của các biến phân loại đến nhiều biến phụ thuộc đồng thời, đồng thời kiểm soát ảnh hưởng của các biến đồng biến (covariates) như tuổi, giới tính hoặc thời gian sử dụng mạng xã hội. Nhờ đó, kết quả thu được có thể phản ánh chính xác hơn ảnh hưởng thực sự của các yếu tố nghiên cứu.
+
+Đối với bài toán xác định các yếu tố ảnh hưởng đến điểm thi cuối kỳ, có thể xem xét sử dụng **LASSO Regression**, **Ridge Regression** hoặc **Elastic Net Regression**. Các phương pháp này đặc biệt hữu ích khi số lượng biến độc lập lớn hoặc tồn tại nhiều biến có mức độ liên quan với nhau, giúp lựa chọn biến quan trọng và hạn chế hiện tượng mô hình quá khớp (overfitting), từ đó nâng cao khả năng dự báo trên dữ liệu mới.
+
+Ngoài ra, **Structural Equation Modeling (SEM)** cũng là một hướng nghiên cứu tiềm năng. Khác với hồi quy tuyến tính thông thường, SEM cho phép đánh giá đồng thời các mối quan hệ trực tiếp và gián tiếp giữa các yếu tố như điều kiện gia đình, thói quen học tập, sức khỏe tinh thần, lối sống và kết quả học tập. Đồng thời, phương pháp này còn có khả năng xây dựng và phân tích các biến tiềm ẩn, giúp mô hình phản ánh tốt hơn bản chất của quá trình học tập.
+
+Bên cạnh đó, do exam_score bị giới hạn trần tại 100 điểm, mô hình Tobit Regression (censored regression) cũng là một hướng phù hợp để xử lý đúng bản chất bị chặn của biến phụ thuộc.
+
+Nhìn chung, việc lựa chọn phương pháp phân tích phụ thuộc vào mục tiêu nghiên cứu. Trong khi **MANOVA** và **Multiple Linear Regression** phù hợp để kiểm định giả thuyết và diễn giải ảnh hưởng của các yếu tố, các phương pháp hiện đại hơn có thể giúp nâng cao khả năng dự báo và khai thác sâu hơn cấu trúc của dữ liệu.
+
+## **(g): Kết luận**
+
+\renewcommand{\arraystretch}{1.4}
+
+\begin{longtable}{|>{\raggedright\arraybackslash\color{RoyalBlue}\bfseries}p{2.8cm}|>{\raggedright\arraybackslash}p{6.3cm}|>{\raggedright\arraybackslash}p{6.3cm}|}
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
+\endfirsthead
+
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
+\endhead
+
+Mục tiêu & Xác định các yếu tố phân loại có ảnh hưởng \textbf{đồng thời} đến ba chỉ tiêu hiệu suất học tập & Xác định mức độ và \textbf{chiều hướng} ảnh hưởng riêng lẻ của từng yếu tố đến điểm thi, xây dựng mô hình dự báo \\ \hline
+
+Biến phụ thuộc & Vector 3 biến: \newline \texttt{study\_hours\_per\_day}, \newline \texttt{attendance\_percentage}, \newline \texttt{exam\_score} & 1 biến: \texttt{exam\_score} \\ \hline
+
+Biến độc lập được xét & \textbullet~\textbf{Bài toán 1:} \texttt{parental\_education\_level} (sàng lọc từ 6 biến phân loại bằng Bonferroni) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group}, \texttt{exercise\_group} và tương tác giữa hai yếu tố & Toàn bộ 14 biến: nhân khẩu học, thói quen học tập, giải trí, sức khỏe, điều kiện học tập, ngoại khóa \\ \hline
+
+Giả định đã kiểm tra & Phân phối chuẩn nhiều chiều (Shapiro-Wilk), đồng nhất hiệp phương sai (Box's M) & Đa cộng tuyến (VIF), chuẩn phần dư (Shapiro-Wilk), đồng nhất phương sai (Breusch-Pagan), độc lập sai số (Durbin-Watson) \\ \hline
+
+Kết quả kiểm định tổng quát & \textbullet~\textbf{Bài toán 1:} Wilks' $\Lambda = 0.977$, $p = 0.006$ (có ý nghĩa nhưng effect size nhỏ) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group} và \texttt{exercise\_group} đều $p < 2 \times 10^{-16}$; tương tác không ý nghĩa ($p = 0.302$) & $R^2 = 0.902$, Adjusted $R^2 = 0.900$, $F = 473.9$, $p < 2.2 \times 10^{-16}$ \\ \hline
+
+Yếu tố có ý nghĩa thống kê & \textbullet~Trình độ học vấn cha mẹ $\rightarrow$ chỉ ảnh hưởng đến \textbf{chuyên cần} (không ảnh hưởng giờ học, điểm thi) \newline \newline \textbullet~Sức khỏe tinh thần \& tần suất vận động $\rightarrow$ ảnh hưởng mạnh đến \textbf{điểm thi} \newline \newline \textbullet~Vận động $\rightarrow$ ảnh hưởng cả \textbf{giờ học} & \textbullet~\textbf{Tác động dương:} \texttt{study\_hours\_per\_day} ($\beta=9.575$), \texttt{sleep\_hours} ($\beta=1.992$), \texttt{mental\_health\_rating} ($\beta=1.944$), \texttt{exercise\_frequency} ($\beta=1.450$), \texttt{attendance\_percentage} ($\beta=0.143$) \newline \newline \textbullet~\textbf{Tác động âm:} \texttt{social\_media\_hours} ($\beta=-2.602$), \texttt{netflix\_hours} ($\beta=-2.282$) \\ \hline
+
+Yếu tố không có ý nghĩa thống kê & Giới tính, việc làm thêm, chế độ ăn, chất lượng Internet, ngoại khóa (khi sàng lọc sơ bộ) & Tuổi, giới tính, trình độ học vấn cha mẹ, chế độ ăn, chất lượng Internet, việc làm thêm, ngoại khóa \\ \hline
+
+Post-hoc / diễn giải chiều hướng & Tukey HSD: Master/High School $>$ None (chuyên cần); Tâm lý vững vàng $>$ ổn định $>$ yếu (điểm thi); Vận động thường xuyên $>$ hai nhóm còn lại (điểm thi) & Không áp dụng post-hoc; diễn giải trực tiếp qua dấu và độ lớn hệ số hồi quy khi kiểm soát các biến khác \\ \hline
+
+Ý nghĩa thống kê & Chứng minh \textbf{có tồn tại khác biệt nhóm} khi xét đồng thời nhiều chỉ tiêu; phân biệt được yếu tố ảnh hưởng mạnh (sức khỏe – lối sống) và yếu (gia đình); không có tương tác giữa sức khỏe tinh thần và vận động & Định lượng chính xác \textbf{mức độ và chiều hướng} tác động của từng biến khi kiểm soát các biến còn lại; mô hình giải thích được $\sim$ 90\% biến thiên điểm thi \\ \hline
+
+Ý nghĩa thực tiễn & Môi trường giáo dục gia đình góp phần hình thành tính kỷ luật (chuyên cần) nhưng không quyết định kết quả học tập; sức khỏe tinh thần tốt và vận động đều đặn là yếu tố thực sự cải thiện thành tích, học nhiều giờ mà thiếu vận động không hiệu quả & Thói quen học tập và lối sống (học tập, ngủ, vận động, sức khỏe tinh thần) quan trọng hơn đặc điểm nhân khẩu học/gia đình; hạn chế mạng xã hội và Netflix có thể cải thiện điểm số \\ \hline
+
+Hạn chế & Một số tổ hợp nhóm vi phạm nhẹ giả định chuẩn nhiều chiều; cỡ mẫu không hoàn toàn cân bằng giữa các nhóm & \texttt{exam\_score} bị chặn trần tại 100 gây phần dư âm bất thường ở nhóm điểm tối đa (censored data) \\ \hline
+\end{longtable}
+
+**Kết luận chung:** Hai phương pháp có tính bổ sung lẫn nhau — MANOVA giúp xác định những yếu tố phân loại tạo ra sự khác biệt về hiệu suất học tập khi xem xét đồng thời nhiều chỉ tiêu, trong khi Multiple Linear Regression giúp định lượng chính xác mức độ và chiều hướng tác động của từng yếu tố đến điểm thi cuối kỳ. Kết quả của cả hai phương pháp đều đồng thuận rằng thói quen học tập, giấc ngủ, vận động thể chất và sức khỏe tinh thần đóng vai trò quan trọng hơn các đặc điểm nhân khẩu học hay điều kiện gia đình trong việc cải thiện hiệu suất học tập của sinh viên.
+
+\baibox{Bài 3: Dataset "ESS ERIC"}
+
+## **Giới thiệu đề tài nghiên cứu và bộ dữ liệu**
+
+-   Đề tài nghiên cứu: Phân tích cấu trúc hệ giá trị cá nhân và ảnh hưởng của các yếu tố nhân khẩu học đến chất lượng cuộc sống bằng phương pháp Phân tích thành phần chính, Phân tích nhân tố và Phân tích phương sai nhiều chiều.
+
+-   Nguồn dữ liệu: Dữ liệu trích xuất từ cuộc khảo sát chuẩn của European Social Survey (ESS) (chỉ trích xuất 2 quốc gia là Anh và Đức)
+
+(European Social Survey European Research Infrastructure (ESS ERIC) (2026) ESS11 - integrated file, edition 4.1 [Data set]. Sikt - Norwegian Agency for Shared Services in Education and Research. <https://doi.org/10.21338/ess11e04_1>.)
+
+-   Mục tiêu nghiên cứu:
+
+    -   Khám phá sự khác biệt quan điểm về hệ giá trị cá nhân dựa trên các yếu tố như giới tính, tôn giáo, chính trị.
+
+    -   Phân tích và rút gọn các biến đo lường thành các nhân tố chính đại diện.
+
+-   Mô tả bộ dữ liệu: Bộ dữ liệu được trích xuất từ European Social Survey (ESS) (Khảo sát Xã hội Châu Âu), một dự án khảo sát xuyên quốc gia uy tín được thực hiện hai năm một lần, bắt đầu từ năm 2002, được thực hiện qua các vòng (hiện tại là vòng khảo sát thứ 11). Dữ liệu gốc là một kho tàng đồ sộ với hàng triệu quan trắc và gần 3000 biến. Tuy nhiên, bộ dữ liệu nhóm lấy chỉ trích xuất lại khoảng hơn 20000 quan trắc và 36 biến từ 2 quốc gia Anh và Đức. Các biến cụ thể được trình bày trong ***Phụ lục A*** cho Data 3:
+
+## **(a): Khám phá và tiền xử lý dữ liệu**
+
+```{r}
+ESS <- read.csv("essUKandGer.csv")
+glimpse(ESS)
+```
+
+**Nhận xét:** Nhìn sơ qua cấu trúc của bộ dữ liệu, ta thấy bộ dữ liệu có 21089 quan sát với 36 biến. Ngoài các biến định tính chỉ thông tin của cuộc khảo sát như `idno, essround` hay các biến chỉ tuổi tác, giới tính và quốc gia như `agea, gndr, cntry` thì hầu hết bao trùm bộ dữ liệu sẽ là các biến định lượng được biểu diễn dưới dạng thang đo (được biểu diễn theo thang điểm 4, 5, 6, 7 hoặc 10.)
+
+Để có thể thực hiện các bước phân tích thống kê, trước tiên ta sẽ tiền xử lý cho bộ dữ liệu.
+
+#### **Tiền xử lý dữ liệu**
+
+Bước đầu tiên, để các biến thể hiện rõ hơn ý nghĩa của chúng, ta sẽ đặt lại tên biến như sau:
+
+```{r}
+ESS <- ESS %>%
+  rename(
+    # 
+    id = idno, country = cntry, gender = gndr, age = agea, 
+    incomeLevel = hinctnta, livingArea = domicil, surveyRound = essround,
+    #
+    eduYears = eduyrs, workHours = wkhtot, tvHours = tvtot, famSize = hhmmb,
+    #
+    creative = ipcrtiv, adventure = ipadvnt, hedonism = ipgdtim,
+    success = ipsuces, rich = imprich, safety = impsafe, tradition = imptrad,
+    rules = ipfrule, helpful = iphlppl, equality = ipeqopt,
+    # 
+    tPolice = trstplc, tPolitician = trstplt, tLegal = trstlgl,
+    polInterest = polintr, boycott = bctprd, signed = sgnptit,
+    # 
+    lifeSatis = stflife, happy = happy, health = health,
+    socialMeet = sclmeet, socialAct = sclact,
+    # 
+    religBelong = rlgblg, levelRelig = rlgdgr, pray = pray, religAttd = rlgatnd
+  )
+names(ESS)
+```
+
+Tiếp theo, ta sẽ xử lý các dữ liệu khuyết. Trước tiên, ta thử kiểm tra xem bộ dữ liệu có bị khuyết không?
+
+```{r}
+any(is.na(ESS))
+```
+
+Vậy bộ dữ liệu không gặp vấn đề bỏ trống hay NA. Tuy nhiên, bộ dữ liệu này đặc biệt ở chỗ là đối với những người được khảo sát mà không có kết quả, tác giả sẽ ký hiệu là `666, 77, 88, 9,...`. Do đó, để xử lý, ta sẽ phân loại các biến có cùng thang đo điểm, sau đó mới xử lý từ từ.
+
+Trước tiên, ta sẽ xử lý cho nhóm có thang đo 4, 5 và 6 và các biến nhị phân. Nhóm này ta có thể xử lý chung, vì chỉ cần loại bỏ những dòng dữ liệu lớn hơn 6 ở những biến này. Ta làm như sau:
+
+```{r}
+ESS <- ESS %>%
+  mutate(
+    across(c(polInterest, health, socialAct, livingArea,
+             creative, adventure, hedonism, success, rich, 
+             safety, tradition, rules, helpful, equality,
+             boycott, signed, religBelong, gender), 
+           ~ ifelse(. > 6, NA, .))) %>% 
+  na.omit()
+dim(ESS)
+```
+
+Lúc này, bộ dữ liệu vẫn còn hơn 20 nghìn quan sát. Tiếp theo, ta xử lý tương tự với nhóm thang đo 7 và 10 như sau:
+
+```{r}
+ESS <- ESS %>%
+  mutate(
+    across(c(socialMeet, pray, religAttd, tvHours), 
+           ~ ifelse(. > 7, NA, .)),
+    across(c(tPolice, tPolitician, tLegal, lifeSatis, happy, levelRelig, incomeLevel), 
+           ~ ifelse(. > 10, NA, .))
+  ) %>%
+na.omit()
+```
+
+Tiếp theo, ta sẽ sẽ kiểm tra các giá trị của biến `age` như sau:
+
+```{r}
+table(ESS$age)
+```
+
+Ta thấy số tuổi 999 là hoàn toàn vô lý. Ta sẽ xử lý biến `age` và biến `workHours`, bằng cách loại những dòng có số giờ làm việc lớn hơn 168 (Vì đây là biến thể hiện tổng số giờ làm việc trong tuần) như sau:
+
+```{r}
+ESS <- ESS %>%
+  mutate(
+    across(age, 
+           ~ ifelse(. == 999, NA, .)),
+    across(workHours, 
+           ~ ifelse(. > 168, NA, .))
+  ) %>%
+na.omit()
+dim(ESS)
+```
+
+Như vậy, bộ dữ liệu của chúng ta còn 15607 quan trắc với 36 biến, đủ để thực hiện những phân tích thống kê tiếp theo.
+
+Trong bộ dữ liệu ESS, các tác giả thiết kế câu hỏi với nhiều chiều hướng khác nhau. Ví dụ, biến `happy` đo từ 0 (Hoàn toàn không) đến 10 (Rất hạnh phúc) nên điểm càng cao thì càng tốt. Ngược lại, Thang đo Schwartz `(creative, safety...)` đo từ 1 (Rất giống tôi) đến 6 (Hoàn toàn không giống tôi) nên điểm càng cao thì càng kém (Không có giá trị đó). Do đó, điều này gợi ý cho chúng ta việc **đảo ngược thang đo**, giúp ta thống nhất một quy tắc duy nhất: Điểm càng cao thì Mức độ của biến đó càng lớn. Trong R, ta làm như sau:
+
+```{r}
+ESS <- ESS %>%
+  mutate(
+    # Thang 4
+    polInterest = 5 - polInterest,
+    # Thang 5
+    health = 6 - health,
+    # Thang 6 (10 biến Schwartz)
+    across(c(creative, adventure, hedonism, success, rich, 
+             safety, tradition, rules, helpful, equality), 
+           ~ 7 - .), 
+    # Thang 7 
+    pray = 8 - pray,
+    religAttd = 8 - religAttd
+  )
+dim(ESS)
+```
+
+Cuối cùng, ta sẽ factor các biến định tính như sau:
+
+```{r}
+ESS <- ESS %>%
+  mutate(
+    gender = factor(gender, levels = c(1, 2), labels = c("Man", "Woman")),
+    boycott = factor(boycott, levels = c(1, 2), labels = c("Yes", "No")),
+    signed = factor(signed, levels = c(1, 2), labels = c("Yes", "No")),
+    religBelong = factor(religBelong, levels = c(1, 2), labels = c("Yes", "No")),
+    livingArea = factor(livingArea, levels = c(1, 2, 3, 4, 5), 
+      labels = c("BigCity", "Suburbs", "Town", "Village", "Farm")),
+    country = as.factor(country)
+  )
+```
+
+**Tổng kết:** Ở bước này, ta đã xử lý các dữ liệu khuyết (cũng như là những giá trị ngoại lai vô lý), đồng thời áp dụng đảo ngược thang đo để thống nhất chung 1 cách hiểu cho toàn bộ các biến thang đo trong bộ dữ liệu (Điểm càng cao thì Mức độ của biến đó càng lớn). Lúc này, bộ dữ liệu đã sẵn sàng cho bước tiếp theo: Thống kê mô tả.
+
+#### **Thống kê mô tả**
+
+Trước tiên, chúng ta cùng tìm hiểu tỷ lệ Giới tính, khu vực sống và quốc gia (Anh hoặc Đức) của những người tham gia khảo sát. Cụ thể sẽ được trình bày trong ***Phụ lục B.1***
+
+**Nhận xét chung:**
+
+-   Tỷ lệ giới tính tham gia khảo sát rất đồng đều.
+
+-   Hầu hết người tham gia khảo sát tại các thị trấn và làng quê (6607 và 4086 người), thường là những khu vực ít được tiếp cận các thiết bị hiện đại, ít nhiều sẽ ảnh hưởng đến cách họ trả lời những câu hỏi khảo sát. Người khảo sát đến từ vùng rìa thành phố hoặc những thành phố lớn ít hơn, nhưng vẫn nhiều hơn số người ở vùng nông trại hay vùng quê hẻo lánh.
+
+-   Trong bộ dữ liệu sau khi xử lý, tỷ lệ người khảo sát thuộc Đức nhiều hơn người Anh. Tuy nhiên, tỷ lệ vẫn không quá chênh lệch giữa 2 quốc gia.(Đức khoảng 57% và Anh khoảng 43%)
+
+Tiếp theo, ta sẽ tìm hiểu phân phối của các biến định lượng quan trọng trong bộ dữ liệu, là những biến được đo bằng thang đo Schwartz cụ thể như sau:
+
+```{r, echo = FALSE}
+df_long <- ESS %>%
+  select(creative, adventure, hedonism, success, rich, 
+         safety, tradition, rules, helpful, equality) %>%
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Value")
+# Bước B: Vẽ
+ggplot(df_long, aes(x = Value)) +
+  geom_histogram(fill = "cornflowerblue", color = "white", bins = 30) +
+  facet_wrap(~Variable, scales = "free") +
+  labs(title = "Phân phối của 10 Biến Định lượng theo thang đo Schwartz", 
+       x = "Giá trị",
+       y = "Tần suất") + 
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold", size = 10)) 
+```
+
+**Nhận xét:**
+
+-   Ta thấy hầu hết các biến đều có phân phối lệch trái hoặc lệch phải, chỉ trừ 2 biến là `rules` và `success` có phân phối khá đều (`success` có phân phối thiên trái hơn nhưng không bằng các biến khác). Điều này cho thấy người tham gia khảo sát đưa ra quan điểm khá trung lập giữa việc phải tuân thủ luật lệ hay không, cũng như tầm quan trọng của sự công nhận.
+
+-   Ta thấy các biến có phân phối lệch trái là các biến như `creative, equality, helpful, hedonism, safety, tradition`. Điều này chứng tỏ rằng tầm quan trọng của sự sáng tạo, sự bình đẳng, sự an ninh, việc biết giúp đỡ người khác, có nhiều thời gian vui vẻ chiều chuộng bản thân và tôn trọng các giá trị truyền thống là những thứ mà người tham gia khảo sát đánh giá rất cao.
+
+-   Ngược lại, những biến như `adventure` và `rich` là những biến có phân phối lệch phải. Điều này cho thấy người khảo sát không quan trọng việc phải mạo hiểm hay đánh đổi để cuộc sống trở nên thú vị, cũng như là họ không mưu cầu sự giàu có, có thể đối với họ chỉ cần vui vẻ và có thể chiều chuộng bản thân (`hedonism` lệch trái) là được.
+
+Ngoài 10 biến thang đo Schwartz trên, cũng có 1 vài biến định lượng khá quan trọng về niềm vui, sức khỏe như sau:
+
+```{r, echo = FALSE}
+df_long <- ESS %>%
+  select(happy, lifeSatis, health) %>%
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Value")
+# Bước B: Vẽ
+ggplot(df_long, aes(x = Value)) +
+  geom_histogram(fill = "cornflowerblue", color = "white", bins = 30) +
+  facet_wrap(~Variable, scales = "free") +
+  labs(title = "Phân phối của 3 biến lifeSatis, happy và health", 
+       x = "Giá trị",
+       y = "Tần suất") + 
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold", size = 10)) 
+```
+
+**Nhận xét:** Với 3 biểu đồ có xu hướng lệch trái như trên, ta thấy hầu hết người tham gia khảo sát đều rất vui vẻ và hài lòng với sức khỏe và cuộc sống của họ. Có thể nói đây là một bộ dữ liệu khá lạc quan.
+
+Tiếp theo, ta thử kiểm tra xem liệu kết quả khảo sát cho 10 biến sử dụng thang đo Schwartz giữa Nam và Nữ có sự khác biệt như thế nào.
+
+```{r, echo = FALSE}
+schwartz_vars <- c("creative", "adventure", "hedonism", "success", "rich", 
+                   "safety", "tradition", "rules", "helpful", "equality")
+df_schwartz_summary <- ESS %>%
+  select(gender, all_of(schwartz_vars)) %>%
+  pivot_longer(cols = -gender, names_to = "Variable", values_to = "Value") %>%
+  group_by(gender, Variable) %>%
+  summarise(Mean_Score = mean(Value, na.rm = TRUE), .groups = 'drop')
+
+ggplot(df_schwartz_summary, aes(x = gender, y = Mean_Score, fill = gender)) +
+  geom_col(alpha = 0.8) + 
+  scale_y_continuous(limits = c(0, 6)) +
+  facet_wrap(~ Variable, scales = "fixed") + 
+  scale_fill_manual(values = c("Man" = "#4C72B0", "Woman" = "#C44E52")) +
+  labs(title = "So sánh 10 giá trị Schwartz giữa Nam và Nữ",
+       x = "Giới tính",
+       y = "Điểm trung bình") +
+  theme_minimal() 
+```
+
+**Nhận xét:** Dựa vào kết quả, ta thấy:
+
+-   Nhìn chung, cấu trúc đánh giá giữa 2 nhóm khá tương đồng. Các giá trị về sự mạo hiểm (`adventure`), sự giàu có (`rich`) và sự tuân thủ luật lệ (`rules`) được những người tham gia khảo sát đánh giá thấp tầm quan trọng hơn so với những biến còn lại, đặc biệt là `rich`.
+
+-   Nhóm Nam sẽ đánh giá cao tầm quan trọng của việc tìm kiếm sự mạo hiểm và thú vị trong cuộc sống (`adventure`), sự hưởng thụ (`hedonism`), sự giàu có (`rich`) và việc được người khác công nhận (`succsess`). Ngoài ra, tầm quan của sự sáng tạo (`creative`) và tuân thủ luật lệ (`rules`) cũng được nhóm Nam đánh giá cao hơn so với Nữ, tuy nhiên chênh lệch không quá nhiều.
+
+-   Ngược lại, nhóm Nữ lại đánh giá cao tầm quan trọng của việc được sống ở nơi an toàn (`safety`), cũng như lòng nhân ái (`helpful`) và sự bình đẳng (`equality`) hơn so với Nam. Điều này dễ hiểu vì đa phần phái Nữ sẽ luôn là đối tượng của các vụ bạo lực, trộm cắp hay phân biệt giới tính trong công việc, do đó họ ưu tiên sự các giá trị mang tính ổn định trong cuộc sống hơn.
+
+-   Ở biến `tradition`, dường như làn ranh về giới tính được xóa nhòa khi cả 2 giới đều có sự đánh giá về tính truyền thống khá ngang nhau.
+
+Ngoài ra, ta có thể tìm hiểu xem liệu mức độ hài lòng về cuộc sống giữa các nhóm người thuộc môi trường sống khác nhau liệu có sự khác biệt như trong **Phụ lục B.2**
+
+
+```{r, echo = FALSE}
+ggplot(ESS, aes(x = happy, y = socialMeet)) +
+  geom_jitter(alpha = 0.3, color = "darkgreen") + 
+  geom_smooth(method = "lm", color = "red") +    
+  theme_minimal() +
+  labs(title = "Mối quan hệ giữa Hạnh phúc và Hài lòng cuộc sống")
+```
+
+**Nhận xét:**
+
+-   Từ đường xu hướng màu đỏ, ta thấy có mối tương quan thuận giữa mức độ hạnh phúc trong cuộc sống và tần suất gặp gỡ bạn bè - người thân, điều này cho thấy những cá nhân tham gia giao lưu xã hội thường xuyên hơn có xu hướng tự đánh giá mức độ hạnh phúc của bản thân cao hơn.
+
+-   Ta cũng có thể thấy, vùng màu xanh đậm đặc nhất nằm ở góc trên bên phải màn hình, chứng tỏ những người có mức độ hạnh phúc cao (khoảng 7 - 9) thường có xu hướng gặp gỡ bạn bè người thân khá nhiều (4 - 7 lần mỗi ngày). Kết quả này củng cố giả thuyết về tầm quan trọng của kết nối xã hội đối với sức khỏe tinh thần.
+
+-   Tuy nhiên, vẫn có những cá nhân có mức độ giao lưu xã hội rất thấp nhưng vẫn duy trì chỉ số hạnh phúc cao, hoặc ngược lại. Điều này gợi ý rằng bên cạnh giao lưu xã hội, sự hạnh phúc còn chịu ảnh hưởng của nhiều yếu tố khác.
+
+## **(b): Xác định vấn đề nghiên cứu và lựa chọn phương pháp phù hợp**
+
+**Vấn đề 1:** Đánh giá xem liệu có sự khác biệt có ý nghĩa thống kê về mức độ tin tưởng vào các thiết chế xã hội (Cảnh sát, Pháp luật, Chính trị gia) giữa 2 nhóm theo tôn giáo và không theo tôn giáo hay không.
+
+-   Phương pháp phân tích: Phân tích Phương sai nhiều chiều (MANOVA). Nhóm chọn phương pháp này vì MANOVA có khả năng phân tích đồng thời sự khác biệt trên một tổ hợp tuyến tính của cả 3 biến phụ thuộc. Tuy nhiên, trong quá trình phân tích, nhóm cũng sẽ kiểm định ANOVA cho từng biến phụ thuộc.
+
+**Vấn đề 2:** Khám phá cấu trúc ẩn đằng sau các biến thang đó đánh giá hệ giá trị cá nhân (Schwartz), niềm tin thể chế và mức độ gắn kết tôn giáo của người dân 2 nước châu Âu (Đức và Anh).
+
+-   Phương pháp phân tích: Phân tích Nhân tố Khám phá (EFA). EFA được lựa chọn vì nó giúp trích xuất phần phương sai chung, loại bỏ sai số đo lường, từ đó thu gọn các biến phức tạp thành một số ít các nhân tố tiềm ẩn. Bên cạnh FA, nhóm cũng quyết định áp dụng thêm kỹ thuật Phân tích Thành phần Chính (PCA) như một phương pháp đối chứng và mở rộng.
+
+Cụ thể, chúng ta sẽ lựa chọn 10 biến về hệ giá trị cá nhân trên thang đo Schwartz: `creative, adventure, hedonism, success, rich, safety, tradition, rules, helpful, equality`, các biến về niềm tin thể chế `tPolice, tPolitician, tLegal` và các biến về tôn giáo `levelRelig, pray, religAttd` như sau:
+
+```{r}
+ESS_pca <- ESS %>% dplyr::select( 
+         creative, hedonism, adventure, success, rich, 
+         safety, tradition, rules, helpful, equality,
+         tPolice, tPolitician, tLegal, levelRelig, pray, religAttd)
+names(ESS_pca)
+```
+
+## **(c): Kiểm tra giả định và đánh giá tính phù hợp của dữ liệu đối với phương pháp đã chọn.**
+
+Để có thể kiểm chứng rằng liệu dữ liệu có phù hợp để ta áp dụng các phương pháp phân tích như PCA và FA không, ta kiểm tra ma trận tương quan và các giả định Barlett và KMO như sau.
+
+#### **Ma trận tương quan**
+
+Trước tiên, ta sẽ vẽ ma trận tương quan để thể hiện mức độ quan hệ giữa các biến.
+
+```{r, echo = FALSE}
+cor_matrix <- cor(ESS_pca) 
+corrplot(cor_matrix, method = "circle")
+```
+
+**Nhận xét:**
+
+-   Ta thấy hầu hết các biến đều có mối tương quan dương với nhau theo nhóm. Điều này cho thấy bộ dữ liệu có thể xuất hiện hiện tượng đa cộng tuyến, hơn nữa cấu trúc của từng nhóm cũng được phân bố khá rõ, gợi ý rằng việc sử dụng phương pháp Phân tích thành phần chính hay Phân tích nhân tố là hợp lý.
+
+-   Các biến `creative, adventure, hedonism, success, rich` có mức tương quan dương với nhau ở mức khá, điều này cho thấy việc một người quan trọng sự sáng tạo có khả năng cũng sẽ đánh giá cao việc phải thử thách, để dẫn đến việc thành công hay giàu có.
+
+-   Các biến `safety, tradition, rules` cũng có tương quan dương với nhau ở mức khá, chứng tỏ rằng một người đánh giá cao sự an ninh có khả năng cũng là người tuân thủ các giá trị truyền thống và sống khá nguyên tắc.
+
+-   2 biến `helpful` và `equality` tương quan với nhau cho thấy những người đánh giá cao lòng nhân ái cũng thường là người quan trọng sự bình đẳng. Hơn nữa, biến `helpful` cũng có tương quan dương với `safety` và `tradition`, 3 biến này cùng nhau thể hiện cho những giá trị ổn định, bền vững của một con người.
+
+-   Ngoài 10 biến thuộc thang đo Schwartz kể trên, ma trận tương quan còn thể hiện rõ các nhóm biến có tương quan với nhau về chính trị như `tPolice, tPolitician, tLegal` và tôn giáo như `levelRelig, pray, religAttd`.
+
+Biểu đồ trên đã cung cấp bằng chứng trực quan, xác nhận dữ liệu khá hợp lý trước khi đưa vào mô hình PCA hoặc EFA. Các biến có tương quan mạnh trên biểu đồ được gợi ý để trở thành các nhóm biến chung. Tuy nhiên, để rõ ràng hơn, ta sẽ làm kiểm định Barlett.
+
+#### **Kiểm định Barlett**
+
+Ta có giả thuyết cho kiểm định Barlett như sau:
+
+-   $H_0:$ Ma trận tương quan là ma trận đơn vị
+
+-   $H_1:$ Ma trận tương quan không phải ma trận đơn vị
+
+```{r}
+library(psych)
+cortest.bartlett(cor(ESS_pca), n = nrow(ESS_pca))
+```
+
+**Nhận xét:** Với mức ý nghĩa 5%, ta bác bỏ giả thuyết $H_0$ cho rằng ma trận tương quan là ma trận đơn vị. Điều này cho thấy giữa các biến tồn tại tương quan tuyến tính có ý nghĩa thống kê và dữ liệu không hoàn toàn độc lập.
+
+#### **Kiểm định KMO**
+
+```{r}
+KMO(ESS_pca)
+```
+
+**Nhận xét:**
+
+-   Hệ số KMO tổng thể của tập dữ liệu đạt 0.72 (\> 0.5). Điều này chứng tỏ mức độ tương quan giữa các biến quan sát là khá tốt để hình thành nên các nhân tố chung. Do đó, tập dữ liệu này đủ điều kiện để ta đưa vào phân tích PCA hoặc FA.
+
+#### **Kiểm định tính chuẩn**
+
+Vì bộ dữ liệu có quá nhiều quan sát, ta sẽ dùng lệnh trong R lấy ngẫu nhiên 4900 quan sát để kiểm định.
+
+```{r, echo = FALSE}
+bien_manova <- c("tPolitician", "tPolice", "tLegal")
+
+# Lấy ngẫu nhiên tối đa 4900 quan sát từ MỖI nhóm Tôn giáo để kiểm định
+ESS %>%
+  select(religBelong, all_of(bien_manova)) %>%
+  group_by(religBelong) %>%
+  sample_n(size = min(n(), 4900)) %>% 
+  doo(~mshapiro_test(.))
+```
+
+**Nhận xét:** Ta thấy p_value rất nhỏ so với mức ý nghĩa 0.05, ta bác bỏ giá thuyết $H_0$ . Do đó ta kết luận rằng vecto 3 biến phụ thuộc ở cả 2 nhóm Yes và No đều không tuân theo phân phối chuẩn nhiều chiều.
+
+Tuy nhiên, do bộ dữ liệu có cỡ mẫu rất lớn ($n = 15607$). Theo Định lý Giới hạn Trung tâm (CLT), phân phối của vectơ trung bình mẫu sẽ xấp xỉ phân phối chuẩn nhiều chiều nên ta vẫn có thể tiếp tục các phân tích tiếp theo. 
+
+Ta cũng kiểm định giả thuyết phân phối chuẩn cho từng biến như trong **Phụ lục C.1.**
+
+**Tóm tắt kết quả:** P-value của tất cả các biến đều rất nhỏ vậy nên tất cả các biến đều không tuân theo phân phối chuẩn với mức ý nghĩa $\alpha=0.05$. Tuy nhiên, do bộ dữ liệu có cỡ mẫu rất lớn ($n = 15607$). Theo Định lý Giới hạn Trung tâm (CLT) ta vẫn có thể tiếp tục các phân tích tiếp theo.
+
+#### **Kiểm tra tính đồng nhất phương sai**
+
+Gọi $\Sigma_{Yes}$ và $\Sigma_{No}$ lần lượt là ma trận hiệp phương sai tổng thể của 3 biến quan sát tương ứng với nhóm khảo sát có theo tôn giáo `(religBelong = Yes)` và nhóm không theo tôn giáo `(religBelong = No)`.
+
+**Đặt giả thuyết:**
+
+-   $H_0 : \Sigma_{Yes} = \Sigma_{No}$ (Ma trận hiệp phương sai tổng thể của hai nhóm là đồng nhất).
+
+-   $H_1 : \Sigma_{Yes} \neq \Sigma_{No}$ (Ma trận hiệp phương sai tổng thể của hai nhóm không đồng nhất).
+
+```{r}
+ket_qua_boxm <- box_m(ESS[, bien_manova], ESS$religBelong)
+print(ket_qua_boxm)
+```
+
+**Nhận xét:** Từ kết quả kiểm định Box's M, ta thu được giá trị p-value\<0.001. Do đó, ta có cơ sở để bác bỏ giả thuyết $H_0$ . Vậy dữ liệu vi phạm giả định về tính đồng nhất của các ma trận hiệp phương sai tổng thể giữa hai nhóm.
+
+Ta cũng kiểm định tính đồng nhất phương sai cho từng biến như trong **Phụ lục C.2**
+
+**Tóm tắt kết quả**: Phương sai của 2 biến `tLegal` và `tPolice` không đồng nhất do có p-value của kiểm định cực kỳ nhỏ. Biến `tPolitician` có $p = 0.1495 > 0.05$ nên ta chưa đủ cơ sở để bác bỏ $H_0$, cho thấy phương sai của biến này là đồng nhất giữa 2 nhóm với mức ý nghĩa 5%.
+
+Vì các giả định về tính Phân phối chuần nhiều chiều và Hiệp phương sai đồng nhất không thỏa nên ta sẽ sử dụng Thống kê Pillai's Trace. Thống kê Pillai’s Trace đánh giá sự khác biệt trên toàn bộ vector trung bình của các nhóm. Thay vì xét từng biến quan sát đơn lẻ, nó kết hợp đồng thời các thành một khối thống nhất để kiểm định xem giữa nhóm theo tôn giáo và không theo tôn giáo có khác nhau về niềm tin chính trị hay không.
+
+## **(d): Thực hiện phân tích bằng phương pháp đã chọn**
+
+### **Phân tích phương sai nhiều chiều (MANOVA)**
+
+**MANOVA 1 nhân tố**: Trước tiên, ta sẽ giải quyết câu hỏi rằng: "Liệu có sự khác nhau về niềm tin chính trị giữa nhóm theo tôn giáo và nhóm không theo tôn giáo hay không?"
+
+Trước tiên, ta sẽ quan sát trực quan bằng hình ảnh như sau:
+
+```{r, echo = FALSE}
+ESS %>%
+  select(religBelong, tPolice, tLegal, tPolitician) %>%
+  pivot_longer(cols = -religBelong, names_to = "Variable", values_to = "Score") %>%
+  group_by(religBelong, Variable) %>%
+  summarise(Mean = mean(Score, na.rm = TRUE)) %>%
+  ggplot(aes(x = Variable, y = Mean, fill = religBelong)) +
+  geom_col(position = "dodge") +
+  theme_minimal() +
+  labs(title = "So sánh niềm tin thể chế: Có Tôn giáo vs Không", y = "Điểm trung bình")
+```
+
+**Nhận xét:** Từ biểu đồ, ta thấy nhóm không theo tôn giáo có trung bình điểm số về niềm tin vào Pháp luật, Cảnh sát và các Chính trị gia thấp hơn nhóm không theo tôn giáo.
+
+Để làm rõ khẳng định này, ta phát biểu một giả thuyết kiểm định như sau:
+
+-   $H_0:$ Không có sự khác biệt có ý nghĩa thống kê về vector trung bình của các biến phụ thuộc giữa hai nhóm.
+
+-   $H_1:$ Có ít nhất một sự khác biệt có ý nghĩa thống kê về vector trung bình của các biến phụ thuộc giữa hai nhóm.
+
+```{r}
+model <- lm(cbind(tLegal, tPolice, tPolitician) ~ religBelong, data = ESS)
+Manova(model, test.statistic = "Pillai")
+```
+
+**Nhận xét:**
+
+-   Có sự khác biệt có ý nghĩa thống kê giữa các nhóm (có theo tôn giáo hoặc không) trên vector biến phụ thuộc (dựa theo các tiêu chí về niềm tin chính trị) vì $p-value < 0.000001$.
+
+Vì kết quả MANOVA trên có ý nghĩa thống kê, nên ta sẽ tiến hành phân tích hậu nghiệm bằng ANOVA 1 nhân tố cho từng nhóm biến.
+
+```{r}
+grouped.data <- ESS %>%
+  gather(key = "variable", value = "value", tLegal, tPolice, tPolitician) %>%  
+  group_by(variable)
+
+grouped.data %>% anova_test(value ~ religBelong)
+```
+
+**Nhận xét**
+
+-   Như vậy, với mức ý nghĩa 5%, có sự khác biệt có ý nghĩa thống kê về cả 3 biến giữa 2 nhóm, vì p-value của các thống kê cho từng biến đều \< 0.05. Tóm lại, các chỉ số liên quan đến niềm tin về chính trị là khác nhau giữa 2 nhóm.
+
+-   Cụ thể, niềm tin vào pháp luật, vào cảnh sát và các chính trị gia ở 2 nhóm theo tôn giáo hoặc không theo tôn giáo là hoàn toàn khác nhau.
+
+Nhờ kiểm định ANOVA 1 chiều cho từng biến, ta biết rằng có sự khác biệt đáng kể về các tiêu chí giữa 2 nhóm. Để biết rằng cụ thể khác biệt ra sao, ta sử dụng kiểm định `tukey_hsd` cho từng biến như sau:
+
+```{r}
+ket_qua_tukey <- grouped.data %>%
+  filter(variable %in% names(ESS)) %>%
+  tukey_hsd(value ~ religBelong)
+```
+
+
+```{r, echo = FALSE}
+kable_styling(
+  kable(ket_qua_tukey, digits = 3), 
+  bootstrap_options = c("striped", "hover"), 
+  full_width = FALSE
+)
+```
+
+**Nhận xét:** Dựa vào bảng trên, ta có nhận xét như sau:
+
+-   Mức độ ý nghĩa thống kê được biểu diễn bằng các dấu sao (\*). Như đã kiểm định MANOVA ở trên, ta thấy rằng hầu hết các khác biệt này cực kỳ đáng kể.
+
+-   Khoảng tin cậy 95% của sự chênh lệch giữa nhóm có Tôn giáo và nhóm không Tôn giáo đều âm và không chứa số 0. Điều này chứng tỏ các chỉ số về niềm tin pháp luật, cảnh sát hay các chính trị gia của nhóm Không theo tôn giáo đều thấp hơn nhóm Có theo tôn giáo, và sự khác biệt này có ý nghĩa thống kê.
+
+-   Diễn giải:
+
+  -   `tLegal` (Niềm tin vào Pháp luật): Khoảng tin cậy là [-0.66, -0.51]. Tức là với độ tin cậy 95%, trung bình nhóm không theo tôn giáo tự đánh giá về niềm tin của họ vào Pháp luật ít hơn nhóm theo tôn giáo từ 0.51 đến 0.66 điểm (trên thang đo 10)
+
+  -   `tPolice` (Niềm tin vào cảnh sát): Khoảng tin cậy là [-0.61, -0.47]. Tức là với độ tin cậy 95%, trung bình nhóm không theo tôn giáo tự đánh giá về niềm tin của họ vào Cảnh sát ít hơn nhóm theo tôn giáo từ 0.47 đến 0.61 điểm (trên thang đo 10)
+
+  -   `tPolitician`(Niềm tin vào các chính trị gia): Khoảng tin cậy là [-0.66, -0.53]. Tức là với độ tin cậy 95%, trung bình nhóm không theo tôn giáo tự đánh giá về niềm tin của họ vào câc Chính trị gia ít hơn nhóm theo tôn giáo từ 0.53 đến 0.66 điểm (trên thang đo 10).
+  
+```{r, echo = FALSE}
+# Chuẩn bị dữ liệu cho biểu đồ
+plot_data <- ESS %>%
+  select(religBelong, tLegal, tPolice, tPolitician) %>%
+  pivot_longer(cols = -religBelong, names_to = "Variable", values_to = "Value") %>%
+  group_by(religBelong, Variable) %>%
+  summarise(Mean = mean(Value, na.rm = TRUE), .groups = 'drop')
+
+# Vẽ biểu đồ
+ggplot(plot_data, aes(x = Variable, y = Mean, color = religBelong, 
+                      group = religBelong)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Hình 8: So sánh mức độ tin tưởng thể chế theo Tôn giáo",
+       x = "Biến niềm tin", y = "Điểm trung bình")
+```
+
+**Nhận xét:** Biểu đồ trên càng chứng minh cho kết quả của MANOVA là chính xác.
+
+### **Phân tích nhân tố (FA)**
+
+Để giải quyết câu hỏi về việc gom nhóm các biến trong thang đo Schwartz cũng các biến về niềm tin chính trị và tôn giáo, ta sẽ áp dụng phương pháp Phân tích nhân tố (FA).
+
+Trước tiên, để quyết định xem nên giữ lại bao nhiêu nhân tố tiềm ẩn, ta dùng biểu đồ Scree và Parallel Analysis.
+
+```{r}
+fa.parallel(ESS_pca,
+           fm = "minres", fa = "both",
+           n.iter = 100, show.legend = TRUE,
+           main = "Parallel Analysis Scree Plot")
+```
+
+**Nhận xét:** Kết quả biểu đồ cho thấy đường Eigenvalues thực tế cắt xuống dưới đường Eigenvalues mô phỏng sau thành phần thứ 5. Thuật toán cũng khuyến nghị số lượng số lượng Nhân tố là 5. Ngoài ra, Phân tích song song cũng khuyết khích lấy 5 PC nếu áp dụng phương pháp Phân tích thành phần chính để gom nhóm. Như vậy, ta quyết định sẽ giữ lại 5 nhân tố cho Phân tích nhân tố.
+
+Ở các phép kiểm định ở trên, ta đã nhận xét rằng dữ liệu không tuân theo phân phối chuẩn, do đó ta sẽ không sử dụng phương pháp Maximum Likelihood và lựa chọn phương pháp Minimum Residual (minres) để trích xuất nhân tố, giúp đảm bảo mô hình đạt được độ chính xác cao nhất.
+
+Ngoài ra, ta cũng lựa chọn phép quay trực giao Varimax, do:
+
+-   Varimax giúp tạo cấu trúc đơn giản, nó có xu hướng đẩy các hệ số tải về gần 0 hoặc 1. Kết quả là nó dọn các biến trong ma trận cực tốt, giúp mỗi biến chỉ gắn liền với duy nhất một nhân tố, giúp ta dễ dàng đặt tên.
+
+-   Ngoài ra, Varimax còn giúp tránh bị hiện tượng đa cộng tuyến cho mô hình sau này. Hơn nữa, việc sử dụng phép quay trực giao Varimax cũng giúp chúng ta dễ dàng so sánh phương pháp FA và PCA, vì PCA tạo ra các Thành phần chính độc lập và vuông góc tuyệt đối với nhau, nên nếu ta dùng phép quay xiên thì sẽ tạo ra 2 hệ quy chiếu khác nhau, gây khó khăn trong việc so sánh 2 phương pháp.
+
+```{r}
+efa_model <- fa(ESS_pca, nfactors = 5, rotate = "varimax", fm = "minres")
+print(efa_model$loadings, cutoff = 0.3, digits = 3, sort = TRUE)
+h2 <- efa_model$communality
+u2 <- efa_model$uniquenesses
+fa_summary <- data.frame(Communality = h2, Uniqueness = u2)
+print(fa_summary)
+```
+
+**Nhận xét:** Trước tiên, ta thấy tổng phương sai tích lũy đạt khoảng 41.2%. Tuy nhiên, có 2 biến có chỉ số `Communality` khá bé, đó là `creative` và `tradition` (lần lượt là 0.187 và 0.171). Điều này cho thấy các biến này có thể mang tính chất độc lập, không cùng chia sẻ một phương sai chung đủ lớn với các biến khác để tạo thành một nhân tố tiềm ẩn trong mô hình hiện tại. Hơn nữa, trong bảng hệ số tải, biến `tradition` còn tải lên 2 nhóm nhân tố. Do đó, ta sẽ thử loại 2 biến ra khỏi mô hình FA nhằm giúp cải thiện tính ổn định của mô hình tổng thể.
+
+```{r}
+ESS_pca <- ESS %>% dplyr::select( 
+         hedonism, adventure, success, rich, 
+         safety, rules, helpful, equality,
+         tPolice, tPolitician, tLegal, levelRelig, pray, religAttd)
+efa_model <- fa(ESS_pca, nfactors = 5, rotate = "varimax", fm = "minres")
+print(efa_model$loadings, cutoff = 0.3, digits = 3, sort = TRUE)
+```
+
+Trước tiên, ta sẽ cùng giải mã Cấu trúc nhân tố mà mô hình FA đem lại. 
+
+**Diễn giải ý nghĩa thực tiễn của 5 nhân tó:**
+
+- MR1: Gồm `levelRelig` (0.822), `pray` (0.81), `religAttd` (0.738). Nhân tố này phản ánh mức độ thực hành tôn giáo của nhóm người khảo sát. Nó đã chỉ ra rằng, những người có mức độ sùng đạo cao sẽ thường xuyên cầu nguyện và tham gia các nghi thức cũng như hoạt động liên quan đến tôn giáo của họ. Đặc biệt là, ở mô hình trước đó có sự xuất hiện của `tradition` trong nhân tố này cũng cho thấy những người có đời sống gắn liền với tôn giáo của họ cũng là những người đánh giá cao lối sống truyền thống. Điều này cũng hoàn toàn hợp lý trong thực tiễn. Do đó, ta có thể đặt tên cho nhân tố này là **Thực hành tôn giáo**.
+
+- MR2: Gồm `tPolice` (0.692), `tPolitician` (0.591), `tLegal` (0.863). Nhân tố này gom nhóm các yếu tố liên quan đến chính trị, nó cho thấy việc có niềm tin về Hệ thống Pháp luật nhà nước cũng sẽ ảnh hưởng đến việc họ tin tưởng vào cảnh sát và các chính trị gia. Ta dễ dàng thấy được sự tương quan giữa 3 biến liên quan đến niềm tin chính trị này, do đó ta có thể đặt tên cho nhân tố này là  **Niềm tin thể chế**.
+
+- MR3: Gồm `adventure` (0.541), `success` (0.623), `rich` (0.561), `hedonism` (0.459). Nhân tố này gồm các yếu tố liên quan đến các giá trị thiên về chủ nghĩa cá nhân, theo đuổi danh vọng và sự mạo hiểm. Từ nhân tố này, ta thấy rằng những người đề cao sự thành công, sung túc trong cuộc sống thì họ cũng đề cao việc phải dám thử thách để đạt được những mục tiêu mình mong muốn. Do đó, ta có thể đặt tên cho nhân tố này là **Khao khát danh vọng và trải nghiệm**.
+
+- MR4: Gồm `safety` (0.675), `rules` (0.416). Nhân tố này chứa các biến liên quan đến sự an toàn kỷ luật. Đây là nhân tố đề các giá trị bền vững, lâu dài và ổn định. Trong thực tế, những người luôn tuân theo quy tắc cũng thường là những người thích sự an toàn và truyền thống. Do đó, ta có thể đặt tên cho nhân tố này là **Giá trị bền vững**. 
+
+- MR5: Gồm `helpful` (0.643), `equality` (0.369). Ta thấy rõ rằng nhân tố này đại diện cho những người có lòng nhân ái và quan tâm đến phúc lợi và sự công bằng trong xã hội. Điều này hoàn toàn phù hợp với thực tiễn, những người biết giúp đỡ người khác thường là người để ý đến sự bất bình đẳng trong xã hội. Do đó, ta có thể đặt tên cho nhóm này là **Giá trị cộng đồng và xã hội**
+
+  Mô hình giải thích được 44.3% tổng lượng biến thiên của 16 biến ban đầu. Phần phương sai không được giải thích là phần phương sai đặc thù và sai số đo lường ngẫu nhiên. Trong mô hình FA, thuật toán chỉ chiết xuất phần phương sai chung và loại bỏ phương sai đặc thù cùng sai số đo lường. Với mức phương sai giải thích là 44.3% nằm ở mức chấp nhận được, điều này khá điển hình bởi vì
+  
+  - Các biến Schwartz vốn được thiết kế để đo nhiều khía cạnh giá trị khác nhau (không phải cùng một cấu trúc tiềm ẩn duy nhất), nên phương sai chung giữa chúng vốn dĩ không quá cao.
+  
+  - Thang đo Likert 4-6-7 điểm có nhiễu đo lường tự nhiên khá lớn, người trả lời có xu hướng phản hồi không nhất quán giữa các câu hỏi tương tự.
+
+```{r, echo = FALSE}
+fa.diagram(efa_model, 
+           simple = FALSE,   
+           cut = 0.3,        
+           digits = ,       
+           main = "Biểu đồ Cấu trúc Nhân tố (Factor Diagram)")
+```
+
+**Nhận xét:** Từ biểu đồ trực quan trên, ta thấy được các biến ta đưa vào mô hình đều đóng góp tải trọng đáng kể cho mỗi nhân tố. Hơn nữa, mỗi nhân tố đều có cho mình những biến đóng góp phù hợp, dễ dàng giải thích và đặt tên trong thực tiễn.
+
+Tiếp theo, thay vì dùng tổng phương sai tích lũy, ta sẽ đánh giá độ phù hợp của mô hình dựa trên các chỉ số như sau:
+
+```{r, echo = FALSE}
+fit <- tibble(
+  TLI = efa_model$TLI,
+  RMSR = efa_model$rms,
+  Lower_RMSEA = efa_model$RMSEA[2],
+  RMSEA = efa_model$RMSEA[1],
+  Upper_RMSEA = efa_model$RMSEA[3]
+)
+fit_model <- as.data.frame(fit)
+kable_styling(
+  kable(fit_model, digits = 3), 
+  bootstrap_options = c("striped", "hover"), 
+  full_width = FALSE
+)
+```
+
+
+**Nhận xét:**
+
+- TLI: Đây là chỉ số so sánh mô hình FA với một mô hình cơ sở (null model). TLI của mô hình là 0.974 rất gần 1, chứng tỏ đây là mô hình phù hợp tốt.
+
+- RMSR: Đo lường phần dư giữa ma trận tương quan thực tế và ma trận tương quan do mô hình dự đoán. RMSR của mô hình là 0.011 bé hơn rất nhiều so với 0.05 (tiêu chuẩn). Do đó mô hình này mô phỏng lại dữ liệu gốc rất tốt.
+
+- RMSEA: dùng để đo lường mức độ sai số của mô hình so với tổng thể. Khoảng tin cậy RMSEA là [0.026, 0.031] cũng là 1 khoảng tin cậy tốt.
+
+**Kết luận: ** Để đánh giá mức độ phù hợp của mô hình 5 nhân tố, ta xem xét các chỉ số Goodness-of-Fit. Kết quả phân tích cho thấy chỉ số RMSR đạt 0.011, nhỏ hơn mức tiêu chuẩn 0.05; RMSEA đạt 0.029, cho thấy mô hình mô phỏng tốt cấu trúc dữ liệu thực tế. Đây là chỉ số quan trọng để đánh giá độ phù hợp của mô hình. Tuy nhiên, nếu ta dùng factor scores để phân loại hay dự báo hành vi của từng người, độ chính xác sẽ bị giảm vì factor scores chỉ nắm được 44.3% thông tin gốc.
+
+### **Phân tích thành phần chính (PCA)**
+
+```{r}
+pca_model <- princomp(ESS_pca, cor = TRUE) 
+summary(pca_model)
+```
+
+**Biểu đồ Scree-Plot**
+
+```{r, echo = FALSE}
+eigenvalues <- pca_model$sdev^2
+var_explained <- eigenvalues / sum(eigenvalues) * 100 
+cum_var <- cumsum(var_explained)
+n_pc <- sum(eigenvalues >= 1)
+
+scree_df <- data.frame(PC = 1:length(eigenvalues), Eigenvalue = eigenvalues)
+
+ggplot(scree_df, aes(x = PC, y = Eigenvalue)) + 
+  geom_line(color = "#1A6FBF", linewidth = 1) + 
+  geom_point(aes(color = Eigenvalue >= 1), size = 3.5) + 
+  scale_color_manual(
+  values = c("TRUE" = "#D73027", "FALSE" = "#1A6FBF"),
+  labels = c("TRUE" = "Eigenvalue \u2265 1 (giữ lại)", "FALSE" = "Eigenvalue < 1"), name = NULL
+) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray40") +
+  annotate("text",
+         x = length(eigenvalues) * 0.72, y = 1.18,
+         label = "Ngưỡng Kaiser = 1", color = "gray40", size = 3
+)+
+  scale_x_continuous(breaks = 1:length(eigenvalues)) +
+  labs(title = "Scree Plot", x = "Thành phần chính (PC)", y = "Eigenvalue") + theme_bw(base_size = 11) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom"
+  )
+```
+
+**Nhận xét:** Dựa vào các kết quả về tổng phương sai tích lũy và biểu đồ Scree - Plot, ta có nhận xét:
+
+-   Quan sát biểu đồ cho thấy, Đường đứt nét màu đỏ biểu thị ngưỡng Eigenvalue = 1 cho thấy chỉ có đúng 5 thành phần đầu tiên nằm trên ngưỡng này. Vậy áp dụng tiêu chuẩn Kaiser, ta sẽ lấy 5 thành phần chính đầu tiên. Hơn nữa, biểu đồ phân tích song song ở trên cũng gợi ý ta sẽ lấy 5 thành phần chính.
+
+-   Từ kết quả trên, ta thấy việc giữ lại 5 Thành phần chính là phương án tối ưu nhất, giúp giải thích được $63.7%$ phương sai của dữ liệu mà vẫn đảm bảo được viêc giảm chiều dữ liệu của mô hình. Tuy nhiên, $63.7%$ cũng không phải là một con số quá cao nếu ta muốn áp dụng PCA cho các công việc khác như hồi quy dự báo.
+
+**Giải thích các PC**
+
+```{r, echo = FALSE}
+loadings_5 <- as.data.frame(unclass(pca_model$loadings))[, 1:5]
+
+kable_styling(
+  kable(loadings_5, digits = 3), 
+  bootstrap_options = c("striped", "hover"), 
+  full_width = FALSE
+)
+```
+
+
+-   PC1: hệ số loadings của các biến nổi bật ở PC này là: `levelRelig` (-0.488), `pray` (-0.461), `religAttd` (-0.466). PC1 là thành phần chiếm tỷ trọng phương sai lớn nhất, nó tập trung tải mạnh ở các biến liên quan đến tôn giáo, PC1 là sự kết hợp giữa việc sùng đạo, tần suất cầu nguyện và tham gia các hoạt động tôn giáo. Ngoài ra, ta còn có thể thấy những người sùng đạo thường sẽ có niềm tin vào chính trị (do các hệ số tải ở nhóm biến này cũng khá lớn). Ta có thể đặt tên PC1 là **Niềm tin tôn giáo**.
+
+-   PC2: hệ số loadings của các biến nổi bật ở PC này là: `hedonism` (0.415), `adventure` (0.341), `success` (0.487), `rich` (0.396). PC2 đại diện cho các biến liên quan đến việc theo đuổi sự thành công, giàu có cũng như tận hưởng một cuộc sống thú vị và mạo hiểm. Những biến này liên quan nhiều đến các giá trị cá nhân, do đó ta có thể đặt tên cho PC2 là **Khát vọng cá nhân**.
+
+-   PC3: hệ số loadings của các biến nổi bật ở PC này là: `tPolice` (-0.414), `tPolitician` (-0.466), `tLegal` (-0.458). Đây là các biến liên quan đến vấn đề chính trị, PC3 chính là thước đo cho niềm tin của người dân vào thể chế nhà nước. Do đó, ta có thể đặt tên cho PC3 là **Niềm tin thể chế**.
+
+-   PC4: Các biến `safety` (-0.512), `rules` (-0.391) có tải trọng âm cao trong khi `adventure` (0.433) tải trọng âm dương. Dễ thấy được rằng từ PC4, những người có xu hướng thích sống an toàn cũng là người luôn tuân theo các luật lệ, ngược lại với những người thích sự thử thách (`adventure`). Do đó, ta có thể đặt tên cho PC này là **Trật tự kỷ luật**.
+
+-   PC5: Các biến `equality` (0.591), `helpful` (0.474) có tải trọng cao nhất. Điều này cho thấy những người luôn quan tâm đến phúc lợi cộng đồng và sự bình đẳng thường sẽ là người biết giúp đỡ người khác, `creative` trong PC này cũng ở mức khá cho thấy việc một người quan tâm đến sự bình đẳng, chứng tỏ người đó có góc nhìn khá bao quát và đa dạng. Do đó, ta có thể đặt tên cho PC5 là **Mức độ nhân ái**.
+
+**Biểu đồ Vòng tròn Tương quan các biến**
+
+```{r, echo = FALSE}
+library(factoextra) 
+fviz_pca_var(pca_model,
+            col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+```
+
+**Nhận xét:**
+
+-   Biểu đồ này chỉ đang chiếu dữ liệu lên 2 Thành phần chính đầu tiên. Tổng lượng thông tin giải thích được trên mặt phẳng này là 33.3%.
+
+-   Thang màu từ Xanh dương (thấp) đến Đỏ (cao) thể hiện mức độ đóng góp của biến đó vào việc hình thành 2 trục Dim1 và Dim2. Trong biểu đồ trên, các biến thuộc nhóm Tôn giáo, nhóm Thành tựu có mũi tên dài màu đỏ cam, chứng tỏ được giải thích rất tốt bởi 2 thành phần này.
+
+-   Nhìn vào hình, ta thấy biểu đồ phân cụm khá rõ nét:
+
+  - Nhóm biến `levelRelig, religAttd, pray` cụm lại về hướng chiều âm của trục Dim1, chứng tỏ 3 biến này có tương quan mạnh với nhau vì đều là các biến liên quan đến tôn giáo. Hơn nữa, nhìn vào biểu đồ ta thấy nhóm biến này tạo với các biến `adventure, rich, success, creative` một góc gần 90 độ. Chứng tỏ rằng việc một người sùng đạo hay không sẽ không liên quan gì đến việc họ có thích làm giàu hay theo đuổi thành tựu cá nhân hay không.
+  
+  - Nhóm biến `adventure, rich, hedonism, success, creative` cụm lại về hướng chiều dương của trục Dim2, các biến này có mối tương quan lớn với nhau, trục Dim2 đại diện cho khát vọng cá nhân và sự hưởng thụ. 
+  
+  - Nhóm biến `tPolice, tLegal, tPolitician` tuy cũng có đóng góp vào việc hình thành trục Dim1, tuy nhiên không nổi bật như nhóm `levelRelig, religAttd, pray`. Xem xét mối tương quan của chúng với các biến còn lại, ta thấy nhóm biến này có tương quan thuận với nhóm `levelRelig, religAttd, pray` trên mặt phẳng `Dim1` và `Dim2`, và kiểm định MANOVA ta sử dụng ở trên hoàn toàn xác nhận lại điều này.
+
+
+```{r, echo = FALSE}
+library(factoextra) 
+fviz_pca_var(pca_model, axes = c(3,4),
+            col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE)
+```
+
+**Nhận xét:**
+
+- Biểu đồ này đang chiếu dữ liệu lên PC3 và PC4. Tổng lượng thông tin giải thích được trên mặt phẳng này là 22.7%.
+
+- Nhìn vào hình, ta cũng thấy được sự phân cụm của các biến:
+
+  - Trục Dim3 được định hình rõ bởi cụm biến Niềm tin thể chế `(tLegal, tPolice, tPolitician)`. Các mũi tên này đâm mạnh theo trục âm của Dim3, và chúng tạo với nhóm biến `rules, safety` một góc khoảng 90 độ. Điều này chứng tỏ rằng: Việc tuân thủ luật lệ và mưu cầu sự an toàn độc lập hoàn toàn với niềm tin vào hệ thống chính quyền. Nói cách khác, một công dân Châu Âu có thể rất đề cao sự an toàn và tuân thủ các quy tắc xã hội, nhưng điều đó không đồng nghĩa với việc họ có mức độ tin tưởng cao vào các chính trị gia hay cảnh sát, và ngược lại.
+  
+  - Trục Dim4 được đóng góp bởi cụm biến liên quan đến sự an toàn và kỷ luật `(safety, rules)`, ngoài ra cũng xuất hiện sự đóng góp mức khá của các biến `helpful` và `equality`. Các mũi tên này đâm mạnh theo phương dọc. Ta thấy trên biểu đồ, 2 biến này có xu hướng tương quan nghịch với các biến `adventure, rich, hedonism, success, creative`. Cho thấy 1 sự thật rằng những người có xu hướng thích sống an toàn và làm theo nguyên tắc thường sẽ không có dã tâm quá lớn trong việc phải thành công rực rỡ và được mọi người công nhận.
+  
+  - Ở mặt phẳng Dim1-Dim2, các biến tôn giáo và niềm tin thể chế thể hiện mối tương quan thuận, tuy nhiên, khi quan sát ở mặt phẳng Dim3-Dim4, mối quan hệ này đã thay đổi. Điều này cho thấy sự sùng đạo không còn là biến duy nhất ảnh hưởng đến niềm tin thể chế.
+  
+**Phân loại**
+
+- Để áp dụng PCA cho việc phân loại, ta vẽ biểu đồ Biplot dựa trên điểm số của các thành phần chính. Ta sẽ lựa chọn biến phân loại là `religBelong` để quan sát như sau:
+
+```{r, echo = FALSE}
+fviz_pca_biplot(
+  pca_model, axes = c(1,2),
+  habillage = ESS$religBelong,
+  geom.ind = "point",
+  pointsize = 2.5,
+  col.var = "#2C3E50",
+  arrowsize = 0.7,
+  label = "var",
+  repel = TRUE
+) +
+
+labs(
+  title = "PCA Biplot",
+  x = "PC1 (Niềm tin Tôn giáo)", 
+  y = "PC2 (Khát vọng cá nhân)",
+  subtitle = "Phân bố của nhóm Tôn giáo dựa trên 2 trục PC đầu"
+) +
+
+theme_classic(base_size = 14) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5,
+    face = "bold"
+  ),
+  plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+```
+
+**Nhận xét:**
+
+- Biểu đồ phân loại các quan sát dựa trên 2 nhóm: Có theo tôn giáo và không theo tôn giáo. Dựa vào biểu đồ, ta thấy rõ sự phân tách theo 2 nhóm:
+
+  - Nhóm `Yes`: Các điểm dữ liệu của nhóm này phân bổ lệch về phía âm của trục PC1. Họ nằm cùng hướng với các vector `pray` và `religAttd`. Điều này hoàn toàn dễ hiểu, vì những người theo tôn giáo tất nhiên sẽ có điểm số về Niềm tin tôn giáo mạnh hơn. 
+  
+  - Ngược lại, nhóm `No` Phân bổ thiên về phía dương của trục PC1. Nó cũng nằm ngược với phía của nhóm các biến về chính trị như `(tLegal, tPolice, tPolitician)`, điều này cho thấy nhóm không theo tôn giáo cũng không có niềm tin về chính trị cao (như ta đã kiểm định MANOVA trước đó).
+
+## **(e): So sánh giữa PCA và FA**
+
+**Điểm giống nhau**
+
+- Trong khuôn khổ dữ liệu, PCA và FA đều được sử dụng để nén dữ liệu, giúp chuyển 14 biến ban đầu thành các biến đại diện. Cả hai phương pháp đều sử dụng ma trận tương quan giữa các biến.
+
+- Dựa vào kết quả, ta thấy cả PCA và FA đều cho ra cấu trúc biến gần như tương đương. Cụ thể là: 
+
+  - Sau khi áp dụng Phân tích Nhân tố, ta thu được các nhân tố như: **Thực hành tôn giáo**, **Khao khát danh vọng và trải nghiệm**, **Niềm tin thể chế**, **Giá trị bền vững**, **Giá trị cộng đồng và xã hội**. Tổng phương sai tích lũy mà các nhân tố này giải thích được là khoảng 44.3% (đã bỏ qua phương sai đặc thù và các sai số đo lường).
+
+  - Sau khi áp dụng Phân tích thành phần chính, ta thu được các thành phần chính đại diện như: **Niềm tin tôn giáo**, **Khát vọng cá nhân**, **Niềm tin thể chế**, **Trật tự kỷ luật**, **Mức độ nhân ái**. Tổng phương sai tích lũy mà 5 thành phần này giải thích được là gần 63.7%.
+
+**Điểm khác nhau**
+
+\renewcommand{\arraystretch}{1.4}
+
+\begin{longtable}{|>{\raggedright\arraybackslash\color{RoyalBlue}\bfseries}p{2.8cm}|>{\raggedright\arraybackslash}p{6.3cm}|>{\raggedright\arraybackslash}p{6.3cm}|}
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Mục so sánh}} & \textcolor{white}{\textbf{PCA}} & \textcolor{white}{\textbf{FA}} \\ \hline
+\endfirsthead
+
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Mục so sánh}} & \textcolor{white}{\textbf{PCA}} & \textcolor{white}{\textbf{FA}} \\ \hline
+\endhead
+
+Mục tiêu phân tích & Giảm chiều và nén dữ liệu: Nhằm tóm tắt một lượng lớn các biến quan sát thành một vài "thành phần chính" giữ lại nhiều thông tin nhất có thể. & Khám phá các nhân tố tiềm ẩn đằng sau các câu hỏi liên quan đến hệ giá trị cá nhân, quan điểm chính trị và tôn giáo. \\ \hline
+
+Mô hình toán học & PCA phân tích dựa trên tổng phương sai, coi mọi biến đều là thông tin, các thành phần chính tổ hợp tuyến tính của các biến gốc. Thành phần đầu tiên luôn gánh phương sai lớn nhất, các thành phần sau giảm dần. Tổng phương sai tích lũy đạt khoảng 63.7\%. & Dựa trên Phương sai chung, chỉ tập trung vào phần phương sai mà các biến chia sẻ với nhau để tạo thành nhóm, đồng thời loại bỏ các sai số nhiễu. Tổng phương sai tích lũy đạt khoảng 44.3\%. \\ \hline
+
+Khả năng diễn giải & Khả năng diễn giải các PC tốt dựa trên các hệ số tải có mức lớn hơn 0.3, được kiểm định lại bởi phương pháp FA. & Sử dụng phép xoay Varimax giúp phân bổ lại phương sai, tách được các nhóm biến. Từ đó, cho ra khả năng diễn giải các Nhân tố tốt, được kiểm chứng lại bởi phương pháp PCA. \\ \hline
+
+Giá trị trong đồ án & Công cụ kỹ thuật mạnh mẽ để giảm số chiều, khử đa cộng tuyến. Có thể sử dụng các Thành phần chính để thực hiện các phân tích tiếp theo (như hồi quy để dự báo hay MANOVA). & Khẳng định cấu trúc lý thuyết đằng sau các câu hỏi liên quan đến hệ giá trị cá nhân, chứng minh cấu trúc thang đo là đúng về mặt lý thuyết xã hội học. \\ \hline
+\end{longtable}
+
+**Nhận xét:**
+
+Mặc dù PCA và FA dựa trên các giả định toán học khác nhau về phương sai, kết quả phân tích trên bộ dữ liệu ESS cho thấy sự tương đồng cao về cấu trúc nhóm. Sự tương này đã xác thực tính đúng đắn của thang đo: các biến đo lường giá trị và niềm tin được gom lại về 5 nhân tố ổn định như đã phân tích. Sự khác biệt về tỷ lệ phương sai tích lũy phản ánh đúng bản chất của dữ liệu: phương pháp FA đã thành công trong việc loại bỏ sai số đo lường vốn thường tồn tại trong các khảo sát xã hội học, trong khi PCA cung cấp các chỉ số tổng hợp cho các mô hình suy diễn tiếp theo.
+
+## **(f): Hạn chế và Đề xuất những phương pháp phù hợp**
+
+Dù đã thực hiện các phương pháp phân tích thống kê nhiều chiều như MANOVA, FA và PCA để phân tích bộ dữ liệu ESS, nhóm vẫn nhận thức rõ một số hạn chế nhất định xuất phát từ dữ liệu. Cụ thể là:
+
+- Việc vi phạm các giả định cốt lõi của MANOVA (như phân phối chuẩn đa biến và tính đồng nhất ma trận hiệp phương sai) là khó tránh khỏi với cỡ mẫu lớn (>15.000). Tuy đã sử dụng chỉ số Pillai’s Trace để bù đắp, độ tin cậy của các phân tích vẫn sẽ bị ảnh hưởng.
+
+- Mô hình Phân tích nhân tố (FA) tuy khám phá được cấu trúc 5 nhân tố phù hợp lý thuyết, nhưng tỷ lệ phương sai tích lũy giải thích được còn khá thấp (khoảng 44.3%), cho thấy dữ liệu chứa một lượng lớn sai số đo lường đặc thù (measurement error) chưa được kiểm soát triệt để. Thật vậy hơn 1 nửa thông tin còn lại là nhiễu hoặc những ý nghĩa riêng biệt của từng biến mà không liên quan đến những biến khác, do đó phần phương sai chung không thể giải thích được.
+
+Từ đó, nhóm có đề xuất như sau:
+
+- Phương pháp PERMANOVA: Thay vì phụ thuộc vào các giả định nghiêm ngặt về phân phối chuẩn và đồng nhất phương sai của tham số, PERMANOVA là một phương pháp thống kê phi tham số sử dụng kỹ thuật lấy mẫu lại để tạo ra phân phối null trực tiếp từ dữ liệu thực tế. Phương pháp này không yêu cầu về giả định phân phối chuẩn đa biến như MANOVA truyền thống, giúp cung cấp các giá trị p-value chính xác và đáng tin cậy hơn khi dữ liệu vi phạm các giả định.
+
+- Để cải thiện mô hình FA, ta có thể lựa chọn thêm những biến chia sẻ lượng phương sai chung lớn từ bộ dữ liệu ESS, điều này sẽ giúp cho tỷ lệ phương sai tích lũy giải thích tăng lên. 
+
+#### **Phân tích Nhân tố Khẳng định (CFA)**
+
+Bởi vì tỷ lệ phương sai tích lũy giải thích không quá cao, sẽ không lý tưởng để ta dùng các factor scores để phân loại hay dự báo điểm cá nhân của từng người. Tuy nhiên, ta có thể thử chạy CFA để xác định liệu cấu trúc 5 nhân tố có ổn định không?
+
+Ở phần EFA, nhóm đã khám phá cấu trúc 5 nhân tố dựa trên toàn bộ dữ liệu. Tuy nhiên, việc kiểm định lại cấu trúc này trên cùng một bộ dữ liệu đã dùng để khám phá nó tiềm ẩn nguy cơ overfitting. Do đó, nhóm sẽ chia ngẫu nhiên dữ liệu làm 2, dùng CFA trên nửa còn lại để kiểm định xem cấu trúc 5 nhân tố có thực sự ổn định hay không.
+
+Cụ thể sẽ được trình bày trong **Phụ lục D.1**
+
+**Tóm tắm kết quả: ** Các chỉ số CFI và TLI đều vượt ngưỡng 0.9, cùng với khoảng tin cậy dành cho RMSEA < 0.06 và chỉ số SRMR cũng bé hơn 0.6. cho thấy mô hình 5 nhân tố được khám phá ở bước EFA vẫn giữ được cấu trúc ổn định khi kiểm định trên một mẫu độc lập.
+
+#### **Phương pháp PCA hỗn hợp**
+
+Ngoài ra, khi chạy PCA cho bộ dữ liệu này, ta đã bỏ qua khá nhiều các biến định tính do PCA chỉ tính ma trận tương quan dựa trên các biến định lượng. Tuy nhiên, giới tính hay tôn giáo của một người cũng ảnh hưởng rất nhiều đến hành vi và quan điểm của họ đối với các vấn đề xã hội. Do đó, để khắc phục hạn chế của PCA, ta thử sử dụng PCA hỗn hợp, phương pháp này cho phép phân tích đồng thời tập hợp các biến thang đo Likert và các biến phân loại (như quốc gia, tôn giáo).
+
+Để minh họa cho phương pháp này, ta sẽ lấy 14 biến định lượng bao gồm `hedonism, adventure, success, rich, safety, rules, helpful, equality, tPolice, tPolitician, tLegal, levelRelig, pray, religAttd` và 2 biến định tính `boycott, religBelong`.
+
+```{r}
+library(PCAmixdata)
+X_quan <- ESS %>% dplyr::select( 
+         hedonism, adventure, success, rich, 
+         safety, rules, helpful, equality,
+         tPolice, tPolitician, tLegal, levelRelig, pray, religAttd)
+
+X_qual <- ESS %>% dplyr::select( 
+         boycott, religBelong)
+X_qual <- as.data.frame(lapply(X_qual, as.factor))
+```
+
+```{r}
+res_pca <- PCAmix(X.quanti = X_quan, X.quali = X_qual, rename.level = TRUE, graph = FALSE)
+summary(res_pca)
+eig <- res_pca$eig
+# Tính Cumulative Proportion
+cum_var <- cumsum(eig[, 2]) 
+print(cum_var)
+```
+
+**Nhận xét:** Dựa trên ma trận hệ số tải và tổng phương sai tích lũy, ta lấy số dim = 5 là phù hợp, giải thích được khoảng 60% sự biến thiên của bộ dữ liệu. Hơn nữa, các biến định tính cũng đóng góp cho các dim (`religBelong` có hệ số tải 0.58 trong `dim 1` và `boycott` có hệ số tải 0.25 trong `dim 5`). Điều này cho thấy việc sử dụng PCA hỗn hợp là hợp lý.
+
+```{r}
+plot(res_pca, choice = "cor", axes = c(1,2), 
+     main = "Tương quan giữa các biến định lượng Schwartz")
+```
+
+**Nhận xét:** Biểu đồ tương quan giữa các biến định lượng chính là biểu đồ mà ta thường vẽ trong PCA, thể hiện mối tương quan, mức độ đóng góp của các biến cho các PC. Và ta thấy rằng, biểu đồ này giống hệt với biểu đồ mà ta đã vẽ trong PCA truyền thống ở phần trước.
+
+```{r}
+plot(res_pca, choice = "levels", axes = c(1,5), 
+     main = "Bản đồ phân hóa giữa các nhóm dựa trên Dim 1 và Dim 5")
+```
+
+**Nhận xét:** Biểu đồ thứ hai là Biểu đồ về biến định tính trong PCA hỗn hợp. Biểu đồ này được giải thích dựa trên vị trí và khoảng cách của từng điểm trong từng nhóm. Ví dụ như ở hình trên:
+
+-   Ta thấy vị trí giữa nhóm thuộc tôn giáo và không thuộc tôn giáo nằm rất xa nhau. Trong khi nhóm Yes nằm ở dưới góc phải của màn hình, còn nhóm No nằm bên trái góc trên màn hình, điều này chứng tỏ rằng 2 điểm này được phân hóa rất tốt, cho thấy sự khác nhau rõ rệt giữa 2 nhóm Tôn giáo dựa trên Dim 1. Hay nói cách khác, nhóm có tôn giáo sẽ có xu hướng sùng đạo hơn nhóm không tôn giáo (do Dim1 đại diện cho Niềm tin tôn giáo đã giải thích ở trên).
+
+-   Tương tự cho 2 nhóm boycott. Trong khi nhóm đã từng tẩy chay một sản phẩm nằm ở phía trên trục X, thì nhóm chưa từng tẩy chay một sản phẩm nào lại nằm phía dưới. Điều này chứng tỏ 2 nhóm này có thể được phân hóa dựa trên Dim5: là trục đại diện cho **Lòng nhân ái và bình đẳng**. Giải thích về mặt xã hội học, việc tẩy chay một sản phẩm sẽ thường do sản phẩm đó được sản xuất bởi một công ty có vấn đề (về việc bóc lột sức lao động hay ủng hộ các cuộc diệt chủng chẳng hạn), do đó, người quan tâm đến bình đẳng xã hội sẽ thường có khả năng tẩy chay các sản phẩm từ những công ty đó hơn.
+
+#### Hồi quy Logistic dự báo từ các nhân tố
+
+Tuy mô hình EFA chỉ đạt 44.3% tổng phương sai tích lũy, việc sử dụng các nhân tố này sẽ cho ra kết quả dự báo không đạt yêu cầu. Tuy nhiên, sau khi xác nhận cấu trúc 5 nhân tố bằng CFA, nhóm vẫn thử sử dụng điểm số nhân tố (factor scores) làm biến độc lập trong mô hình hồi quy logistic, nhằm trả lời câu hỏi: hệ giá trị cá nhân, niềm tin thể chế và mức độ tôn giáo có dự báo được việc một người tự nhận thuộc về một tôn giáo (`religBelong`) hay không?
+
+Cụ thể, mô hình ta thực hiện là mô hình hồi quy Logistic nhị phân , được dùng để dự đoán xác suất một cá nhân thuộc về một nhóm tôn giáo (`religBelong = "Yes"`) dựa trên các nhân tố được trích từ EFA và các biến giới tính, tuổi. Mô hình có công thức toán học như sau:
+
+$$\ln\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1(Aspiration) + \beta_2(Institutional) + \beta_3(Stability) + \beta_4(Community) + \beta_5(gender) + \beta_6(age)$$
+Trong đó:
+
+- $\ln\left(\frac{p}{1-p}\right)$: được gọi là Log-oddst, logarit của tỉ lệ giữa xác suất "Có" và xác suất "Không".
+
+- $\beta$: các hệ số hồi quy, cho biết mức độ thay đổi của Log-odds khi biến độc lập tăng 1 đơn vị.
+
+Việc xây dựng mô hình cụ thể được diễn giải trong **Phụ lục D.2**.
+
+## **(g): Kết luận và hướng phát triển của đề tài**
+
+Như vậy, sau khi áp dụng các phương pháp liên quan đến phân tích thống kê nhiều chiều như Phân tích phương sai nhiều chiều (MANOVA), Phân tích Nhân tố (FA) và Phân tích Thành phần chính (PCA). Ta đã trả lời được các câu hỏi được đặt ra ở phần Xác định vấn đề nghiên cứu. Cụ thể là:
+
+- Phân tích được sự khác biệt về niềm tin vào chính trị, thể chế giữa Nhóm theo và Nhóm không theo tôn giáo bằng phương pháp MANVOA
+
+- Khám phá ra cấu trúc ẩn đằng sau các biến thang đó đánh giá hệ giá trị cá nhân, niềm tin thể chế và mức độ gắn kết tôn giáo của người dân 2 nước châu Âu (Đức và Anh) bằng cách áp dụng 2 phương pháp FA và PCA. 
+
+- Cải tiến bài làm bằng cách áp dụng PCA hỗn hợp, nhờ đó mà khám phá ra 2 biến định tính về tôn giáo và thái độ tẩy chay sản phẩm cũng đóng góp lượng thông tin khá lớn.
+
+Về hướng phát triển của đề tài, nếu có thêm thời gian, nhóm mong muốn sẽ phân tích sâu hơn về niềm tin thể chế giữa các nhóm tôn giáo cụ thể chứ không chỉ riêng việc có theo tôn giáo hay không. Đồng thời, dựa trên cấu trúc tiềm ẩn mà nhóm đã tìm ra, nhóm mong muốn có thể lấy thêm dữ liệu để áp dụng phuơng pháp SEM (Structural Equation Modeling - Mô hình cấu trúc tuyến tính) để phân tích các mối quan hệ phức tạp giữa các biến, giúp ta không chỉ phân nhóm mà còn có thể xác định được tác động của nhiều biến tiềm ẩn. Ngoài ra, nhóm cũng mong muốn sẽ áp dụng trọng số khảo sát (design weights) trong bộ dữ liệu ESS để đảm bảo cho tính đại diện dân số.
+
+```{r, echo = FALSE}
+save.image(file = "Nhom4_DoAnCuoiKi.RData")
+```
+
+\newpage
+
+# LỜI CẢM ƠN {.unnumbered}
+
+Lời đầu tiên, nhóm chúng em xin gửi lời cảm ơn chân thành và sâu sắc nhất đến Cô Nguyễn Thị Mộng Ngọc. Trong suốt học phần Thống kê nhiều chiều, Cô đã tận tình truyền đạt cho nhóm nền tảng lý thuyết vững chắc về các phương pháp phân tích đa biến như MANOVA, Phân tích thành phần chính (PCA) và Phân tích nhân tố khám phá (EFA), đồng thời luôn sẵn lòng giải đáp thắc mắc và đưa ra những nhận xét khách quan, giúp nhóm định hướng đúng đắn trong suốt quá trình thực hiện đồ án.
+
+Bên cạnh đó, nhóm cũng xin gửi lời cảm ơn đến các nguồn dữ liệu quý giá đã được sử dụng trong đồ án. Nhóm 4 xin cảm ơn Cộng đồng Kaggle cùng tác giả jayaantanaath đã chia sẻ bộ dữ liệu "Student Habits vs Academic Performance", và tác giả uom190346a đã chia sẻ bộ dữ liệu "Sleep Health and Lifestyle Dataset". Đây là hai nguồn dữ liệu quan trọng giúp nhóm vận dụng các phương pháp MANOVA và hồi quy tuyến tính bội vào các bài toán thực tiễn. Đồng thời, nhóm xin trân trọng cảm ơn European Social Survey European Research Infrastructure (ESS ERIC) đã cung cấp bộ dữ liệu khảo sát chuẩn ESS11 (trích xuất từ hai quốc gia Anh và Đức), tạo điều kiện để nhóm ứng dụng Phân tích nhân tố khám phá (EFA) trên một bộ dữ liệu khảo sát xã hội học có quy mô và độ tin cậy cao.
+
+Nhờ sự kết hợp giữa kiến thức được Cô truyền đạt và ba bộ dữ liệu đa dạng nêu trên, nhóm đã có cơ hội thực hành đầy đủ các phương pháp thống kê nhiều chiều đã học trên nhiều loại dữ liệu khác nhau, từ dữ liệu hành vi - lối sống đến dữ liệu khảo sát xã hội học quy mô lớn.
+
+Mặc dù đã nỗ lực hết mình, đồ án chắc chắn không tránh khỏi những thiếu sót. Nhóm rất mong nhận được sự đóng góp ý kiến của Cô để đề tài ngày càng hoàn thiện hơn.
+
+Nhóm 4 chúng em xin trân trọng cảm ơn!
+
+\newpage
+
+\nocite{*}
+
+# TÀI LIỆU THAM KHẢO {.unnumbered}

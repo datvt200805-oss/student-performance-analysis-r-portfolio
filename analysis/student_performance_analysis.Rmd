@@ -1,0 +1,916 @@
+---
+title: "Student Performance Analysis"
+author: "Le Vu Thanh Dat"
+output: html_document
+---
+
+# Phân tích hiệu suất học tập của sinh viên
+
+Mô tả chi tiết về **nguồn dữ liệu** và **ý nghĩa của từng biến** trong bộ dữ liệu được trình bày tại **Phụ lục A**
+
+## **(a): Tiền xử lý dữ liệu**
+
+#### **Đọc dữ liệu**
+
+```{r}
+data <- read.csv("StudentHabitsPerformance.csv", stringsAsFactors = TRUE)
+# Kiểm tra kích thước 
+dim(data)
+```
+
+**Nhận xét:** Bộ dữ liệu gồm có 1000 quan trắc (tương ứng với 1000 sinh viên) và 16 biến đúng như mô tả.
+
+#### **Xử lí dữ liệu**
+
+```{r}
+data_clean <- data %>%
+  # Loại bỏ biến định danh student_id
+  select(-student_id) %>% 
+  # Chuyển đổi tất cả các biến dạng chuỗi (character) sang dạng thứ bậc (Factor)
+  mutate(across(where(is.character), as.factor))
+```
+
+**Nhận xét:** Sau khi loại bỏ biến định danh, bộ dữ liệu còn lại gồm 1000 quan sát và 15 biến
+
+#### **Kiểm tra và xử lí Missing Values**
+
+```{r}
+any(is.na(data_clean))
+```
+
+**Nhận xét:** Không có dữ liệu khuyết
+
+```{r}
+data_final <- data_clean
+```
+
+**Nhận xét:** Sau khi rà soát và xử lý, tập dữ liệu cuối cùng (`data_final`) được bảo toàn với 1000 quan sát và 15 biến.
+
+Cấu trúc chi tiết của từng biến sau khi xử lý (kiểu dữ liệu, số mức của các biến định tính) được kiểm tra và trình bày tại **Phụ lục B.1**.
+
+#### **Thống kê mô tả bộ dữ liệu gốc**
+
+```{r}
+# Lọc ra các biến định lượng từ tập dữ liệu đã làm sạch
+numeric_vars <- data_clean %>% select(where(is.numeric))
+# Thống kê mô tả các biến định lượng
+summary(numeric_vars)
+```
+
+**Nhận xét:** Các biến phản ánh **thói quen sinh hoạt và học tập** của sinh viên có mức độ biến thiên khá lớn. Trung bình sinh viên học khoảng **3.55 giờ/ngày**, sử dụng **2.51 giờ/ngày** cho mạng xã hội, **1.82 giờ/ngày** xem Netflix, ngủ **6.47 giờ/ngày** và tập thể dục khoảng **3 lần/tuần**. Điều này cho thấy sự khác biệt đáng kể về lối sống và cách phân bổ thời gian giữa các sinh viên.
+
+Đối với **kết quả học tập và sức khỏe**, tỷ lệ chuyên cần trung bình đạt **84.13%**, điểm sức khỏe tinh thần trung bình là **5.44/10**, trong khi điểm thi cuối kỳ trung bình đạt **69.60 điểm** (trung vị **70.5 điểm**), cho thấy kết quả học tập tương đối ổn định và phân phối điểm không bị lệch mạnh. Bên cạnh đó, độ tuổi dao động từ **17–24 tuổi** (trung bình khoảng **20.5 tuổi**), phù hợp với đối tượng sinh viên đại học.
+
+Ngoài ra, các biến định lượng có **thang đo và phạm vi giá trị khác nhau** (ví dụ: `attendance_percentage` từ **56–100**, `mental_health_rating` từ **1–10**, `study_hours_per_day` từ **0–8.3**). Do đó, dữ liệu cần được **chuẩn hóa theo Z-score** trước khi quyết định áp dụng các phương pháp dựa trên phương sai như **PCA** và **EFA**, nhằm tránh các biến có độ lớn lớn hơn chi phối kết quả phân tích.
+
+Trước khi lựa chọn phương pháp phân tích chính, nghiên cứu đã thực hiện các bước khám phá dữ liệu bổ sung: trực quan hóa phân phối biến định lượng trước và sau chuẩn hóa bằng Box-plot **(Phụ lục B.2)**; phát hiện và xử lý ngoại lai đơn biến **(Phụ lục B.3**) và đa biến theo khoảng cách Mahalanobis **(Phụ lục B.4)**; phân tích ma trận tương quan **(Phụ lục B.5)**; kiểm định Bartlett **(Phụ lục B.6)** và KMO **(Phụ lục B.7)** để đánh giá khả năng áp dụng PCA/EFA; và trực quan hóa Scree-plot **(Phụ lục B.8)**. Kết quả cho thấy dữ liệu **không phù hợp để thực hiện PCA/EFA (KMO = 0.17).**
+
+## **(b): Xác định vấn đề nghiên cứu và lựa chọn phương pháp phù hợp**
+
+#### **Lựa chọn phương pháp phân tích và xác định vấn đề nghiên cứu**
+
+Bộ dữ liệu **Student Habits Performance** bao gồm nhiều biến định tính phản ánh đặc điểm cá nhân, điều kiện học tập và lối sống của sinh viên, đồng thời chứa nhiều biến định lượng phản ánh kết quả học tập. Để khai thác toàn diện bộ dữ liệu, nghiên cứu sử dụng **hai phương pháp phân tích thống kê**, gồm **MANOVA (Multivariate Analysis of Variance)** và **Multiple Linear Regression (Hồi quy tuyến tính bội)**.
+
+Phương pháp **MANOVA** được sử dụng nhằm đánh giá sự khác biệt đồng thời của nhiều chỉ tiêu học tập giữa các nhóm sinh viên được phân chia theo các yếu tố phân loại. Trong khi đó, **Multiple Linear Regression** được sử dụng để xác định mức độ và chiều hướng ảnh hưởng của các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập đến **điểm thi cuối kỳ (`exam_score`)**, đồng thời xây dựng mô hình dự báo kết quả học tập.
+
+Trong thực tế, hiệu suất học tập không chỉ được phản ánh thông qua điểm số cuối kỳ mà còn thể hiện qua quá trình học tập hằng ngày và mức độ tham gia học tập. Vì vậy, để đánh giá hiệu suất học tập một cách toàn diện trong phần MANOVA, nghiên cứu lựa chọn ba chỉ tiêu:
+
+-   `study_hours_per_day`: phản ánh mức độ đầu tư thời gian cho việc học;
+
+-   `attendance_percentage`: phản ánh mức độ chuyên cần và ý thức tham gia học tập;
+
+-   `exam_score`: phản ánh kết quả học tập đạt được.
+
+Từ đó, nghiên cứu thực hiện hai mục tiêu chính:
+
+> **Mục tiêu 1 (MANOVA):** Xác định các yếu tố phân loại có ảnh hưởng đáng kể đến hiệu suất học tập của sinh viên thông qua ba chỉ tiêu gồm `study_hours_per_day`, `attendance_percentage` và `exam_score`, đồng thời khảo sát ảnh hưởng của **mức độ sức khỏe tinh thần**, **tần suất tập thể dục** và ảnh hưởng tương tác giữa hai yếu tố này.
+>
+> **Mục tiêu 2 (Multiple Linear Regression):** Xác định những yếu tố ảnh hưởng đến **điểm thi cuối kỳ (`exam_score`)**, đánh giá mức độ và chiều hướng tác động của từng biến khi các yếu tố khác được giữ không đổi, đồng thời xây dựng mô hình dự báo kết quả học tập của sinh viên.
+
+## **(c)/(d): Kiểm tra giả định, đánh giá tính phù hợp và thực hiện phân tích bằng phương pháp đã chọn**
+
+### **Bài toán 1 (One-Way MANOVA)**
+
+Trước khi xây dựng mô hình One-way MANOVA, nghiên cứu thực hiện bước sàng lọc các biến độc lập bằng các kiểm định MANOVA sơ bộ nhằm lựa chọn biến phù hợp. Kết quả sàng lọc bằng MANOVA **(Phụ lục C.1)** cho thấy chỉ có biến `parental_education_level` có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phản ánh hiệu suất học tập.
+
+Do đó, bài toán thứ nhất tập trung trả lời câu hỏi:
+
+> **Liệu trình độ học vấn của phụ huynh có ảnh hưởng đến mức độ đầu tư học tập, tỷ lệ chuyên cần và kết quả học tập của sinh viên hay không?**
+
+Mô hình One-Way MANOVA gồm:
+
+-   **Biến độc lập:** `parental_education_level`
+
+-   **Biến phụ thuộc:** `study_hours_per_day`, `attendance_percentage`, `exam_score`
+
+#### **Lọc tập dữ liệu**
+
+```{r}
+manova_data <- data_final %>%
+  select(parental_education_level,
+         study_hours_per_day,
+         attendance_percentage,
+         exam_score)
+
+dim(manova_data)
+```
+
+**Nhận xét:** Bộ dữ liệu được sử dụng để MANOVA còn lại 1000 quan trắc và 4 biến
+
+#### **Thống kê mô tả**
+
+```{r}
+summary_stats <- manova_data %>%
+  group_by(parental_education_level) %>%
+  get_summary_stats(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score,
+    type = "mean_sd"
+  )
+
+print(summary_stats, n = 12)
+```
+
+**Nhận xét:**
+
+-   Số lượng quan sát giữa các nhóm không hoàn toàn cân bằng. Hai nhóm **High School** (392 quan sát) và **Bachelor** (350 quan sát) chiếm tỷ trọng lớn nhất, trong khi nhóm **None** chỉ có 91 quan sát. Tuy nhiên, tất cả các nhóm đều có cỡ mẫu đủ lớn để thực hiện các phân tích suy luận.
+
+-   Thống kê mô tả cho thấy ba biến phụ thuộc có giá trị trung bình khá tương đồng giữa các nhóm trình độ học vấn của cha mẹ. Cụ thể, số giờ học trung bình dao động từ **3.50–3.66 giờ/ngày**, tỷ lệ chuyên cần từ **82.6–86.6%**, và điểm thi cuối kỳ từ **68.1–70.3 điểm**. Nhóm **None** có số giờ học và tỷ lệ chuyên cần trung bình cao nhất, trong khi nhóm **Bachelor** có điểm thi trung bình cao nhất; tuy nhiên, mức chênh lệch giữa các nhóm đều không lớn.
+
+-   Độ lệch chuẩn của các biến phụ thuộc tương đối tương đồng giữa các nhóm, cho thấy mức độ phân tán dữ liệu không có khác biệt đáng kể. Nhìn chung, các nhóm sinh viên có đặc điểm học tập và kết quả học tập khá giống nhau, mặc dù **tỷ lệ chuyên cần** có xu hướng khác biệt rõ hơn so với số giờ học và điểm thi, gợi ý đây có thể là biến đóng góp nhiều hơn vào sự khác biệt tổng thể giữa các nhóm.
+
+#### **Trực quan hóa bằng Box-plot**
+
+```{r, echo = FALSE}
+library(ggplot2)
+library(patchwork)
+
+my_theme <- theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_blank(),         
+    axis.text.x = element_text(size = 10),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+
+p1 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      exam_score)
+) +
+  geom_boxplot(fill = "#66C2A5") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Exam score",
+    y = "Điểm thi"
+  ) +
+  my_theme
+
+p2 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      attendance_percentage)
+) +
+  geom_boxplot(fill = "#FC8D62") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Attendance",
+    y = "Tỷ lệ chuyên cần (%)"
+  ) +
+  my_theme
+
+p3 <- ggplot(
+  manova_data,
+  aes(parental_education_level,
+      study_hours_per_day)
+) +
+  geom_boxplot(fill = "#8DA0CB") +
+  scale_x_discrete(labels = c(
+    "Bachelor",
+    "High\nSch.",
+    "Master",
+    "None"
+  )) +
+  labs(
+    title = "Study hours",
+    y = "Số giờ học"
+  ) +
+  my_theme
+
+(p1 | p2 | p3) +
+plot_annotation(
+  caption = "Trình độ học vấn của cha mẹ"
+)
+```
+
+**Nhận xét:** Các biểu đồ boxplot cho thấy phân bố của ba biến phụ thuộc (`exam_score`, `attendance_percentage` và `study_hours_per_day`) giữa các nhóm trình độ học vấn của cha mẹ nhìn chung khá tương đồng, với các khoảng tứ phân vị chồng lấn đáng kể. Tuy nhiên, vẫn có một số khác biệt nhỏ về trung vị giữa các nhóm và xuất hiện một số giá trị ngoại lai ở từng biến.
+
+#### **Kiểm tra phân phối chuẩn nhiều chiều**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Vector chứa ba biến quan sát (`study_hours_per_day`, `attendance_percentage`, `exam_score`) tuân theo phân phối chuẩn nhiều chiều.
+
+-   $H_1$: Vector chứa ba biến quan sát (`study_hours_per_day`, `attendance_percentage`, `exam_score`) không tuân theo phân phối chuẩn nhiều chiều.
+
+```{r}
+# Phân nhóm và kiểm tra mshapiro_test cho từng nhóm trình độ học vấn
+res_mshapiro_grouped <- manova_data %>%
+  group_by(parental_education_level) %>%
+  doo(~ mshapiro_test(data = .[, c("study_hours_per_day", 
+                                   "attendance_percentage", "exam_score")]))
+
+print(res_mshapiro_grouped)
+```
+
+**Nhận xét:** Kết quả kiểm định Shapiro–Wilk nhiều chiều được thực hiện riêng cho từng nhóm trình độ học vấn của phụ huynh. Tất cả các nhóm đều có p-value lớn hơn 0.05 (Bachelor: 0.469; High School: 0.577; Master: 0.674; None: 0.264). Do đó, không có đủ bằng chứng thống kê để bác bỏ giả thuyết dữ liệu tuân theo phân phối chuẩn nhiều chiều trong từng nhóm.
+
+Bên cạnh kiểm định phân phối chuẩn nhiều chiều, kết quả **kiểm định Shapiro–Wilk một chiều** cho từng biến riêng lẻ trong từng nhóm được trình bày chi tiết tại **Phụ lục C.2**, cho thấy giả định chuẩn một chiều không được thỏa mãn hoàn toàn ở một số biến; tuy nhiên điều này không ảnh hưởng đến kết luận MANOVA nhờ cỡ mẫu lớn theo Định lý giới hạn trung tâm.
+
+#### **Kiểm tra tính đồng nhất của ma trận hiệp phương sai (Box's M Test)**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Các ma trận hiệp phương sai tổng thể của các nhóm là đồng nhất.
+
+-   $H_1$: Có ít nhất hai ma trận hiệp phương sai tổng thể không đồng nhất.
+
+```{r}
+# Thực hiện Box's M Test
+box_m_result <- box_m(
+  manova_data[, c("study_hours_per_day",
+                  "attendance_percentage",
+                  "exam_score")],
+  manova_data$parental_education_level
+)
+
+print(box_m_result)
+```
+
+**Nhận xét:** Kết quả kiểm định Box's M cho giá trị thống kê bằng 9.86 và p-value = 0.936. Với mức ý nghĩa $\alpha=0.001$, ta có: **p-value=0.936\>0.001**. Do đó, không bác bỏ giả thuyết $H_0$. Không có đủ bằng chứng thống kê để kết luận rằng ma trận hiệp phương sai của các nhóm trình độ học vấn của cha mẹ là khác nhau.
+
+**Kết luận:** Giả định đồng nhất ma trận hiệp phương sai giữa các nhóm được thỏa mãn. Kết hợp với kết quả kiểm định phân phối chuẩn nhiều chiều ở bước trước, dữ liệu đáp ứng các giả định quan trọng để tiếp tục thực hiện phân tích MANOVA.
+
+#### **Phân tích phương sai Nhiều chiều Một nhân tố (One-Way MANOVA)**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Trình độ học vấn của cha mẹ không ảnh hưởng đến vector trung bình của các biến hiệu suất học tập.
+
+-   $H_1$: Có sự khác biệt về vector trung bình của ít nhất một nhóm trình độ học vấn của cha mẹ.
+
+```{r}
+# Xây dựng mô hình MANOVA
+model_mlm <- lm( cbind(study_hours_per_day, attendance_percentage, exam_score) 
+                 ~ parental_education_level, data = manova_data )
+
+# Thực hiện MANOVA với thống kê Wilks' Lambda
+res_manova <- Manova( model_mlm, test.statistic = "Wilks" ) 
+print(res_manova)
+```
+
+**Nhận xét:**
+
+Kết quả kiểm định MANOVA sử dụng thống kê **Wilks' Lambda** cho giá trị Wilks' Lambda = **0.97718**, giá trị thống kê **F = 2.5616** và **p-value = 0.006244**. Với mức ý nghĩa $\alpha = 0.05$, ta có: $p\text{-value} = 0.006244 < 0.05$ Do đó, **bác bỏ giả thuyết** $H_0$. Kết quả này cho thấy trình độ học vấn của cha mẹ có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc gồm `study_hours_per_day`, `attendance_percentage` và `exam_score` khi được xem xét đồng thời.
+
+Nói cách khác, khi đánh giá tổng thể trên cả ba khía cạnh là t**hời gian học tập**, **mức độ chuyên cần** và **kết quả học tập**, tồn tại **sự khác biệt** giữa các nhóm sinh viên có t**rình độ học vấn của cha mẹ khác nhau.** Mặc dù kết quả MANOVA có ý nghĩa thống kê, giá trị Wilks' Lambda = 0.977 cho thấy mức độ khác biệt tổng thể giữa các nhóm tương đối nhỏ. Điều này hàm ý rằng trình độ học vấn của phụ huynh chỉ giải thích một phần nhỏ sự khác biệt trong hiệu suất học tập của sinh viên.
+
+#### **Phân tích phương sai Một chiều (One-Way ANOVA)**
+
+**Đặt giả thuyết thống kê**
+
+Đối với mỗi biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`), thực hiện kiểm định:
+
+-   $H_0$: Giá trị trung bình của biến phụ thuộc là như nhau giữa các nhóm trình độ học vấn của cha mẹ.
+
+-   $H_1$: Có ít nhất một nhóm có giá trị trung bình khác biệt so với các nhóm còn lại.
+
+```{r}
+# ANOVA cho số giờ học mỗi ngày
+anova_study <- aov( study_hours_per_day ~ parental_education_level, 
+                    data = manova_data ) 
+summary(anova_study) 
+
+# ANOVA cho tỷ lệ chuyên cần 
+anova_attendance <- aov( attendance_percentage ~ parental_education_level, 
+                         data = manova_data)
+summary(anova_attendance) 
+
+# ANOVA cho điểm thi cuối kỳ 
+anova_exam <- aov( exam_score ~ parental_education_level, 
+                   data = manova_data ) 
+summary(anova_exam)
+```
+
+**Nhận xét:**
+
+Kết quả ANOVA cho biến `study_hours_per_day` cho giá trị F = 0.313 và p-value = 0.816. Với mức ý nghĩa ( $\alpha = 0.05$), ta có p-value \> 0.05 nên không bác bỏ giả thuyết $H_0$. Do đó chưa có đủ bằng chứng cho thấy sự khác biệt về số giờ học trung bình giữa các nhóm trình độ học vấn của cha mẹ
+
+-   Đối với biến `attendance_percentage`, kết quả ANOVA cho giá trị F = 4.035 và p-value = 0.00725. Vì p-value \< 0.05 nên bác bỏ giả thuyết $H_0$. Điều này cho thấy **tồn tại sự khác biệt có ý nghĩa thống kê về tỷ lệ chuyên cần giữa các nhóm sinh viên có trình độ học vấn của cha mẹ khác nhau**.
+
+-   Đối với biến `exam_score`, kết quả ANOVA cho giá trị F = 0.653 và p-value = 0.581. Do p-value \> 0.05 nên không bác bỏ giả thuyết $H_0$. Như vậy, chưa có đủ bằng chứng thống kê để khẳng định trình độ học vấn của cha mẹ ảnh hưởng đến điểm thi cuối kỳ của sinh viên.
+
+Tóm lại, trong ba biến phụ thuộc được xem xét, chỉ có biến `attendance_percentage` cho thấy sự khác biệt có ý nghĩa thống kê giữa các nhóm trình độ học vấn của cha mẹ. Do đó, nhóm tiếp tục thực hiện phân tích hậu nghiệm (Post-hoc) bằng phương pháp Tukey HSD đối với biến `attendance_percentage` để xác định cụ thể những nhóm nào khác biệt với nhau.
+
+#### **Phân tích hậu nghiệm (Post-hoc Test)**
+
+**Đặt giả thuyết**
+
+Đối với mỗi cặp nhóm được so sánh:
+
+-   $H_0$: Không có sự khác biệt về tỷ lệ chuyên cần trung bình giữa hai nhóm.
+
+-   $H_1$: Có sự khác biệt về tỷ lệ chuyên cần trung bình giữa hai nhóm.
+
+```{r}
+tukey_result <- manova_data %>% 
+  tukey_hsd(attendance_percentage ~ parental_education_level)
+print(tukey_result)
+```
+
+**Nhận xét:** Kết quả kiểm định hậu nghiệm Tukey HSD cho thấy chỉ có hai cặp nhóm xuất hiện sự khác biệt có ý nghĩa thống kê về tỷ lệ chuyên cần.
+
+Cụ thể, giữa nhóm **High School** và **None**, giá trị (p_adj=0.0478\<0.05) và khoảng tin cậy 95% của chênh lệch trung bình (0.018; 5.62) không chứa giá trị 0. Do đó, có đủ bằng chứng để kết luận tỷ lệ chuyên cần trung bình của hai nhóm này khác nhau.
+
+Tương tự, giữa nhóm **Master** và **None**, giá trị (p_adj=0.00537\<0.05) và khoảng tin cậy 95% (0.896; 7.17) không chứa giá trị 0. Vì vậy, có thể kết luận tỷ lệ chuyên cần trung bình của hai nhóm này khác nhau một cách có ý nghĩa thống kê.
+
+Đối với các cặp nhóm còn lại, giá trị (p_adj\>0.05) và khoảng tin cậy 95% đều chứa giá trị 0. Do đó, không có đủ bằng chứng thống kê để kết luận tồn tại sự khác biệt về tỷ lệ chuyên cần trung bình giữa các nhóm này.
+
+### **Bài toán 2 (Two-way MANOVA)**
+
+Bên cạnh yếu tố gia đình, các yếu tố thuộc về sức khỏe và lối sống cũng có thể ảnh hưởng đến hiệu suất học tập của sinh viên. Vì vậy, nghiên cứu tiếp tục xem xét đồng thời hai yếu tố là **mức độ sức khỏe tinh thần** (`mental_health_rating`) và **tần suất tập thể dục** (`exercise_frequency`).
+
+Bài toán thứ hai nhằm trả lời câu hỏi:
+
+> **Liệu mức độ sức khỏe tinh thần và tần suất tập thể dục có ảnh hưởng đồng thời đến hiệu suất học tập của sinh viên, và hai yếu tố này có tồn tại ảnh hưởng tương tác hay không?**
+
+Mô hình Two-Way MANOVA gồm:
+
+-   **Biến độc lập:** `mental_group`, `exercise_group`
+
+-   **Biến phụ thuộc:** `study_hours_per_day`, `attendance_percentage`, `exam_score`
+
+#### **Phân nhóm dữ liệu**
+
+Do `mental_health_rating` và `exercise_frequency` là hai biến định lượng, nghiên cứu tiến hành phân nhóm hai biến này thành ba mức **Low**, **Medium** và **High** để phù hợp với mô hình **Two-Way MANOVA**. Cụ thể:
+
+`mental_health_rating`:
+
+-   Tâm lý yếu: 1–3
+
+-   Tâm lý ổn định: 4–6
+
+-   Tâm lý vững vàng: 7–10
+
+`exercise_frequency`:
+
+-   Ít vận động: 0–2 lần/tuần
+
+-   Vận động vừa phải: 3–4 lần/tuần
+
+-   Vận động thường xuyên: 5–7 lần/tuần
+
+```{r, echo = FALSE}
+two_way_data <- data_final %>%
+  mutate(
+    mental_group = case_when(
+      mental_health_rating <= 3 ~ "Tâm lý yếu",
+      mental_health_rating <= 6 ~ "Tâm lý ổn định",
+      TRUE ~ "Tâm lý vững vàng"
+    ) %>% factor(levels = c("Tâm lý yếu", "Tâm lý ổn định", "Tâm lý vững vàng")),
+    
+    exercise_group = case_when(
+      exercise_frequency <= 2 ~ "Ít vận động",
+      exercise_frequency <= 4 ~ "Vận động vừa phải",
+      TRUE ~ "Vận động thường xuyên"
+    ) %>% factor(levels = c("Ít vận động", "Vận động vừa phải", "Vận động thường xuyên"))
+  )
+
+kable(
+  as.data.frame(table(two_way_data$mental_group)),
+  col.names = c("Mental group", "Tần số"),
+  caption = "Bảng 1. Số lượng quan sát theo mức độ sức khỏe tinh thần"
+)
+
+kable(
+  as.data.frame(table(two_way_data$exercise_group)),
+  col.names = c("Exercise group", "Tần số"),
+  caption = "Bảng 2. Số lượng quan sát theo tần suất tập thể dục"
+)
+
+kable(
+  as.data.frame(table(two_way_data$mental_group,
+                      two_way_data$exercise_group)),
+  col.names = c("Mental group", "Exercise group", "Tần số"),
+  caption = "Bảng 3. Số lượng quan sát theo từng tổ hợp nhóm"
+)
+```
+
+**Nhận xét:**
+
+-   Cả hai yếu tố sau khi chuyển đổi sang dạng thứ bậc đều đạt kích thước mẫu lớn. Cụ thể, các nhóm thuộc biến Sức khỏe tinh thần (`mental_group`) có tần số dao động từ 301 đến 382 quan sát; các nhóm thuộc biến Tần suất vận động (`exercise_group`) dao động từ 287 đến 412 quan sát.
+
+-   Tổng số $N = 1000$ quan sát được phân bổ trọn vẹn vào 9 ô tổ hợp, trong đó nhóm có quy mô nhỏ nhất đạt $n = 75$ (Tâm lý yếu $\times$ Vận động vừa phải) và lớn nhất đạt $n = 156$ (Tâm lý vững vàng $\times$ Ít vận động).
+
+#### **Thống kê mô tả**
+
+```{r}
+summary_two_way <- two_way_data %>%
+  group_by(mental_group, exercise_group) %>%
+  get_summary_stats(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score,
+    type = "mean_sd"
+  )
+
+print(summary_two_way, n = 30)
+```
+
+**Nhận xét:** Giá trị trung bình của ba biến phụ thuộc có sự khác biệt rõ rệt giữa các tổ hợp nhóm, nhưng mức độ khác biệt không đồng đều giữa ba chỉ tiêu.
+
+Đáng chú ý nhất là **exam_score**: điểm thi có xu hướng tăng dần và khá nhất quán theo chiều sức khỏe tinh thần tốt hơn, từ nhóm Tâm lý yếu (60.7–69.3 điểm) đến Tâm lý ổn định (66.6–69.9 điểm) và cao nhất ở Tâm lý vững vàng (73.5–80.4 điểm). Trong cùng một nhóm tâm lý, điểm thi cũng có xu hướng tăng theo tần suất vận động, và mức tăng này thể hiện rõ nhất ở nhóm Tâm lý vững vàng — từ 73.5 điểm (Ít vận động) lên 80.4 điểm (Vận động thường xuyên), chênh lệch tới 6.9 điểm. Đây là tổ hợp có điểm thi trung bình cao nhất trong toàn bộ 9 nhóm.
+
+Ngược lại, hai biến còn lại biến động khá ít giữa các tổ hợp. **attendance_percentage** chỉ dao động trong khoảng 83.1%–85.4% (chênh lệch tối đa 2.3 điểm phần trăm) và không cho thấy xu hướng tăng/giảm rõ theo mental_group hay exercise_group. Tương tự, **study_hours_per_day** dao động từ 3.28–3.71 giờ/ngày (chênh lệch tối đa chỉ 0.43 giờ), cũng không thể hiện quy luật rõ ràng theo hai yếu tố phân loại.
+
+#### **Interaction plot**
+
+```{r, echo = FALSE}
+plot_data <- two_way_data %>%
+  select(
+    mental_group,
+    exercise_group,
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score
+  ) %>%
+  pivot_longer(
+    cols = c(study_hours_per_day,
+             attendance_percentage,
+             exam_score),
+    names_to = "Variable",
+    values_to = "Value"
+  )
+ggplot(
+  plot_data,
+  aes(
+    x = exercise_group,
+    y = Value,
+    color = mental_group,
+    group = mental_group
+  )
+) +
+  stat_summary(
+    fun = mean,
+    geom = "line",
+    linewidth = 1
+  ) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    size = 2.8
+  ) +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.15,
+    linewidth = 0.6
+  ) +
+  scale_x_discrete(
+    labels = c(
+      "Ít\nvận động",
+      "Vận động\nvừa phải",
+      "Vận động\nthường xuyên"
+    )
+  ) +
+  facet_wrap(
+    ~Variable,
+    scales = "free_y",
+    labeller = as_labeller(c(
+      study_hours_per_day = "Study hours",
+      attendance_percentage = "Attendance",
+      exam_score = "Exam score"
+    ))
+  ) +
+  labs(
+    x = "Tần suất tập thể dục",
+    y = NULL,
+    color = "Sức khỏe tinh thần"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold", size = 12),
+    axis.text.x = element_text(size = 10, lineheight = 0.9),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+```
+
+**Nhận xét:** Giá trị trung bình của ba biến phụ thuộc thay đổi theo từng tổ hợp giữa mức độ sức khỏe tinh thần và tần suất tập thể dục. Cụ thể, đối với điểm thi (Exam score), nhóm sinh viên có tâm lý vững vàng luôn đạt điểm trung bình cao hơn hai nhóm còn lại và mức tăng rõ rệt khi tần suất tập thể dục tăng. Đối với tỷ lệ chuyên cần (Attendance) và số giờ học (Study hours), sự khác biệt giữa các nhóm nhỏ hơn nhưng xu hướng thay đổi theo tần suất tập thể dục không hoàn toàn giống nhau giữa các mức sức khỏe tinh thần.
+
+#### **Kiểm tra phân phối chuẩn nhiều chiều**
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Vector các biến phụ thuộc trong mỗi nhóm tuân theo phân phối chuẩn nhiều chiều.
+
+-   $H_1$: Vector các biến phụ thuộc trong ít nhất một nhóm không tuân theo phân phối chuẩn nhiều chiều.
+
+```{r}
+two_way_data %>%
+  group_by(mental_group, exercise_group) %>%
+  doo(~ mshapiro_test(
+    .[, c("study_hours_per_day",
+          "attendance_percentage",
+          "exam_score")]
+  ))
+```
+
+**Nhận xét:** 7/9 nhóm có p-value \> 0.05, nên không bác bỏ $H_0$​, tức chưa có bằng chứng cho thấy dữ liệu của các nhóm này vi phạm giả định phân phối chuẩn nhiều chiều.
+
+Có 2 nhóm có p-value \< 0.05:
+
+-   Tâm lý yếu × Ít vận động: p = 0.0487.
+
+-   Tâm lý vững vàng × Vận động thường xuyên: p = 0.0022.
+
+Do đó, giả định phân phối chuẩn nhiều chiều không được thỏa mãn hoàn toàn ở tất cả các tổ hợp nhóm.
+
+#### **Kiểm tra tính đồng nhất của ma trận hiệp phương sai**
+
+```{r}
+box_m(
+  two_way_data[, c("study_hours_per_day",
+                   "attendance_percentage",
+                   "exam_score")],
+  interaction(two_way_data$mental_group,
+              two_way_data$exercise_group)
+)
+```
+
+**Nhận xét:** Với mức ý nghĩa $\alpha=0.001$ ta có $p-value = 0.641 >0.001$ Do đó, không bác bỏ giả thuyết $H_0$. Không có đủ bằng chứng thống kê để kết luận rằng ma trận hiệp phương sai của các tổ hợp giữa mức độ sức khỏe tinh thần và tần suất tập thể dục là khác nhau.
+
+#### **Phân tích phương sai nhiều chiều hai nhân tố (Two-Way MANOVA)**
+
+Xét đối với (`mental_group`, `exercise_group` và `mental_group × exercise_group`):
+
+-   $H_0$​: Không có sự khác biệt về vector trung bình của các biến phụ thuộc giữa các nhóm.
+
+-   $H_1$​: Có sự khác biệt về vector trung bình của ít nhất một nhóm.
+
+```{r}
+model_two_way <- lm(
+  cbind(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score
+  ) ~ mental_group * exercise_group,
+  data = two_way_data
+)
+
+# Pillai's Trace
+Manova(model_two_way, test.statistic = "Pillai")
+
+# Wilks' Lambda
+Manova(model_two_way, test.statistic = "Wilks")
+```
+
+**Nhận xét:**
+
+-   **Yếu tố mức độ sức khỏe tinh thần (`mental_group`)** có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`) với **p-value \< 2×10⁻¹⁶ \< 0.05**. Do đó, bác bỏ giả thuyết $H_0$​.
+
+-   **Yếu tố tần suất tập thể dục (`exercise_group`)** cũng có ảnh hưởng có ý nghĩa thống kê đến ba biến phụ thuộc với **p-value \< 2×10⁻¹⁶ \< 0.05**. Vì vậy, bác bỏ giả thuyết $H_0$​.
+
+-   **Tương tác giữa sức khỏe tinh thần và tần suất tập thể dục** (`mental_group:exercise_group`) có **p-value = 0.302 \> 0.05**, nên không có đủ bằng chứng để bác bỏ giả thuyết $H_0$. Điều này cho thấy **không tồn tại ảnh hưởng tương tác có ý nghĩa thống kê** giữa hai yếu tố đối với hiệu suất học tập.
+
+**Kết luận:** Hiệu suất học tập của sinh viên chịu ảnh hưởng độc lập bởi mức độ sức khỏe tinh thần và tần suất tập thể dục, nhưng không có bằng chứng cho thấy sự kết hợp giữa hai yếu tố này tạo ra ảnh hưởng tương tác đáng kể.
+
+#### **Phân tích phương sai hai nhân tố đơn biến (Two-Way Univariate ANOVAs)**
+
+Do kết quả MANOVA tổng thể cho thấy cả hai yếu tố `mental_group` và `exercise_group` đều có ảnh hưởng có ý nghĩa thống kê đến vector trung bình, nghiên cứu tiếp tục thực hiện các kiểm định Two-Way ANOVA đơn biến độc lập cho từng biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`) nhằm xác định cụ thể biến nào chịu tác động bởi các yếu tố này.
+
+**Đặt giả thuyết thống kê**
+
+Đối với mỗi biến phụ thuộc, ta tiến hành kiểm định hai nhóm giả thuyết tương ứng với hai hiệu ứng chính:
+
+-   **Hiệu ứng chính của Sức khỏe tinh thần (`mental_group`):**
+
+    -   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa các nhóm sức khỏe tinh thần khác nhau.
+
+    -   $H_1$: Tồn tại ít nhất một nhóm sức khỏe tinh thần có giá trị trung bình khác biệt.
+
+-   **Hiệu ứng chính của Tần suất tập thể dục (`exercise_group`):**
+
+    -   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa các nhóm tần suất tập thể dục khác nhau.
+
+    -   $H_1$: Tồn tại ít nhất một nhóm tần suất tập thể dục có giá trị trung bình khác biệt.
+
+*Mức ý nghĩa được thiết lập ở độ tin cậy* $\alpha = 0.05$.
+
+```{r}
+summary.aov(model_two_way)
+```
+
+**Nhận xét:** Với mức ý nghĩa $\alpha = 0.05$, phân tích tác động riêng lẻ lên từng chỉ tiêu học tập cho thấy:
+
+1.  **Đối với số giờ học mỗi ngày (`study_hours_per_day`):**
+
+    -   **Tần suất tập thể dục** có ảnh hưởng tới số giờ học ($F = 4.333,\ p = 0.0134 < 0.05$).
+
+    -   **Sức khỏe tâm lý** không có tác động đáng kể ($F = 0.825,\ p = 0.4387 > 0.05$).
+
+2.  **Đối với tỷ lệ chuyên cần (`attendance_percentage`):**
+
+    -   Cả hai yếu tố sức khỏe tinh thần ($p = 0.2606$) và tần suất tập thể dục ($p = 0.5399$) **đều không ảnh hưởng tới tỷ lệ chuyên cần** ($p > 0.05$).
+
+3.  **Đối với điểm thi cuối kỳ (`exam_score`):**
+
+    -   Cả **Sức khỏe tâm lý** ($F = 54.904,\ p < 2.2\times10^{-16}$) và **Tần suất tập thể dục** ($F = 14.623,\ p = 5.51\times10^{-7}$) **đều tác động độc lập cực kỳ mạnh mẽ** đến điểm số ($p < 0.001$).
+
+-   **Về ảnh hưởng tương tác (`mental_group : exercise_group`):**
+
+    -   Nhất quán với kết quả MANOVA tổng thể, hiệu ứng tương tác giữa hai yếu tố **không đạt ý nghĩa thống kê trên cả 3 biến phụ thuộc** (các giá trị $p$-value lần lượt là $0.917;\ 0.353;\ 0.367$, đều $> 0.05$).
+
+#### **Phân tích hậu nghiệm (Post-hoc Test)**
+
+Mục đích của bước này nhằm so sánh từng cặp nhóm để chỉ ra cụ thể những trạng thái nào tạo ra sự khác biệt có ý nghĩa thống kê đối với hiệu suất học tập. Theo kết quả ANOVA ở bước trước, các cặp so sánh cần thực hiện bao gồm:
+
+1.  So sánh các cặp mức độ **Sức khỏe tinh thần** (`mental_group`) đối với **Điểm thi cuối kỳ** (`exam_score`).
+
+2.  So sánh các cặp **Tần suất vận động** (`exercise_group`) đối với **Điểm thi cuối kỳ** (`exam_score`).
+
+3.  So sánh các cặp **Tần suất vận động** (`exercise_group`) đối với **Số giờ học mỗi ngày** (`study_hours_per_day`).
+
+**Đặt giả thuyết thống kê:**
+
+Đối với mỗi cặp nhóm phân loại (Ký hiệu là Nhóm $A$ và Nhóm $B$) khi xét trên một biến phụ thuộc cụ thể, các giả thuyết được thiết lập như sau:
+
+-   $H_0$: Không có sự khác biệt về giá trị trung bình của biến phụ thuộc giữa nhóm $A$ và nhóm $B$. ($\mu_A = \mu_B$)
+
+-   $H_1$: Tồn tại sự khác biệt có ý nghĩa thống kê về giá trị trung bình của biến phụ thuộc giữa nhóm $A$ và nhóm $B$. ($\mu_A \neq \mu_B$)
+
+Mức ý nghĩa kiểm định được thiết lập tại độ tin cậy $\alpha = 0.05$.
+
+```{r}
+# 1. Kiểm định hậu nghiệm cho biến Điểm thi cuối kỳ (exam_score)
+tukey_exam_mental <- two_way_data %>% tukey_hsd(exam_score ~ mental_group)
+tukey_exam_exercise <- two_way_data %>% tukey_hsd(exam_score ~ exercise_group)
+
+# 2. Kiểm định hậu nghiệm cho biến Số giờ học mỗi ngày (study_hours_per_day)
+tukey_study_exercise <- two_way_data %>% tukey_hsd(study_hours_per_day ~ exercise_group)
+```
+
+```{r, echo = FALSE}
+kable(tukey_exam_mental[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 4. So sánh cặp Tukey HSD cho Điểm thi theo Sức khỏe tinh thần")
+```
+
+**Nhận xét:** Kết quả kiểm định cho thấy cả 3 cặp nhóm tâm lý đều có sự khác biệt về điểm thi mang ý nghĩa thống kê rất cao ($p_{adj} < 0.01$). Cụ thể:
+
+-   Nhóm **Tâm lý vững vàng** có điểm thi trung bình cao hơn nhóm *Tâm lý ổn định* là **8.04 điểm** ($p_{adj} < 0.001$) và cao hơn nhóm *Tâm lý yếu* tới **12.47 điểm** ($p_{adj} < 0.001$).
+
+-   Nhóm **Tâm lý ổn định** cũng có điểm thi cao hơn nhóm *Tâm lý yếu* là **4.43 điểm** ($p_{adj} = 0.00182$).
+
+$\rightarrow$ ***Kết luận**:* Điểm thi cuối kỳ tăng theo chiều thuận với sức khỏe tinh thần; trạng thái tâm lý càng tốt thì kết quả điểm thi càng cao.
+
+```{r, echo = FALSE}
+kable(tukey_exam_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 5. So sánh cặp Tukey HSD cho Điểm thi theo Tần suất vận động")
+```
+
+**Nhận xét:** Kết quả so sánh cặp cho thấy sự phân hóa rõ rệt đến từ nhóm vận động cường độ cao:
+
+-   Nhóm **Vận động thường xuyên** đạt điểm thi trung bình cao hơn hẳn so với nhóm Ít vận động là **6.26 điểm** ($p_{adj} = 2.60 \times 10^{-6}$) và cao hơn nhóm Vận động vừa phải là **5.10 điểm** ($p_{adj} = 6.52 \times 10^{-4}$).
+
+-   Trong khi đó, giữa nhóm Ít vận động và Vận động vừa phải **không có sự khác biệt** về điểm thi ($\text{estimate} = 1.16,\ p_{adj} = 0.637 > 0.05$).
+
+$\rightarrow$ **Kết luận**: Hoạt động thể chất chỉ thực sự tạo ra tác động cải thiện điểm số thi cử khi sinh viên duy trì ở tần suất thường xuyên (5–7 lần/tuần).
+
+```{r, echo = FALSE}
+kable(tukey_study_exercise[, c("group1", "group2", "estimate", "p.adj", "p.adj.signif")], 
+      caption = "Bảng 6. So sánh cặp Tukey HSD cho Số giờ học theo Tần suất vận động")
+```
+
+**Nhận xét:**
+
+-   Giữa nhóm **Ít vận động** và **Vận động vừa phải** có sự khác biệt ($p_{adj} = 0.00974 < 0.01$), trong đó nhóm Vận động vừa phải có số giờ học trung bình mỗi ngày **ít hơn** nhóm Ít vận động là **0.33 giờ** (khoảng 20 phút).
+
+-   Các cặp so sánh còn lại giữa **Vận động thường xuyên** với hai nhóm kia đều không có sự khác biệt ($p_{adj} > 0.05$).
+
+Khi đối chiếu đồng thời kết quả kiểm định giữa **Bảng 5** (Điểm thi) và **Bảng 6** (Số giờ học), nghiên cứu phát hiện một thực tế đáng chú ý ở cặp nhóm **Ít vận động** và **Vận động vừa phải**:
+
+-   Sinh viên Ít vận động dành nhiều thời gian ngồi học hơn sinh viên Vận động vừa phải (nhiều hơn 0.33 giờ/ngày).
+
+-   Tuy nhiên, điểm thi cuối kỳ của hai nhóm này lại **tương đương nhau** ($p_{adj} = 0.637$).
+
+Điều này chỉ ra rằng việc ngồi học lâu nhưng cơ thể thiếu đi sự vận động thể chất tương ứng sẽ không giúp sinh viên cải thiện được điểm số đầu ra.
+
+### **(e): Đánh giá mô hình và kết quả phân tích, diễn giải kết quả và thảo luận ý nghĩa thực tiễn**
+
+Các giả định quan trọng của mô hình MANOVA đều được thỏa mãn ở cả hai bài toán, giúp các kết luận có độ tin cậy thống kê cao. Đáng chú ý, mức độ ảnh hưởng giữa hai nhóm yếu tố không đồng đều: yếu tố gia đình (Bài toán 1) chỉ giải thích một phần nhỏ sự khác biệt, trong khi yếu tố lối sống – sức khỏe (Bài toán 2) có tác động rõ rệt hơn nhiều.
+
+Về ý nghĩa thực tiễn, kết quả nghiên cứu cho thấy **trình độ học vấn của cha mẹ** chủ yếu **liên quan đến mức độ chuyên cần của sinh viên**, nhưng **không tạo ra sự khác biệt đáng kể về thời gian tự học và điểm thi cuối kỳ**. Điều này cho thấy môi trường giáo dục gia đình có thể góp phần hình thành tính kỷ luật và ý thức học tập, song thành tích học tập ở bậc đại học còn phụ thuộc vào nhiều yếu tố cá nhân khác.
+
+Bên cạnh đó, **sức khỏe tinh thần** được xác định là yếu tố có mối liên hệ mạnh với kết quả học tập. Sinh viên có **trạng thái tâm lý tích cực** thường **đạt điểm số cao hơn**, cho thấy việc duy trì sức khỏe tinh thần tốt có thể giúp nâng cao khả năng tập trung, quản lý áp lực học tập và cải thiện hiệu quả tiếp thu kiến thức.
+
+Kết quả nghiên cứu cũng cho thấy việc **dành nhiều thời gian học tập hơn chưa chắc mang lại kết quả học tập tốt hơn**. Ngược lại, sinh viên **duy trì thói quen vận động thường xuyên** có xu hướng **đạt kết quả học tập cao hơn**. Phát hiện này gợi ý rằng việc cân bằng giữa học tập, sức khỏe tinh thần và hoạt động thể chất có thể đóng vai trò quan trọng trong việc nâng cao hiệu suất học tập của sinh viên trong dài hạn.
+
+### **Phương pháp 2: Multiple Linear Regression**
+
+Bên cạnh việc đánh giá sự khác biệt về kết quả học tập giữa các nhóm sinh viên bằng phương pháp MANOVA, nghiên cứu tiếp tục sử dụng hồi quy tuyến tính bội nhằm xác định các yếu tố ảnh hưởng đến điểm thi cuối kỳ của sinh viên.
+
+Cụ thể, nghiên cứu xem xét đồng thời toàn bộ các biến có trong bộ dữ liệu (ngoại trừ `student_id`) để đánh giá mức độ tác động của từng yếu tố đến biến phụ thuộc là điểm thi cuối kỳ (`exam_score`). Các biến giải thích bao gồm các đặc điểm nhân khẩu học, thói quen học tập, lối sống, sức khỏe và điều kiện học tập của sinh viên.
+
+Mục tiêu của mô hình hồi quy là:
+
+-   Xác định những yếu tố có ảnh hưởng đáng kể đến điểm thi cuối kỳ của sinh viên.
+
+-   Đánh giá chiều hướng và mức độ tác động của từng yếu tố đến kết quả học tập khi các yếu tố khác được giữ không đổi.
+
+-   Xây dựng mô hình dự báo điểm thi cuối kỳ dựa trên các đặc điểm của sinh viên.
+
+**Biến phụ thuộc:** Y= `exam_score`
+
+**Biến độc lập:**
+
+-   Nhóm nhân khẩu học: `age`, `gender` ,`parental_education_level`
+
+-   Nhóm thói quen học tập: `study_hours_per_day`, `attendance_percentage`
+
+-   Nhóm giải trí: `social_media_hours`, `netflix_hours`
+
+-   Nhóm sức khỏe: `sleep_hours`, `exercise_frequency`, `mental_health_rating`, `diet_quality`
+
+-   Nhóm điều kiện học tập: `internet_quality`, `part_time_job`
+
+-   Nhóm hoạt động ngoại khóa: `extracurricular_participation`
+
+Trước khi xây dựng mô hình, các biến định tính được chuyển đổi thành biến giả (dummy variables) như trình bày tại **Phụ lục D.1**, và thống kê mô tả tổng quan của toàn bộ các biến được trình bày tại **Phụ lục D.2**. Mô hình hồi quy tuyến tính bội tổng quát với đầy đủ 14 biến độc lập nêu trên được trình bày chi tiết tại **Phụ lục D.3.**
+
+#### **Kiểm định ý nghĩa tổng thể của mô hình**
+
+$$H_0 : \beta_1 = \beta_2 = \cdots = \beta_{14} = 0$$
+
+(Tất cả các biến độc lập không ảnh hưởng đến `exam_score`.)
+
+$$H_1 : \exists \beta_i \neq 0.$$
+
+(Tồn tại ít nhất một biến độc lập ảnh hưởng đến `exam_score`.)
+
+```{r}
+# Loại bỏ biến định danh
+data <- subset(data, select = -student_id)
+
+# Chuyển các biến định tính thành factor
+cat_vars <- c(
+  "gender",
+  "parental_education_level",
+  "diet_quality",
+  "internet_quality",
+  "part_time_job"
+)
+
+data[cat_vars] <- lapply(data[cat_vars], factor)
+# Xây dựng mô hình hồi quy đầy đủ
+model_full <- lm(exam_score ~ ., data = data)
+
+# Kết quả mô hình
+summary(model_full)
+```
+
+**Nhận xét:** Kết quả hồi quy cho thấy mô hình có ý nghĩa thống kê tổng thể với F = 473.9 và $p < 2.2 \times 10^{-16}$. Do đó, bác bỏ giả thuyết $H_0$, cho thấy **tồn tại ít nhất một biến độc lập có ảnh hưởng đến điểm thi cuối kỳ** (`exam_score`).
+
+Hệ số xác định $R^2 = 0.9018$ cho thấy khoảng **90.18%** sự biến thiên của điểm thi cuối kỳ được giải thích bởi các biến độc lập trong mô hình, trong khi **9.82%** còn lại được giải thích bởi các yếu tố khác chưa được đưa vào mô hình hoặc do sai số ngẫu nhiên. Bên cạnh đó, **Adjusted** $R^2 = 0.8999$ rất gần với $R^2$, chứng tỏ mô hình có khả năng giải thích tốt và việc đưa nhiều biến độc lập vào mô hình không làm giảm chất lượng mô hình do các biến dư thừa.
+
+Các giả định của mô hình hồi quy tuyến tính đã được kiểm tra đầy đủ: kiểm tra đa cộng tuyến thông qua hệ số VIF, cho kết quả toàn bộ hệ số đều nhỏ hơn ngưỡng cho phép **(Phụ lục D.4)**; kiểm tra phân phối chuẩn của phần dư bằng Histogram, QQ-Plot và kiểm định Shapiro–Wilk **(Phụ lục D.5)**; kiểm tra tính đồng nhất phương sai sai số bằng biểu đồ Residuals vs Fitted và kiểm định Breusch–Pagan **(Phụ lục D.6)**; và kiểm tra tính độc lập của sai số bằng kiểm định Durbin–Watson **(Phụ lục D.7)**. Kết quả cho thấy tất cả các giả định trên đều được thỏa mãn ở mức chấp nhận được, đảm bảo độ tin cậy của mô hình hồi quy.
+
+#### **Kiểm định ý nghĩa của từng hệ số hồi quy**
+
+Đối với mỗi biến $X_i$, giả thuyết là:
+
+$$H_0 : \beta_i = 0$$
+
+(Hệ số hồi quy của biến $X_i$ bằng 0, tức là khi giữ các biến khác không đổi, biến đó **không có ảnh hưởng tuyến tính** đến `exam_score`.)
+
+$$H_1 : \beta_i \neq 0$$
+
+(Hệ số hồi quy của biến $X_i$ khác 0, tức là biến đó **có ảnh hưởng tuyến tính** đến `exam_score`.)
+
+```{r, echo = FALSE}
+coef_table <- summary(model_full)$coefficients
+
+result <- data.frame(
+  Variable = rownames(coef_table),
+  Coefficient = round(coef_table[, "Estimate"], 3),
+  P_value = coef_table[, "Pr(>|t|)"],
+  row.names = NULL
+)
+
+result <- subset(result, Variable != "(Intercept)")
+rownames(result) <- NULL
+
+# Hiển thị p-value 
+result$P_value <- ifelse(result$P_value < 0.001,
+                         "<0.001",
+                         sprintf("%.4f", result$P_value))
+
+colnames(result) <- c("Biến", "Hệ số hồi quy", "P-value")
+
+kable(
+  result,
+  align = "lcc",
+  caption = "Hệ số hồi quy và ý nghĩa thống kê của các biến"
+) %>%
+  kable_styling(
+    full_width = FALSE,
+    position = "center"
+  )
+```
+
+**Nhận xét:** Với mức ý nghĩa 5%, các biến `study_hours_per_day`, `social_media_hours`, `netflix_hours`, `attendance_percentage`, `sleep_hours`, `exercise_frequency` và `mental_health_rating` có **ý nghĩa thống kê** ($p < 0.05$). Điều này cho thấy các biến này có ảnh hưởng đáng kể đến điểm thi cuối kỳ khi các yếu tố khác được giữ không đổi. Ngược lại, các biến `age`, `gender`, `part_time_job`, `diet_quality`, `parental_education_level`, `internet_quality` và `extracurricular_participation` đều có $p > 0.05$, nên **chưa có đủ bằng chứng** để kết luận chúng ảnh hưởng đến điểm thi cuối kỳ trong mô hình. Cụ thể:
+
+-   `study_hours_per_day` ($\beta = 9.575$): Khi số giờ học mỗi ngày tăng thêm 1 giờ, điểm thi cuối kỳ dự kiến **tăng khoảng 9.575 điểm**, với điều kiện các yếu tố khác không đổi.
+-   `social_media_hours` ($\beta = -2.602$): Khi thời gian sử dụng mạng xã hội tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **giảm khoảng 2.60 điểm**, nếu các yếu tố khác không đổi.
+-   `netflix_hours` ($\beta = -2.282$): Khi thời gian xem Netflix tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **giảm khoảng 2.28 điểm**, trong điều kiện các yếu tố khác không đổi.
+-   `attendance_percentage` ($\beta = 0.143$): Khi tỷ lệ chuyên cần tăng thêm 1%, điểm thi cuối kỳ dự kiến **tăng khoảng 0.143 điểm**, khi các yếu tố khác không đổi.
+-   `sleep_hours` ($\beta = 1.992$): Khi thời gian ngủ tăng thêm 1 giờ mỗi ngày, điểm thi cuối kỳ dự kiến **tăng khoảng 1.992 điểm**, với các yếu tố khác được giữ nguyên.
+-   `exercise_frequency` ($\beta = 1.450$): Khi tần suất tập thể dục tăng thêm 1 đơn vị, điểm thi cuối kỳ dự kiến **tăng khoảng 1.45 điểm**, nếu các yếu tố khác không đổi.
+-   `mental_health_rating` ($\beta = 1.944$): Khi mức đánh giá sức khỏe tinh thần tăng thêm 1 đơn vị, điểm thi cuối kỳ dự kiến **tăng khoảng 1.944 điểm**, trong điều kiện các yếu tố khác không đổi.
+
+#### **(e): Đánh giá mô hình và kết quả phân tích, diễn giải kết quả và thảo luận ý nghĩa thực tiễn**
+
+Kết quả phân tích hồi quy tuyến tính bội cho thấy mô hình có khả năng giải thích tốt sự biến thiên của điểm thi cuối kỳ của sinh viên ( $R^2=0.9018$) và đáp ứng các giả định cần thiết để đưa ra các kết luận thống kê đáng tin cậy.
+
+Phân tích chỉ ra rằng **thời gian học tập mỗi ngày** là yếu tố có ảnh hưởng tích cực mạnh nhất đến điểm thi cuối kỳ. Bên cạnh đó, **tỷ lệ chuyên cần**, **thời gian ngủ**, **tần suất tập thể dục** và **mức độ sức khỏe tinh thần** cũng có tác động tích cực và có ý nghĩa thống kê đến kết quả học tập. Ngược lại, việc dành nhiều thời gian cho **mạng xã hội** và **Netflix** có xu hướng làm giảm điểm thi cuối kỳ.
+
+Đối với các yếu tố như **tuổi**, **giới tính**, **trình độ học vấn của phụ huynh**, **chất lượng chế độ ăn**, **chất lượng Internet**, **việc làm bán thời gian** và **tham gia hoạt động ngoại khóa**, nghiên cứu chưa tìm thấy bằng chứng thống kê cho thấy chúng ảnh hưởng đáng kể đến điểm thi cuối kỳ khi đã kiểm soát các yếu tố khác trong mô hình.
+
+Nhìn chung, kết quả nghiên cứu cho thấy **thói quen học tập và lối sống của sinh viên có vai trò quan trọng hơn các đặc điểm nhân khẩu học và điều kiện cá nhân trong việc dự đoán kết quả học tập**. Điều này cho thấy rằng việc duy trì thời gian học hợp lý, nâng cao tỷ lệ chuyên cần, đảm bảo giấc ngủ, rèn luyện thể chất và chăm sóc sức khỏe tinh thần, đồng thời hạn chế thời gian dành cho các hoạt động giải trí trực tuyến, có thể góp phần cải thiện kết quả học tập của sinh viên.
+
+## **(f): Đề xuất các phương pháp khác có thể cho kết quả tốt hơn**
+
+Mặc dù phương pháp **MANOVA** và **Multiple Linear Regression** đã giúp giải quyết các mục tiêu nghiên cứu và cho thấy nhiều kết quả có ý nghĩa thống kê, song vẫn còn một số phương pháp phân tích khác có thể được xem xét trong các nghiên cứu tiếp theo nhằm khai thác dữ liệu sâu hơn và nâng cao khả năng giải thích mô hình.
+
+Đối với bài toán so sánh sự khác biệt giữa các nhóm sinh viên, **MANCOVA (Multivariate Analysis of Covariance)** là một lựa chọn phù hợp. Phương pháp này cho phép đánh giá ảnh hưởng của các biến phân loại đến nhiều biến phụ thuộc đồng thời, đồng thời kiểm soát ảnh hưởng của các biến đồng biến (covariates) như tuổi, giới tính hoặc thời gian sử dụng mạng xã hội. Nhờ đó, kết quả thu được có thể phản ánh chính xác hơn ảnh hưởng thực sự của các yếu tố nghiên cứu.
+
+Đối với bài toán xác định các yếu tố ảnh hưởng đến điểm thi cuối kỳ, có thể xem xét sử dụng **LASSO Regression**, **Ridge Regression** hoặc **Elastic Net Regression**. Các phương pháp này đặc biệt hữu ích khi số lượng biến độc lập lớn hoặc tồn tại nhiều biến có mức độ liên quan với nhau, giúp lựa chọn biến quan trọng và hạn chế hiện tượng mô hình quá khớp (overfitting), từ đó nâng cao khả năng dự báo trên dữ liệu mới.
+
+Ngoài ra, **Structural Equation Modeling (SEM)** cũng là một hướng nghiên cứu tiềm năng. Khác với hồi quy tuyến tính thông thường, SEM cho phép đánh giá đồng thời các mối quan hệ trực tiếp và gián tiếp giữa các yếu tố như điều kiện gia đình, thói quen học tập, sức khỏe tinh thần, lối sống và kết quả học tập. Đồng thời, phương pháp này còn có khả năng xây dựng và phân tích các biến tiềm ẩn, giúp mô hình phản ánh tốt hơn bản chất của quá trình học tập.
+
+Bên cạnh đó, do exam_score bị giới hạn trần tại 100 điểm, mô hình Tobit Regression (censored regression) cũng là một hướng phù hợp để xử lý đúng bản chất bị chặn của biến phụ thuộc.
+
+Nhìn chung, việc lựa chọn phương pháp phân tích phụ thuộc vào mục tiêu nghiên cứu. Trong khi **MANOVA** và **Multiple Linear Regression** phù hợp để kiểm định giả thuyết và diễn giải ảnh hưởng của các yếu tố, các phương pháp hiện đại hơn có thể giúp nâng cao khả năng dự báo và khai thác sâu hơn cấu trúc của dữ liệu.
+
+## **(g): Kết luận**
+
+\renewcommand{\arraystretch}{1.4}
+
+\begin{longtable}{|>{\raggedright\arraybackslash\color{RoyalBlue}\bfseries}p{2.8cm}|>{\raggedright\arraybackslash}p{6.3cm}|>{\raggedright\arraybackslash}p{6.3cm}|}
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
+\endfirsthead
+
+\hline
+\rowcolor{RoyalBlue!60}
+\textcolor{white}{\textbf{Tiêu chí}} & \textcolor{white}{\textbf{MANOVA (Bài toán 1 \& 2)}} & \textcolor{white}{\textbf{Multiple Linear Regression}} \\ \hline
+\endhead
+
+Mục tiêu & Xác định các yếu tố phân loại có ảnh hưởng \textbf{đồng thời} đến ba chỉ tiêu hiệu suất học tập & Xác định mức độ và \textbf{chiều hướng} ảnh hưởng riêng lẻ của từng yếu tố đến điểm thi, xây dựng mô hình dự báo \\ \hline
+
+Biến phụ thuộc & Vector 3 biến: \newline \texttt{study\_hours\_per\_day}, \newline \texttt{attendance\_percentage}, \newline \texttt{exam\_score} & 1 biến: \texttt{exam\_score} \\ \hline
+
+Biến độc lập được xét & \textbullet~\textbf{Bài toán 1:} \texttt{parental\_education\_level} (sàng lọc từ 6 biến phân loại bằng Bonferroni) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group}, \texttt{exercise\_group} và tương tác giữa hai yếu tố & Toàn bộ 14 biến: nhân khẩu học, thói quen học tập, giải trí, sức khỏe, điều kiện học tập, ngoại khóa \\ \hline
+
+Giả định đã kiểm tra & Phân phối chuẩn nhiều chiều (Shapiro-Wilk), đồng nhất hiệp phương sai (Box's M) & Đa cộng tuyến (VIF), chuẩn phần dư (Shapiro-Wilk), đồng nhất phương sai (Breusch-Pagan), độc lập sai số (Durbin-Watson) \\ \hline
+
+Kết quả kiểm định tổng quát & \textbullet~\textbf{Bài toán 1:} Wilks' $\Lambda = 0.977$, $p = 0.006$ (có ý nghĩa nhưng effect size nhỏ) \newline \newline \textbullet~\textbf{Bài toán 2:} \texttt{mental\_group} và \texttt{exercise\_group} đều $p < 2 \times 10^{-16}$; tương tác không ý nghĩa ($p = 0.302$) & $R^2 = 0.902$, Adjusted $R^2 = 0.900$, $F = 473.9$, $p < 2.2 \times 10^{-16}$ \\ \hline
+
+Yếu tố có ý nghĩa thống kê & \textbullet~Trình độ học vấn cha mẹ $\rightarrow$ chỉ ảnh hưởng đến \textbf{chuyên cần} (không ảnh hưởng giờ học, điểm thi) \newline \newline \textbullet~Sức khỏe tinh thần \& tần suất vận động $\rightarrow$ ảnh hưởng mạnh đến \textbf{điểm thi} \newline \newline \textbullet~Vận động $\rightarrow$ ảnh hưởng cả \textbf{giờ học} & \textbullet~\textbf{Tác động dương:} \texttt{study\_hours\_per\_day} ($\beta=9.575$), \texttt{sleep\_hours} ($\beta=1.992$), \texttt{mental\_health\_rating} ($\beta=1.944$), \texttt{exercise\_frequency} ($\beta=1.450$), \texttt{attendance\_percentage} ($\beta=0.143$) \newline \newline \textbullet~\textbf{Tác động âm:} \texttt{social\_media\_hours} ($\beta=-2.602$), \texttt{netflix\_hours} ($\beta=-2.282$) \\ \hline
+
+Yếu tố không có ý nghĩa thống kê & Giới tính, việc làm thêm, chế độ ăn, chất lượng Internet, ngoại khóa (khi sàng lọc sơ bộ) & Tuổi, giới tính, trình độ học vấn cha mẹ, chế độ ăn, chất lượng Internet, việc làm thêm, ngoại khóa \\ \hline
+
+Post-hoc / diễn giải chiều hướng & Tukey HSD: Master/High School $>$ None (chuyên cần); Tâm lý vững vàng $>$ ổn định $>$ yếu (điểm thi); Vận động thường xuyên $>$ hai nhóm còn lại (điểm thi) & Không áp dụng post-hoc; diễn giải trực tiếp qua dấu và độ lớn hệ số hồi quy khi kiểm soát các biến khác \\ \hline
+
+Ý nghĩa thống kê & Chứng minh \textbf{có tồn tại khác biệt nhóm} khi xét đồng thời nhiều chỉ tiêu; phân biệt được yếu tố ảnh hưởng mạnh (sức khỏe – lối sống) và yếu (gia đình); không có tương tác giữa sức khỏe tinh thần và vận động & Định lượng chính xác \textbf{mức độ và chiều hướng} tác động của từng biến khi kiểm soát các biến còn lại; mô hình giải thích được $\sim$ 90\% biến thiên điểm thi \\ \hline
+
+Ý nghĩa thực tiễn & Môi trường giáo dục gia đình góp phần hình thành tính kỷ luật (chuyên cần) nhưng không quyết định kết quả học tập; sức khỏe tinh thần tốt và vận động đều đặn là yếu tố thực sự cải thiện thành tích, học nhiều giờ mà thiếu vận động không hiệu quả & Thói quen học tập và lối sống (học tập, ngủ, vận động, sức khỏe tinh thần) quan trọng hơn đặc điểm nhân khẩu học/gia đình; hạn chế mạng xã hội và Netflix có thể cải thiện điểm số \\ \hline
+
+Hạn chế & Một số tổ hợp nhóm vi phạm nhẹ giả định chuẩn nhiều chiều; cỡ mẫu không hoàn toàn cân bằng giữa các nhóm & \texttt{exam\_score} bị chặn trần tại 100 gây phần dư âm bất thường ở nhóm điểm tối đa (censored data) \\ \hline
+\end{longtable}
+
+**Kết luận chung:** Hai phương pháp có tính bổ sung lẫn nhau — MANOVA giúp xác định những yếu tố phân loại tạo ra sự khác biệt về hiệu suất học tập khi xem xét đồng thời nhiều chỉ tiêu, trong khi Multiple Linear Regression giúp định lượng chính xác mức độ và chiều hướng tác động của từng yếu tố đến điểm thi cuối kỳ. Kết quả của cả hai phương pháp đều đồng thuận rằng thói quen học tập, giấc ngủ, vận động thể chất và sức khỏe tinh thần đóng vai trò quan trọng hơn các đặc điểm nhân khẩu học hay điều kiện gia đình trong việc cải thiện hiệu suất học tập của sinh viên.

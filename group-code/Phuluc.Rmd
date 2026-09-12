@@ -1,0 +1,2997 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: false
+    keep_tex: true
+    highlight: tango
+fontsize: 11pt
+linestretch: 1.05
+geometry: "top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm"
+mainfont: Times New Roman 
+header-includes: |
+  \let\maxwidth\undefined
+  \usepackage{amsmath, amssymb, amsfonts}
+  \usepackage{graphicx}
+  \usepackage{float}
+  \usepackage{enumitem}
+  \usepackage{tabularx, booktabs, colortbl, tabu, longtable, multirow}
+  \usepackage{listings}
+  \usepackage{caption}
+  \usepackage{fancyhdr}
+  \usepackage{tikz}
+  \usepackage{etoolbox}
+  \usepackage{media9} 
+  \usepackage{framed}
+  \usepackage{color}
+  \usepackage{makecell}
+  \usepackage{pdflscape}
+  \usepackage{array}
+  \usepackage{xcolor}
+  \usepackage{colortbl}
+
+  \definecolor{shadecolor}{RGB}{248,249,250}
+  % \newenvironment{Shaded}{}{}
+  
+  % --- CẤU HÌNH MỤC LỤC & GIÃN DÒNG ---
+  \usepackage[titles]{tocloft}
+  \usepackage{parskip}
+  \setlength{\parindent}{0pt}
+  
+  % --- MÀU SẮC CHỦ ĐẠO (ROYAL BLUE THEME) ---
+  \definecolor{RoyalBlue}{RGB}{0, 50, 120}
+  \colorlet{ROYALBLUE}{RoyalBlue}             
+  \definecolor{CrimsonRed}{RGB}{160, 0, 0}     
+  \definecolor{LightBlueBG}{RGB}{240, 245, 255}
+  \definecolor{CodeGray}{RGB}{245, 245, 245}   
+  \definecolor{GoldenBrown}{RGB}{184,134,11}
+
+  \renewcommand{\cftsecfont}{\bfseries\color{RoyalBlue}}
+  \renewcommand{\cftsecpagefont}{\bfseries\color{RoyalBlue}}
+  \renewcommand{\cftsubsecfont}{\color{black!80}}
+
+  \usepackage{hyperref}
+  \hypersetup{
+      colorlinks=true,
+      linkcolor=RoyalBlue,
+      filecolor=magenta,
+      urlcolor=RoyalBlue,
+      citecolor=CrimsonRed,
+      pdfborder={0 0 0}
+  }
+
+  % ===================================================
+  % 2. CÁC HỘP (BOX) & TIÊU ĐỀ ĐẸP (TCOLORBOX)
+  % ===================================================
+  \usepackage[most]{tcolorbox}
+  \tcbuselibrary{skins, breakable}
+  \usepackage{titlesec}
+
+  % Header 1 (#) - Tương ứng với \section
+  \titleformat{\section}
+  {\huge\bfseries\color{black}}
+  {\thesection}
+  {0.5em}
+  {}
+
+  % Header 2 (##) - Tương ứng với \subsection
+  \titleformat{\subsection}
+  {\Large\bfseries\color{CrimsonRed}}
+  {\thesubsection}
+  {0.5em}
+  {}
+  [\color{CrimsonRed}\titlerule]
+
+  % Header 3 (###) - Tương ứng với \subsubsection
+  \titleformat{\subsubsection}
+  {\large\bfseries\color{RoyalBlue}}
+  {\thesubsubsection}
+  {0.5em}
+  {}
+
+  % Header 4 (####) - Tương ứng với \paragraph
+  \titleformat{\paragraph}
+  {\normalsize\bfseries\color{GoldenBrown}}
+  {\theparagraph}
+  {0.5em}
+  {}
+  \titlespacing*{\paragraph}{0pt}{1ex plus 0.5ex minus .2ex}{1ex plus .2ex}
+
+  % Header 5 (#####) - Tương ứng với \subparagraph
+  \titleformat{\subparagraph}[runin]
+  {\bfseries\color{RoyalBlue!70!black}}
+  {}
+  {0pt}
+  {}
+  \titlespacing*{\subparagraph}{0pt}{1em}{0.5em}
+
+
+  % --- ĐỊNH NGHĨA HỘP BÀI TẬP (PROBLEMBOX) ---
+  \newtcolorbox{problembox}[2]{
+      enhanced, breakable,
+      colback=LightBlueBG, colframe=RoyalBlue,
+      title={\bfseries #1},
+      fonttitle=\bfseries,
+      boxrule=1.2pt, arc=5pt,
+      attach boxed title to top left={yshift=-2mm, xshift=5mm},
+      boxed title style={colback=RoyalBlue, arc=3pt, outer arc=3pt, boxrule=0pt},
+      drop fuzzy shadow,
+      #2
+  }
+  % ===================================================
+  % HỘP TIÊU ĐỀ CANH GIỮA MÀU ĐỎ CHO TỪNG BÀI (KHÔNG TỰ ĐÁNH SỐ)
+  % ===================================================
+  \newcommand{\baibox}[1]{
+      \phantomsection
+      \addcontentsline{toc}{section}{#1}
+      \vspace{1.5em}
+      \begin{center}
+          \begin{tcolorbox}[
+              enhanced, breakable=false,
+              colback=white, colframe=CrimsonRed,
+              boxrule=1.5pt, arc=8pt,
+              top=12pt, bottom=12pt,
+              width=0.65\textwidth,
+              halign=center,
+              drop fuzzy shadow
+              ]
+              \LARGE \bfseries \color{CrimsonRed} #1
+          \end{tcolorbox}
+      \end{center}
+      \vspace{0.5em}
+  }
+
+  % ===================================================
+  % 3. CẤU HÌNH CODE R / MATLAB 
+  % ===================================================
+  \lstdefinestyle{RStyle}{
+      backgroundcolor=\color{CodeGray},
+      basicstyle=\ttfamily\small,
+      numbers=left,
+      numberstyle=\tiny\color{gray},
+      keywordstyle=\color{RoyalBlue}\bfseries,
+      commentstyle=\color{green!40!black}\itshape,
+      stringstyle=\color{orange!90!black},
+      breaklines=true,
+      frame=none, 
+      showstringspaces=false,
+      captionpos=b,
+      tabsize=2
+  }
+  \lstset{style=RStyle}
+  \captionsetup{font={small,bf}, labelfont={color=RoyalBlue}}
+
+  % ===================================================
+  % 4. CẤU HÌNH TRANG & HEADER
+  % ===================================================
+  \setlength{\headheight}{23pt} 
+
+  \pagestyle{fancy}
+  \fancyhf{} 
+
+  \fancyhead[L]{\normalsize \bfseries \color{RoyalBlue} Multivariate Statistical Analysis}
+  \fancyhead[R]{\normalsize \bfseries \color{RoyalBlue} HK2 2025-2026}
+  \fancyfoot[C]{\thepage}
+
+  \renewcommand{\headrulewidth}{1pt}
+  \renewcommand{\headrule}{%
+      \vspace{-8pt}% 
+      \hbox to\headwidth{\color{RoyalBlue}\leaders\hrule height \headrulewidth\hfill}} 
+
+  \setcounter{secnumdepth}{0}
+  \setcounter{tocdepth}{3}
+
+  \newcommand{\parttitle}[1]{
+      \clearpage
+      \phantomsection
+      \vspace*{0.5cm}
+      \begin{center}
+          \begin{tcolorbox}[
+              enhanced,
+              colback=white,
+              colframe=CrimsonRed,
+              boxrule=1.5pt,
+              arc=0pt,
+              top=15pt, bottom=15pt,
+              width=0.9\textwidth,
+              halign=center,
+              drop fuzzy shadow
+              ]
+              \Huge \bfseries \color{CrimsonRed} \MakeUppercase{#1}
+          \end{tcolorbox}
+      \end{center}
+      \addcontentsline{toc}{section}{#1}
+      \vspace{0.5cm}
+  }
+
+  % ===================================================
+  % 5. ĐỊNH NGHĨA LẠI CÁC LỆNH TỪ MATLAB EXPORT
+  % ===================================================
+  \lstnewenvironment{matlabcode}{\lstset{style=RStyle, language=Matlab}}{}
+  \lstnewenvironment{matlaboutput}{\lstset{basicstyle=\small\ttfamily\color{gray}, breaklines=true}}{}
+  \lstnewenvironment{matlabsymbolicoutput}{\lstset{basicstyle=\small\ttfamily\color{black}, breaklines=true}}{}
+
+  \newcommand{\matlabtitle}[1]{
+      \phantomsection
+      \addcontentsline{toc}{section}{#1}
+      \vspace{1em}\noindent\textbf{\Large\color{CrimsonRed} #1}\par\vspace{0.5em}
+  }
+  \newcommand{\matlabheading}[1]{\vspace{0.8em}\noindent\textbf{\large\color{RoyalBlue} #1}\par\vspace{0.5em}}
+  \newcommand{\matlabstep}[1]{\vspace{0.6em}\noindent\textbf{\normalsize #1}\par\vspace{0.3em}}
+  \newcommand{\maxwidth}[1]{0.8\linewidth}
+  
+  % ===================================================
+  % LÀM ĐẸP HỘP CODE R MARKDOWN (PHONG CÁCH HIỆN ĐẠI, TỐI GIẢN)
+  % ===================================================
+  \definecolor{RCodeBG}{RGB}{248, 249, 250} % Màu nền xám siêu nhạt
+  \AtBeginDocument{
+      \renewenvironment{Shaded}{
+          \vspace{0.5em}
+          \begin{tcolorbox}[
+              enhanced, breakable,
+              colback=RCodeBG,          
+              colframe=RCodeBG,         
+              boxrule=0pt,              
+              borderline west={3pt}{0pt}{RoyalBlue}, 
+              arc=2pt,                  
+              left=8pt, right=4pt, top=6pt, bottom=6pt
+          ]
+      }{
+          \end{tcolorbox}
+          \vspace{0.2em}
+      }
+  }
+---
+
+```{r setup, include=FALSE}
+options(kableExtra.latex.load_packages = FALSE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  tidy = "styler",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "95%",
+  fig.width = 8,
+  fig.height = 5,
+  fig.align = "center",
+  fig.showtext = TRUE,
+  fig_crop = FALSE
+)
+
+suppressPackageStartupMessages({
+    library(tidyverse)
+    library(dplyr)
+    library(kableExtra)
+    library(visdat)
+    library(naniar)
+    library(tidyr)
+    library(mice)
+    library(tibble)
+    library(knitr)
+    library(readr)
+    library(readxl)
+    library(ggplot2)
+    library(corrplot)
+    library(tseries)
+    library(skedastic)
+    library(showtext)
+    library(Metrics)
+    library(janitor) 
+    library(car)
+    library(ellipse)
+    library(rstatix)
+    library(ggpubr)
+    library(factoextra)
+    library(survival)
+    library(asaur)
+    library(psych)
+    library(scales)
+    library(patchwork)
+    library(ggforce)
+    library(janitor)
+    library(caret)
+    library(randomForest)
+    library(nnet)
+    library(pROC)
+    showtext_auto()
+  })
+  
+  ## Thiết lập tiếng Việt
+  Sys.setlocale("LC_ALL", "vi_VN.UTF-8")
+required_packages <- c(
+  "tidyverse", "janitor", "caret", "randomForest", "rpart", "rpart.plot",
+  "nnet", "e1071", "pROC", "knitr", "MLmetrics"
+)
+missing_packages <- required_packages[!required_packages %in% rownames(installed.packages())]
+if (length(missing_packages) > 0) {
+  install.packages(missing_packages, dependencies = TRUE)
+}
+```
+
+\begin{titlepage} 
+\pagenumbering{gobble} 
+\thispagestyle{empty} 
+
+\begin{tikzpicture}[remember picture, overlay]
+    \draw[line width=2.5pt, RoyalBlue, rounded corners=15pt] 
+    ([xshift=2cm, yshift=-2cm]current page.north west) 
+    rectangle 
+    ([xshift=-2cm, yshift=2cm]current page.south east);
+    
+    \draw[line width=1pt, RoyalBlue!50, rounded corners=12pt] 
+    ([xshift=2.3cm, yshift=-2.3cm]current page.north west) 
+    rectangle 
+    ([xshift=-2.3cm, yshift=2.3cm]current page.south east);
+    
+    \node[anchor=north west, opacity=0.8] at ([xshift=2.5cm, yshift=-2.5cm]current page.north west) {\color{RoyalBlue}\LARGE $\diamond$};
+    \node[anchor=south east, opacity=0.8] at ([xshift=-2.5cm, yshift=2.5cm]current page.south east) {\color{RoyalBlue}\LARGE $\diamond$};
+\end{tikzpicture}
+
+\begin{center}
+    \vspace*{-0.2cm} 
+    
+    {\normalsize\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH} \\ \vspace{0.1cm}
+    {\Large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN} \\ \vspace{0.1cm}
+    {\large\bfseries\color{RoyalBlue} KHOA TOÁN - TIN HỌC}
+    
+    \vspace{0.2cm}
+    \textcolor{RoyalBlue}{\rule{0.6\textwidth}{1.5pt}} 
+    \vspace{0.4cm}
+    
+    \includegraphics[width=0.3\textwidth]{logo.png} 
+    
+    \vspace{0.6cm}
+    
+    \begin{tcolorbox}[
+        enhanced, colback=white, colframe=RoyalBlue, boxrule=1.5pt, arc=5pt, 
+        drop fuzzy shadow, width=0.9\textwidth, top=8pt, bottom=8pt, halign=center
+        ]
+        {\Large\bfseries\color{RoyalBlue} MÔN HỌC: THỐNG KÊ NHIỀU CHIỀU}\\[0.3cm]
+        {\Huge\bfseries\color{CrimsonRed} PHỤ LỤC ĐỒ ÁN CUỐI KÌ}
+    \end{tcolorbox}
+    
+    \vspace{0.8cm}
+    
+    \begin{minipage}{0.9\textwidth}
+        \begin{center}
+            {\large \textbf{Giảng viên hướng dẫn:}} \\ \vspace{0.1cm}
+            {\Large \textbf{\color{RoyalBlue} TS. Nguyễn Thị Mộng Ngọc}}
+        \end{center}
+        
+        \vspace{0.5cm} 
+        
+   % --- BẮT ĐẦU PHẦN DANH SÁCH THÀNH VIÊN ---
+        \begin{center}
+            \textbf{\large \color{RoyalBlue} Danh sách thành viên thực hiện - Nhóm 4}
+            \vspace{0.3cm}
+            
+            % Cấu hình bảng
+            \arrayrulecolor{RoyalBlue}         % Màu đường kẻ bảng
+            \setlength{\arrayrulewidth}{0.8pt} % Độ dày đường kẻ
+            \renewcommand{\arraystretch}{1.5}  % Chiều cao dòng
+            
+            % Tạo bảng có kẻ khung (Grid)
+            \begin{tabular}{|c|p{11cm}|}
+                \hline
+                % Dòng tiêu đề tô màu nền
+                \rowcolor{RoyalBlue!15} 
+                \textbf{STT} & \textbf{Thành viên và vai trò} \\
+                \hline
+                
+                % Nội dung
+                1 & Thành viên A (ẩn danh) - Phụ trách chính Data 3; rà soát Data 1-2; thực hiện slide thuyết trình \\
+                \hline
+                2 & Thành viên B (ẩn danh) - Phụ trách chính Data 1; rà soát Data 2-3 \\
+                \hline
+                3 & Lê Vũ Thành Đạt - Phụ trách chính Data 2; rà soát Data 1-3; tổng hợp báo cáo cuối \\
+                \hline
+            \end{tabular}
+        \end{center}
+    \end{minipage}
+    
+    \vfill
+    
+\end{center}
+\end{titlepage}
+
+\pagenumbering{arabic}
+
+\clearpage
+\thispagestyle{empty}
+\vspace*{-1cm}
+\begingroup
+    \hypersetup{linkcolor=black} 
+    \renewcommand{\contentsname}{\centering \color{RoyalBlue}\Huge\bfseries MỤC LỤC}
+    \setlength{\cftbeforesecskip}{10pt} 
+    \tableofcontents
+\endgroup
+\clearpage
+\setcounter{page}{1}
+
+\baibox{Bài 1: Dataset "SleepHealthLifestyle.csv"}
+
+```{r load-data-for-appendix, echo = FALSE}
+# Tải và tiền xử lý dữ liệu (giống File chính)
+data_raw <- read.csv("SleepHealthLifestyle.csv") %>% janitor::clean_names()
+sleep_data_cleaned <- data_raw %>%
+  separate(
+    blood_pressure,
+    into = c("systolic_bp", "diastolic_bp"),
+    sep = "\\s*/\\s*",
+    convert = TRUE
+  ) %>%
+  mutate(
+    gender = as.factor(gender),
+    bmi_category = as.factor(bmi_category),
+    occupation = as.factor(occupation),
+    sleep_disorder = as.factor(ifelse(is.na(sleep_disorder) | sleep_disorder == "",
+                                       "None", sleep_disorder))
+  )
+data <- sleep_data_cleaned %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(bmi_category, levels = c("Normal", "Overweight", "Obese"))
+  ) %>% select(-person_id)
+
+data_original <- data
+
+# Chuẩn hóa Z-score (giống File chính)
+data <- data %>%
+  mutate(across(c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+                  stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps), 
+                ~ as.numeric(scale(.))))
+
+data_scaled <- data %>%
+  mutate(across(
+    c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+      stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps),
+    ~ as.numeric(scale(.))
+  ))
+
+bien_so <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+
+cor_mat <- cor(bien_so, use = "pairwise.complete.obs", method = "pearson")
+pca_result <- prcomp(bien_so, center = TRUE, scale. = TRUE)
+efa_varimax <- fa(bien_so, nfactors = 3, rotate = "varimax", fm = "ml")
+efa_final <- efa_varimax
+```
+
+## **Phụ lục A: Giới thiệu bộ dữ liệu và tiền xử lý dữ liệu**
+
+### A.1: Giới thiệu bộ dữ liệu
+
+Tập tin `SleepHealthLifestyle.csv`\* là bộ dữ liệu phản ánh nhiều khía cạnh liên quan đến giấc ngủ và thói quen sinh hoạt hằng ngày. Dữ liệu cung cấp thông tin về giới tính, tuổi, nghề nghiệp, thời lượng ngủ, chất lượng giấc ngủ, mức độ hoạt động thể chất, mức độ căng thẳng, phân loại BMI, huyết áp, nhịp tim, số bước chân hằng ngày và tình trạng rối loạn giấc ngủ. Bộ dữ liệu được lấy từ nguồn Kaggle [[[[<https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset/data>]
+
+-   `Person ID`\*: Mã định danh của mỗi cá nhân tham gia khảo sát.
+-   `Gender`\*: Giới tính của cá nhân `Nam/Nữ`).
+-   `Age`\*: Tuổi của cá nhân (tính theo năm).
+-   `Occupation`\*: Nghề nghiệp hoặc công việc của cá nhân.
+-   `Sleep Duration (hours)`\*: Số giờ ngủ trung bình mỗi ngày của cá nhân.
+-   `Quality of Sleep`\*: Thang điểm 1-10: Mức đánh giá chủ quan về chất lượng giấc ngủ, từ 1 đến 10.
+-   `Physical Activity Level (minutes/day)`\*: Số phút hoạt động thể chất trung bình mỗi ngày.
+-   `Stress Level`\*: Thang điểm 1-10: Mức độ căng thẳng do cá nhân tự đánh giá, từ 1 đến 10.
+-   `BMI Category`\*: Nhóm phân loại chỉ số khối cơ thể (BMI), ví dụ: Thiếu cân `Underweight`); Bình thường `Normal`); Thừa cân `Overweight`).
+-   `Blood Pressure`\*: Huyết áp (huyết áp tâm thu/tâm trương).
+-   `Heart Rate (bpm)`\*: Nhịp tim lúc nghỉ ngơi của cá nhân, tính bằng số nhịp mỗi phút.
+-   `Daily Steps`\*: Số bước chân trung bình mỗi ngày của cá nhân.
+-   `Sleep Disorder`\*: Tình trạng rối loạn giấc ngủ của cá nhân, bao gồm: Không có rối loạn giấc ngủ `None`); Mất ngủ `Insomnia`); Ngưng thở khi ngủ `Sleep Apnea`).
+
+### A.2: Kiểm tra cấu trúc dữ liệu
+
+```{r}
+data_check <- read.csv("SleepHealthLifestyle.csv")
+data_check <- data_check %>% janitor::clean_names()
+str(data_check)
+```
+
+**Nhận xét**
+
+-   **Kiểu số nguyên `int`)**: Gồm 7 biến đại diện cho các mã định danh, định lượng hoặc thang điểm đánh giá là `person_id`, `age`, `quality_of_sleep`, `physical_activity_level`, `stress_level`, `heart_rate`, và `daily_steps`.
+
+    -   **Kiểu số thực `num`)**: Gồm 1 biến đo lường thời gian là `sleep_duration`.
+    -   **Kiểu ký tự `chr`)**: Gồm 5 biến định tính hoặc chứa ký tự đặc biệt là `gender`, `occupation`, `bmi_category`, `blood_pressure`, và `sleep_disorder`.
+
+-   Biến `blood_pressure` (Huyết áp) hiện ở dạng ký tự `chr`) do chứa định dạng phân tách `"Tâm thu/Tâm trương"` (ví dụ: `"126/83"`). Để thuận tiện cho việc phân tích tính toán, cần bóc tách biến này thành 2 biến số nguyên riêng biệt.
+
+-   Các biến phân loại như `gender`, `bmi_category`, `occupation`, và `sleep_disorder` chuyển đổi sang kiểu dữ liệu nhân tố `factor`)
+
+Cấu trúc dữ liệu sau khi bóc tách `blood_pressure` và chuyển đổi kiểu:
+
+```{r}
+str(sleep_data_cleaned)
+```
+
+### A.3: Box-plot dữ liệu gốc và dữ liệu sau chuẩn hóa
+
+#### A.3.1: Boxplot các biến định lượng (chưa chuẩn hóa)
+
+```{r}
+bien_so_raw <- sleep_data_cleaned %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+bien_so_raw %>%
+  pivot_longer(everything(), names_to = "bien", values_to = "gia_tri") %>%
+  ggplot(aes(x = bien, y = gia_tri)) +
+  geom_boxplot(fill = "lightblue", outlier.color = "red") +
+  facet_wrap(~ bien, scales = "free", ncol = 3) +
+  coord_flip() +
+  labs(
+    title = "Boxplot các biến định lượng (chưa chuẩn hóa)",
+    x = NULL, y = "Giá trị"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+```
+
+**Nhận xét**: Biểu đồ Boxplot cho thấy các biến định lượng có độ phân tán vừa phải và không có nhiều giá trị ngoại lai ở các biến
+
+-   Các biến `age`, `sleep_duration`, `quality_of_sleep`, `physical_activity_level`, `stress_level`, `systolic_bp`, `diastolic_bp` và `daily_steps` có phân bố khá ổn định, với trung vị nằm gần vùng trung tâm của hộp, cho thấy dữ liệu tập trung tương đối tốt quanh giá trị trung bình
+
+-   Biến `sleep_duration` và `quality_of_sleep` có xu hướng phân bố khá cân đối, phản ánh các quan sát tập trung quanh mức ngủ trung bình khoảng 7 giờ và chất lượng giấc ngủ ở mức trung bình-khá.
+
+-   Hai biến huyết áp `systolic_bp` và `diastolic_bp` cũng không xuất hiện ngoại lai rõ rệt, cho thấy các giá trị đo nằm trong khoảng sinh lý hợp lý.
+
+-   Biến `heart_rate` là biến duy nhất có giá trị ngoại lai ở phía bên phải, do đó cần cân nhắc ý nghĩa của biến trước khi quyết định xử lý những giá trị ngoại lai này
+
+#### A.3.2: Boxplot các biến định lượng (đã chuẩn hóa)
+
+```{r}
+bien_so_box <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+bien_so_box %>%
+  pivot_longer(everything(), names_to = "bien", values_to = "gia_tri") %>%
+  ggplot(aes(x = bien, y = gia_tri)) +
+  geom_boxplot(fill = "lightblue", outlier.color = "red") +
+  coord_flip() +
+  labs(title = "Boxplot các biến định lượng (đã chuẩn hóa)",
+       x = NULL, y = "Giá trị chuẩn hóa") +
+  theme_minimal()
+```
+
+### A.4: Kiểm tra và xử lý ngoại lai đơn biến
+
+#### A.4.1: Kiểm tra bằng IQR
+
+```{r}
+dem_outlier_iqr <- function(x) {
+  q1 <- quantile(x, 0.25)
+  q3 <- quantile(x, 0.75)
+  iqr <- q3 - q1
+  sum(x < (q1 - 1.5  *iqr) | x > (q3 + 1.5*  iqr))
+}
+sapply(bien_so_raw, dem_outlier_iqr)
+```
+
+Cụ thể, biến `heart_rate` có **15** giá trị ngoại lai. Trích 15 giá trị ngoại lai từ biến `heart_rate` ra và xem xét khoảng giá trị thực tế của các outliers
+
+```{r}
+library(dplyr)
+q1 <- quantile(data_original$heart_rate, 0.25, na.rm = TRUE)
+q3 <- quantile(data_original$heart_rate, 0.75, na.rm = TRUE)
+iqr <- q3 - q1
+lower <- q1 - 1.5 * iqr
+upper <- q3 + 1.5 * iqr
+
+hr_out <- data_original %>%
+  mutate(is_outlier_hr = heart_rate < lower | heart_rate > upper) %>%
+  filter(is_outlier_hr)
+
+hr_out %>%
+  summarise(
+    n_outliers = n(),
+    min_hr = min(heart_rate, na.rm = TRUE),
+    q1_hr = quantile(heart_rate, 0.25, na.rm = TRUE),
+    median_hr = median(heart_rate, na.rm = TRUE),
+    q3_hr = quantile(heart_rate, 0.75, na.rm = TRUE),
+    max_hr = max(heart_rate, na.rm = TRUE)
+  )
+```
+
+**Nhận xét**:
+
+Kết quả cho thấy giá trị của **15 outliers** này nằm trong khoảng từ **80 đến 86 bpm** (trung vị 83 bpm). các giá trị này nằm trong phạm vi nhịp tim nghỉ bình thường của người trưởng thành *(nhịp tim nghỉ của người trưởng thành thường được ghi nhận từ 60-100 bpm)*. Điều này cho thấy các giá trị outliers này không phải là điểm bất thường do lỗi nhập liệu và nên giữ lại để mô hình phản ánh đúng thông tin từ bộ dữ liệu hơn.
+
+#### A.4.2: Kiểm tra bằng Z-score
+
+Ngoại lai đơn biến là những giá trị cực đoan khi xét trên từng biến riêng lẻ. Để phát hiện, ta sử dụng điểm chuẩn hóa Z-score; các quan sát có điểm chuẩn hóa vượt quá ngưỡng $|Z| > 3$ sẽ được đánh dấu là ngoại lai đơn biến.
+
+```{r}
+bien_so_scaled <- scale(bien_so)
+univariate_outliers <- which(abs(bien_so_scaled) > 3, arr.ind = TRUE)
+if (nrow(univariate_outliers) > 0) {
+  cat(
+    "Phát hiện", nrow(univariate_outliers),
+    "điểm dữ liệu ngoại lai đơn biến vượt ngưỡng |Z| > 3.\n"
+  )
+  print(univariate_outliers)
+} else {
+  cat("Không tìm thấy outlier đơn biến nào vượt ngưỡng |Z| > 3.\n")
+}
+```
+
+**Nhận xét**:\
+Phương pháp Z-score phát hiện **9 quan sát ngoại lai đơn biến**, và tất cả đều thuộc biến `heart_rate`. Mặc dù các giá trị này lệch khá xa so với trung bình mẫu, chúng vẫn nằm trong khoảng hợp lý (80–86 bpm). Do đó, các quan trắc này được giữ lại và tiếp tục đánh giá ngoại lai đa biến bằng khoảng cách Mahalanobis
+
+### A.5: Kiểm tra và xử lý ngoại lai đa biến
+
+```{r}
+mu <- colMeans(bien_so)
+s_matrix <- cov(bien_so)
+p <- ncol(bien_so)
+
+d2 <- mahalanobis(x = bien_so, center = mu, cov = s_matrix)
+
+threshold <- qchisq(p = 1 - 0.001, df = p)
+cat("Ngưỡng Chi-bình phương (alpha = 0.001, df =", p, "):", round(threshold, 3), "\n")
+```
+
+```{r}
+mv_outlier_index <- which(d2 > threshold)
+cat("Phát hiện", length(mv_outlier_index), "quan sát là outlier đa biến.\n")
+bien_so[mv_outlier_index, ]
+```
+
+**Nhận xét**: Với mức ý nghĩa $\alpha = 0.001$, kết quả phân tích khoảng cách Mahalanobis cho thấy có 11 quan trắc được coi lại giá trị ngoại lai đa biến. Trong đó
+
+-   Nhịp tim `heart_rate`) ở mức cao (từ 70 đến 86 bpm), trong đó có 4 quan sát đạt 85–86 bpm.
+
+-   Mức độ căng thẳng `stress_level`) thường ở mức cao (chủ yếu là 8).
+
+-   Mức độ hoạt động thể chất `physical_activity_level`) khá thấp ở một số quan sát (chỉ 30–45 phút/ngày).
+
+-   Một số quan sát có tuổi cao hơn (49–56 tuổi) và huyết áp tâm thu/tâm trương ở mức cao (139/91, 140/90).
+
+Mặc dù các quan trắc này được phát hiện là giá trị ngoại lai theo phân tích Mahalanobis nhưng vì các giá trị trên có thể phản ánh đặc điểm thực tế của một nhóm nhỏ khác biệt so với phần lớn quan trắc còn lại nên vẫn **giữ** lại 11 quan trắc là outliers trên
+
+### A.6: Kiểm tra dữ liệu trùng lặp (chi tiết)
+
+```{r}
+n_trung <- sleep_data_cleaned %>%
+  select(-person_id) %>%
+  duplicated() %>%
+  sum()
+n_trung
+```
+
+**Nhận xét:** Kết quả `r n_trung` cho thấy trong 374 quan sát, có **242 dòng** có toàn bộ giá trị (tuổi, giới tính, nghề nghiệp, thời lượng ngủ, chất lượng ngủ, BMI, huyết áp,...) giống y hệt một dòng khác đã xuất hiện trước đó — chỉ khác `person_id`.
+
+Đây **không phải lỗi dữ liệu**, mà do các biến trong bộ dữ liệu có rất ít giá trị khả dĩ:
+
+-   `quality_of_sleep` và `stress_level` chỉ theo thang 1–10.
+
+-   `occupation` chỉ có 11 nghề.
+
+-   `bmi_category` chỉ có 3 nhóm.
+
+-   Các biến `physical_activity_level`, `daily_steps`,... cũng chỉ nhận một số giá trị nhất định trong khảo sát.
+
+Vì vậy, các dòng này **không bị loại bỏ**, nếu xóa sẽ làm mất thông tin của những cá nhân thật khác nhau (do `person_id` khác nhau, tức 242 cá nhân riêng biệt, không phải một người bị nhập trùng hai lần).
+
+### A.7: Kiểm tra giá trị khuyết (chi tiết)
+
+```{r}
+vis_miss(data)
+```
+
+-   Biến `sleep_disorder`: Trong bộ dữ liệu, giá trị `"None"` là một **chuỗi ký tự**, đại diện cho việc cá nhân\
+    *không mắc rối loạn giấc ngủ nào*, là một level của biên phân loại, khác với `NA` (giá trị bị thiếu/không xác định do dữ liệu không được ghi nhận). Vì vậy, hàm `is.na()` sẽ **không** đếm các dòng `"None"` này là thiếu dữ liệu
+
+**Nhận xét: Bộ dữ liệu không có giá trị khuyết**
+
+### A.8: Thống kê mô tả (chi tiết)
+
+```{r}
+str(data_original)
+```
+
+```{r}
+summary(data_original)
+```
+
+**Nhận xét:**
+
+-   Ở biến `age`: Độ tuổi trải dài từ 27 đến 59 tuổi, tuổi trung bình rơi vào khoảng `mean= 42.18`) và trung vị là 43, cho thấy bộ dữ liệu khảo sát nhiều người thuộc nhóm trung niên hơn. Bên cạnh đó, số lượng nam nữ gần như tương đương nhau (189 nam, 185 nữ) cho thấy nếu xét về giới tính thì đây là thí nghiệm cân bằng.
+
+-   Biến `sleep_duration` thể hiện thời lượng ngủ trung bình của một quan trắc là khoảng **7.13 giờ/ngày**, chất lượng giấc ngủ trung bình `quality_of_sleep`) đạt **7.31**
+
+-   Biến `stress_level` có trung bình khoảng **5.39/10**, cho thấy mức stress của những người được khảo sát ở trong bộ dữ liệu ở mức trung bình.
+
+-   Số phút vận động trung bình (mean của biến `physical_activity_level`) là khoảng **59.17 phút/ngày**, và số bước chân trung bình `daily_steps`) khoảng **6817 bước/ngày**
+
+-   Huyết áp tâm thu `systolic_bp`) và tâm trương `diastolic_bp`) có trung bình lần lượt khoảng **128.6** và **84.65**, nhịp tim trung bình `heart_rate`) là **70.17 bpm**
+
+-   Về biến `sleep_disorder` thể hiện rối loạn giấc ngủ, nhóm `None` chiếm đa số (219 quan trắc), còn `Insomnia` và `Sleep Apnea` có số lượng gần tương đương nhau (77 và 78 quan trắc).
+
+Bộ dữ liệu sau khi tiền xử lý:
+
+```{r}
+str(data) 
+summary(data)
+```
+
+**Nhận xét:** Bộ dữ liệu sau khi tiền xử lý gồm 374 quan trắc và 13 biến, các biến định tính được chuyển thành kiểu `factor` và đã được chuẩn hóa theo z-score. Trong đó:
+
+-   Các biến định lượng sau chuẩn hóa đều có giá trị nằm quanh 0, cho thấy quá trình chuẩn hóa đã thực hiện đúng và giúp các biến có thể so sánh trực tiếp với nhau.
+
+-   Biến `heart_rate` vẫn có giá trị lớn nhất khá cao (khoảng **3.83**), phù hợp với kết quả kiểm tra trước đó rằng biến này có một số quan sát ngoại lai đơn biến.
+
+-   Các biến như `sleep_duration`, `quality_of_sleep`, `stress_level`, `systolic_bp`, và `diastolic_bp` có khoảng dao động tương đối cân đối quanh trung tâm, phản ánh dữ liệu sau chuẩn hóa đã được đưa về cùng thang đo.
+
+-   Một số biến vẫn có độ lệch nhất định giữa trung vị và trung bình, cho thấy phân phối chưa hoàn toàn đối xứng, nhưng đây là điều thường gặp trong dữ liệu thực tế.
+
+-   Ở các biến phân loại, phân bố mẫu không đồng đều hoàn toàn:
+
+    -   `bmi_category` chủ yếu tập trung ở nhóm `Normal` và `Overweight`, trong khi nhóm `Obese` chiếm tỷ lệ nhỏ.
+
+    -   `sleep_disorder` có số lượng lớn nhất ở nhóm `None`, cho thấy phần lớn người tham gia không mắc rối loạn giấc ngủ.
+
+    -   `occupation` gồm 11 mức, phản ánh sự đa dạng nghề nghiệp trong mẫu khảo sát.
+
+Tổng quát, dữ liệu sau tiền xử lý đã ở trạng thái phù hợp để tiếp tục thực hiện các phân tích khám phá và mô hình hóa như PCA, EFA hoặc MANOVA.
+
+### A.9: Chuẩn hóa nhãn biến phân loại bmi_category (chi tiết)
+
+```{r}
+data_check_bmi <- sleep_data_cleaned
+str(data_check_bmi$bmi_category)
+levels(data_check_bmi$bmi_category)
+```
+
+**Nhận xét**: Biến `bmi_category` có 4 mức nhưng `"Normal"` và `"Normal Weight"` cùng thể hiện một nhóm (Bình thường). Cần gộp 2 nhãn này lại thành một mức duy nhất để tránh sai lệch khi phân tích/thống kê theo nhóm.
+
+------------------------------------------------------------------------
+
+## **Phụ lục B: Kiểm tra điều kiện trước khi thực hiện PCA/EFA**
+
+### B.1: Kiểm định Bartlett
+
+**Giả thuyết kiểm định Bartlett:**
+
+$H_0$: Ma trận tương quan của tổng thể là ma trận đơn vị (Các biến quan sát hoàn toàn độc lập, không có tương quan tuyến tính với nhau).
+
+$H_1$: Ma trận tương quan của tổng thể khác ma trận đơn vị (Các biến quan sát có sự tương quan tuyến tính với nhau).
+
+```{r}
+bartlett_res <- cortest.bartlett(cor_mat, n = nrow(bien_so))
+bartlett_res
+```
+
+**Nhận xét**: Kết quả kiểm định Bartlett cho thấy giá trị $\chi^2 = 3992.346$ và p_value $\approx$ 0 \< 0.05. Do đó, với mức ý nghĩa 5%, bác bỏ giả thuyết H0 rằng ma trận tương quan là ma trận đơn vị. Điều này cho thấy các biến có tương quan với nhau và dữ liệu phù hợp để thực hiện PCA/EFA.
+
+### B.2: Kiểm định KMO
+
+```{r}
+kmo_res <- KMO(cor_mat)
+kmo_res
+```
+
+**Nhận xét:** Về kiểm định KMO, chỉ số KMO tổng thể đạt **0.61**, tức là ở mức **chấp nhận được nhưng chưa thật sự tốt**. Điều này cho thấy dữ liệu có thể dùng cho phân tích nhân tố, nhưng mức độ phù hợp chỉ ở mức trung bình.
+
+Xét theo từng biến, một số biến có MSA khá tốt như `age` (0.85), `sleep_duration` (0.83), và `quality_of_sleep` (0.68). Tuy nhiên, `daily_steps` có MSA khá thấp (0.31) và `physical_activity_level` cũng chỉ đạt 0.48, cho thấy hai biến này không chia sẻ nhiều phương sai chung với các biến còn lại. Hai biến huyết áp `systolic_bp` và `diastolic_bp` có MSA ở mức trung bình (lần lượt 0.54 và 0.54), còn `heart_rate` đạt 0.64.
+
+Tóm lại, bộ dữ liệu **có thể** được dùng cho PCA/EFA, vì kiểm định Bartlett có ý nghĩa thống kê và KMO tổng thể vượt ngưỡng 0.5.
+
+------------------------------------------------------------------------
+
+## **Phụ lục C: Chạy PCA và EFA**
+
+### C.1: Bảng eigenvalue đầy đủ 9 thành phần
+
+```{r pca-eigenvalue}
+eig_tbl <- as.data.frame(factoextra::get_eigenvalue(pca_result))
+colnames(eig_tbl) <- c("Eigenvalue", "% Phuong sai", "% Phuong sai tich luy")
+kable(eig_tbl, digits = 3, 
+  caption = "Eigenvalue và tỷ lệ phương sai giải thích của 9 thành phần chính (PCA)")
+```
+
+**Nhận xét:** Theo tiêu chí Kaiser (chỉ giữ thành phần có eigenvalue \> 1), có đúng **3 thành phần chính (PC1, PC2, PC3)** đủ điều kiện giữ lại, với eigenvalue lần lượt là `r round(eig_tbl[1,1],3)`, `r round(eig_tbl[2,1],3)`, `r round(eig_tbl[3,1],3)`. Ba thành phần này giải thích tổng cộng `r round(eig_tbl[3,3],2)`% phương sai của toàn bộ 9 biến gốc, nghĩa là 3 thành phần chính PC1, PC2, PC3 giải thích được `r round(eig_tbl[3,3],2)`% sự biến thiên của bộ dữ liệu. Đây là kết quả khá tốt thể hiện mức độ giải thích cao, cho thấy việc rút gọn từ 9 biến xuống thành 3 thành phần chính vẫn giữ lại được phần lớn thông tin của dữ liệu gốc.
+
+Đồng thời việc Phân tích thành phần chính (PCA) còn giúp làm mất hiện tượng đa cộng tuyến giữa các biến có mối tương quan cao (như cặp `systolic_bp` và `diastolic_bp` đã nêu ở ma trận tương quan)
+
+### C.2: Scree Plot PCA (fviz_eig)
+
+```{r pca-screeplot, fig.width=8, fig.height=5}
+fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 45),
+         barfill = "steelblue", barcolor = "steelblue",
+         main = "Scree Plot - Phần trăm phương sai giải thích theo từng thành phần",
+         xlab = "Thành phần chính", ylab = "% Phương sai giải thích")
+```
+
+**Nhận xét:** Đồ thị cho thấy độ dốc giảm rất mạnh hay nói cách khác **điểm gãy** của đồ thị khuỷu tay tại PC3. Trên đồ thị thể hiện PC1 đóng góp 38.9% mức độ giải thích phương sai, sau đó đến PC2 (31.0%) và PC3 (17.2%). Từ PC4 trở đi chỉ đóng góp rất nhỏ (dưới 7%). Điều này cho thấy quyết định giữ **3 thành phần chính** thống nhất với kết quả của Phân tích song song trước đó
+
+### C.3: Bảng loadings PCA chi tiết
+
+```{r pca-loadings}
+var_pca <- factoextra::get_pca_var(pca_result)
+loadings_pca <- as.data.frame(var_pca$coord)
+colnames(loadings_pca) <- paste0("PC", 1:ncol(loadings_pca))
+kable(round(loadings_pca[, 1:3], 3), 
+  caption = "Hệ số tải (loadings/coordinates) của 9 biến lên 3 thành phần chính (PCA)")
+```
+
+**Nhận xét:**
+
+-   **PC1** giải thích 38.9% phương sai: tải cao và cùng chiều (mang dấu + trước hệ số) ở `quality_of_sleep` (0.966), `sleep_duration` (0.900); tải cao nhưng ngược chiều ở `stress_level` (-0.940) và `heart_rate` (-0.769). Trục này đối lập giữa "ngủ ngon, ngủ đủ" và "căng thẳng cao, nhịp tim cao". Điều này cho thấy PC1 phản ánh **"Chất lượng giấc ngủ – Căng thẳng"**.
+
+-   **PC2** (31.0% phương sai): tải cao ở `diastolic_bp` (0.928), `systolic_bp` (0.882), và `age` (0.699). PC2 thể hiện khía cạnh **"Huyết áp – Tuổi tác"** (khía cạnh sinh lý tim mạch liên quan đến tuổi).
+
+-   **PC3** (17.2% phương sai): tải cao ở `daily_steps` (-0.819) và `physical_activity_level` (-0.710). Những biến này thể hiện cho **"Vận động thể chất"**
+
+-   Biến `age` có tải tương đối ở cả PC2 (0.699) lẫn PC1 (0.449).
+
+### C.4: Contribution Plot
+
+```{r pca-contrib-combined, fig.width=15, fig.height=5, warning=FALSE}
+library(factoextra)
+library(gridExtra)
+p1 <- fviz_contrib(pca_result, choice = "var", axes = 1, top = 9,
+                   title = "Mức đóng góp vào PC1")
+p2 <- fviz_contrib(pca_result, choice = "var", axes = 2, top = 9,
+                   title = "Mức đóng góp vào PC2")
+p3 <- fviz_contrib(pca_result, choice = "var", axes = 3, top = 9,
+                   title = "Mức đóng góp vào PC3")
+grid.arrange(p1, p2, p3, ncol = 3)
+```
+
+**Nhận xét**:
+
+*Đường đứt ngang trong cả 3 biểu đồ là ngưỡng đóng góp trung bình của 9 biến đóng góp đồng đều vào mỗi trục (100%/9* $\approx$ 11.1%), những biến có giá trị cao hơn ngưỡng này được xem là đóng góp quan trọng cho trục tương ứng
+
+-   **Ở PC1:** `quality_of_sleep`, `stress_level`, `sleep_duration`, `heart_rate` là 4 biến vượt ngưỡng trung bình và chiếm gần như toàn bộ mức đóng góp của trục này, trong khi các biến còn lại (`age`, `systolic_bp`, `diastolic_bp`, `physical_activity_level`, `daily_steps`) đóng góp không đáng kể . Điều này khẳng định PC1 là trục **"Giấc ngủ – Căng thẳng"**
+
+-   **Ở PC2:** `diastolic_bp`, `systolic_bp`, `age` là 3 biến đóng góp chính, tiếp theo là `physical_activity_level` và `daily_steps` ở mức khá; các biến thuộc nhóm giấc ngủ (`heart_rate`, `quality_of_sleep`, `sleep_duration`, `stress_level`) hầu như không đóng góp. Kết quả này xác nhận PC2 là trục **"Huyết áp – Tuổi tác"**
+
+-   **Ở PC3:** `daily_steps` và `physical_activity_level` vượt ngưỡng trung bình, Các biến còn lại (`systolic_bp`, `age`, `diastolic_bp`, `stress_level`, `sleep_duration`, `quality_of_sleep`, `heart_rate`) đóng góp rất thấp cho thấy PC3 là một trục **"thuần vận động"**.
+
+### C.5: Correlation Circle
+
+```{r pca-corr-circle, fig.width=8, fig.height=7}
+fviz_pca_var(pca_result, col.var = "contrib",
+             gradient.cols = c("#2E86C1", "#F4D03F", "#E74C3C"),
+             repel = TRUE,
+             title = "Biểu đồ vòng tròn tương quan (Correlation Circle) - PCA")
+```
+
+**Nhận xét:**
+
+**Trục PC1 ("Chất lượng nghỉ ngơi và Áp lực tâm lý"):**
+
+-   **Phía dương (bên phải)** của trục PC1 tập trung các biến `quality_of_sleep`, `sleep_duration` cùng với `age` ở mức đóng góp nhẹ hơn, đại diện cho nhóm cá nhân có lối sống điều độ, ưu tiên nghỉ ngơi: ngủ đủ giờ và cảm nhận chất lượng giấc ngủ tốt.
+
+-   **Phía âm (bên trái)** gồm các biến `stress_level` và `heart_rate` thể hiện cho việc cá nhân chịu áp lực tâm lý cao, kéo theo phản ứng sinh lý là nhịp tim tăng, một dấu hiệu cảnh báo sớm về nguy cơ tim mạch liên quan đến stress mãn tính.
+
+-   Điều này cho thấy trục PC1 phản ánh một sự cân bằng giữa nghỉ ngơi và áp lực cuộc sống: cá nhân càng lệch về phía âm càng có nguy cơ stress cao dẫn đến chất lượng ngủ kém và tim mạch bị ảnh hưởng.
+
+**Trục PC2 ("Đặc điểm sinh lý gắn liền với tuổi tác"):**
+
+-   **Phía dương** của trục PC2 có biến `diastolic_bp`, `systolic_bp` và `age` đóng góp quan trọng , cùng nhóm biến vận động (`physical_activity_level`, `daily_steps`) ở mức đóng góp thấp hơn.
+
+-   Đáng chú ý, toàn bộ các biến thuộc nhóm giấc ngủ (`sleep_duration`, `quality_of_sleep`, `stress_level`) gần như không xuất hiện trên trục này.
+
+-   Điều này cho thấy trục PC2 đại diện cho một khía cạnh sức khỏe tách biệt với thói quen ngủ nghỉ\*: đó là quá trình lão hóa tự nhiên đi kèm huyết áp tăng dần theo tuổi.
+
+**Mối tương quan giữa các biến (dựa trên góc giữa các vector trong biểu đồ vòng tròn tương quan):**
+
+-   **Góc tù (tương quan âm mạnh):** Vector `quality_of_sleep` và `sleep_duration` nằm gần như đối xứng hoàn toàn qua tâm so với vector `stress_level` và `heart_rate`. Điều này cho thấy trong thực tế: **căng thẳng kéo dài không chỉ làm giảm thời lượng và chất lượng giấc ngủ, mà còn biểu hiện rõ qua nhịp tim tăng**
+
+-   **Góc vuông:** Vector `daily_steps`, `physical_activity_level` gần như vuông góc với nhóm vector giấc ngủ/stress. Điều này nghĩa là: **nếu chỉ đơn thuần khuyến khích vận động nhiều hơn (tăng số bước chân, tăng thời gian tập luyện) chưa chắc sẽ cải thiện trực tiếp chất lượng giấc ngủ hay giảm stress** trong nhóm đối tượng khảo sát này.
+
+### C.6: Biplot PCA kết hợp phân cụm K-means
+
+#### C.6.1: Xác định số cụm tối ưu (Elbow method)
+
+```{r kmeans-elbow, fig.width=8, fig.height=5}
+set.seed(123)
+fviz_nbclust(bien_so, kmeans, method = "wss", k.max = 8) +
+  labs(title = "Phương pháp Elbow - Xác định số cụm tối ưu (K-means)")
+```
+
+**Nhận xét:** Biểu đồ tổng bình phương khoảng cách trong cụm (WSS) giảm mạnh từ k=1 đến k=3, sau đó tốc độ giảm chậm lại rõ rệt (điểm khuỷu tay tại k=3). Do đó, ta chọn **k = 3 cụm**
+
+#### C.6.2: Phân cụm K-means và Biplot
+
+```{r kmeans-biplot, fig.width=9, fig.height=7}
+set.seed(123)
+km_res <- kmeans(bien_so, centers = 3, nstart = 25)
+fviz_pca_biplot(
+  pca_result, axes = c(1, 2),
+  geom.ind = "point",
+  col.ind = factor(km_res$cluster),
+  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+  addEllipses = TRUE,
+  label = "var",
+  col.var = "black",
+  repel = TRUE,
+  legend.title = "Cum K-means",
+  title = "Biplot PCA (PC1-PC2) kết hợp phân cụm K-means (k=3)"
+)
+```
+
+```{r cluster-vs-disorder}
+cluster_table <- table(Cum = km_res$cluster, Sleep_Disorder = data$sleep_disorder)
+kable(as.data.frame.matrix(cluster_table), 
+  caption = "Đối chiếu cụm K-means với nhóm sleep_disorder thực tế")
+```
+
+**Nhận xét:**
+
+**Cụm 1 (xanh dương, bên trái): "Nhóm nguy cơ cao":**
+
+-   Cụm này nằm lệch hẳn về phía âm của trục PC1, nơi tập trung các vector `stress_level` và `heart_rate` cùng hướng, đại diện cho những cá nhân vừa chịu áp lực tâm lý cao, vừa có nhịp tim tăng, đi kèm `sleep_duration` và `quality_of_sleep` ở mức thấp.
+
+-   Về mặt thực tiễn, đây là nhóm chịu ảnh hưởng rõ nhất của mối liên hệ giữa căng thẳng, thiếu ngủ và sức khỏe tim mạch. Họ không chỉ ngủ ít mà còn có nhịp tim cao, cho thấy cơ thể đang phản ứng bất lợi trước tình trạng căng thẳng kéo dài.
+
+**Cụm 2 (vàng, phía trên bên phải) và Cụm 3 (cam, chính giữa bên phải): Nhóm ngủ tốt nhưng khác biệt về lối sống**
+
+-   Cả hai cụm đều nằm ở phía dương của trục PC1, cho thấy các đối tượng trong hai cụm này nhìn chung ngủ đủ, chất lượng giấc ngủ tốt và mức độ căng thẳng thấp hơn so với cụm 1. Tuy nhiên, chúng vẫn được tách biệt theo trục PC2, chủ yếu bởi tuổi, huyết áp và phần nào là mức độ hoạt động thể chất. Điều này cho thấy nhóm có giấc ngủ tốt không hoàn toàn đồng nhất.
+
+-   Cụm 2 có xu hướng gồm những người lớn tuổi hơn và có huyết áp cao hơn, trong khi cụm 3 tập trung những người có các chỉ số sinh lý ổn định hơn.
+
+**Đối chiếu cấu trúc phân cụm với nhãn `sleep_disorder` thực tế:**\
+Bảng chéo cho thấy cụm 1 có tỷ lệ `Insomnia` và `Sleep Apnea` cao hơn, trong khi cụm 3 chủ yếu là `None`. Dù K-means không sử dụng biến `sleep_disorder` để phân cụm, kết quả vẫn cho thấy sự tương ứng nhất định giữa các cụm và tình trạng rối loạn giấc ngủ. Tuy nhiên, sự phân tách chưa hoàn toàn rõ ràng, nên cần **kiểm định MANOVA** để đánh giá sự khác biệt giữa các nhóm `sleep_disorder` một cách chính thức.
+
+### C.7: EFA xoay Oblimin
+
+```{r efa-oblimin}
+library(psych)
+efa_oblimin <- fa(bien_so, nfactors = 3, rotate = "oblimin", fm = "ml")
+print(efa_oblimin$loadings, digits = 3, cut = 0.3, sort = TRUE)
+```
+
+```{r}
+kable(round(efa_oblimin$Phi, 2), 
+      caption = "Ma trận tương quan giữa các nhân tố (Phi) - Xoay Oblimin")
+```
+
+**Nhận xét:**
+
+-   **ML2** tiếp tục gồm `quality_of_sleep` (0.993), `stress_level` (-0.917), `sleep_duration` (0.885) và `heart_rate` (-0.651).
+
+-   **ML3** gồm `systolic_bp` (0.995) và `diastolic_bp` (0.957).
+
+-   **ML1** gồm `daily_steps` (1.004) và `physical_activity_level` (0.760).
+
+-   Biến `age` vẫn tải lên cả ML2 và ML3, cho thấy đây là biến có tải kép, không phải do lựa chọn phép xoay.
+
+-   Ma trận tương quan giữa các nhân tố ($\Phi$). Kết quả cho thấy:
+
+    -   Tương quan giữa ML2 (Giấc ngủ/Căng thẳng) và ML3 (Huyết áp) ở mức $-0.03$.
+
+    -   Tương quan giữa ML1 (Vận động) và ML2 ở mức $0.00$.
+
+    -   Tương quan giữa ML1 (Vận động) và ML3 (Huyết áp) đạt $0.19$. Đây là cặp nhân tố có liên hệ rõ nhất trong ba cặp
+
+Ma trận tương quan giữa các nhân tố cho thấy các hệ số tương quan đều rất nhỏ (lớn nhất khoảng 0.19), chứng tỏ ba nhân tố gần như độc lập. Vì vậy, phép xoay Varimax vẫn là lựa chọn phù hợp và dễ diễn giải hơn cho các phân tích tiếp theo
+
+### C.8: EFA xoay Promax
+
+```{r efa-promax}
+efa_promax <- fa(bien_so, nfactors = 3, rotate = "promax", fm = "ml")
+print(efa_promax$loadings, digits = 3, cut = 0.3, sort = TRUE)
+```
+
+```{r}
+kable(round(efa_promax$Phi, 2), 
+      caption = "Ma trận tương quan giữa các nhân tố (Phi) - Xoay Promax")
+```
+
+**Nhận xét:**
+
+-   **ML2**:hệ số tải mạnh tại `sleep_duration` (0.890), `quality_of_sleep` (0.990), `stress_level` (-0.917) và `heart_rate` (-0.671).
+
+-   Các hệ số tải mạnh ở **ML3**: `systolic_bp` (0.991) và `diastolic_bp` (0.947).
+
+-   **ML1** gồm `physical_activity_level` (0.765) và `daily_steps` (1.016).
+
+-   Biến `age` thể hiện tính chất tải kép với hệ số tải 0.424 lên ML2 và 0.694 lên ML3, tương đương với các kết quả phân tích trước
+
+-   Ma trận tương quan giữa các nhân tố ($\Phi$), phép xoay Promax cho thấy:
+
+    -   Tương quan giữa ML2 (Giấc ngủ/Căng thẳng) và ML3 (Huyết áp) ở mức $0.03$.
+
+    -   Tương quan giữa ML2 và ML1 (Vận động) ở mức $0.05$.
+
+    -   Tương quan giữa ML3 và ML1 đạt $0.23$.
+
+Kết quả Promax cho thấy vận động thể chất chỉ liên hệ nhẹ với huyết áp, trong khi giấc ngủ và căng thẳng tương đối độc lập với hai nhóm biến còn lại. Do đó, mỗi khía cạnh sức khỏe cần được đánh giá và can thiệp riêng, thay vì áp dụng một giải pháp chung.
+
+### C.9: So sánh chỉ số phù hợp mô hình EFA (3 phép xoay)
+
+```{r efa-fit-same}
+cat("So sánh chỉ số phù hợp mô hình (bất biến qua phép xoay):\n")
+cat("Varimax : RMSEA =", round(efa_varimax$RMSEA[1],3), 
+    " TLI =", round(efa_varimax$TLI,3), " BIC =", round(efa_varimax$BIC,2), "\n")
+cat("Oblimin : RMSEA =", round(efa_oblimin$RMSEA[1],3), 
+    " TLI =", round(efa_oblimin$TLI,3), " BIC =", round(efa_oblimin$BIC,2), "\n")
+cat("Promax  : RMSEA =", round(efa_promax$RMSEA[1],3), 
+    " TLI =", round(efa_promax$TLI,3), " BIC =", round(efa_promax$BIC,2), "\n")
+```
+
+**Nhận xét**
+
+-   Các chỉ số phù hợp mô hình (RMSEA = 0.287, TLI = 0.717, BIC = 311.47) **hoàn toàn giống nhau** giữa 3 phép xoay. Điều này là do phép xoay chỉ thay đổi cách biểu diễn các nhân tố, chứ không làm thay đổi mô hình nhân tố đã ước lượng.
+
+-   Bên cạnh đó, ma trận Phi ở cả Oblimin và Promax đều cho thấy các hệ số tương quan rất nhỏ cho thấy phép quay xiên và quay trực giao cũng không có sự khác biệt rõ ràng.
+
+Vì thế Varimax được lựa chọn làm phép xoay chính vì dễ diễn giải hơn, đồng thời vẫn phù hợp với đặc điểm của dữ liệu.
+
+### C.10: Cải thiện mô hình EFA — Thử loại biến age
+
+Mặc dù Varimax được chọn làm phép xoay chính, mô hình ba nhân tố vẫn còn một số hạn chế. Cụ thể, biến `age` có hệ số tải trên cả hai nhân tố ML2 và ML3 nên chưa thể hiện rõ thuộc về một nhân tố nào. Bên cạnh đó, các chỉ số đánh giá mô hình cũng chưa đạt mức mong muốn (RMSEA = 0.287 và TLI = 0.717). Vì vậy, bước tiếp theo sẽ xem xét loại biến age khỏi mô hình để đánh giá liệu cấu trúc nhân tố có rõ ràng và phù hợp hơn hay không.
+
+```{r efa-improve-noage}
+bien_so_noage <- bien_so %>% select(-age)
+efa_noage <- fa(bien_so_noage, nfactors = 3, rotate = "varimax", fm = "ml")
+print(efa_noage$loadings, digits = 3, cut = 0.3, sort = TRUE)
+```
+
+```{r}
+cat("RMSEA =", round(efa_noage$RMSEA[1],3), " TLI =", round(efa_noage$TLI,3),
+    " BIC =", round(efa_noage$BIC,2), "\n")
+```
+
+**Nhận xét:**
+
+-   Sau khi loại bỏ `age`, cấu trúc ba nhân tố trở nên rõ ràng hơn khi mỗi biến chỉ tải mạnh lên một nhân tố và không còn hiện tượng tải kép. Ba nhân tố vẫn lần lượt đại diện cho giấc ngủ và căng thẳng, huyết áp, và mức độ vận động thể chất.
+
+-   Tổng phương sai trích tăng từ 82.7% lên 84.8%, nhưng các chỉ số đánh giá độ phù hợp của mô hình lại giảm (RMSEA tăng từ 0.287 lên 0.355, TLI giảm từ 0.717 xuống 0.623), cho thấy mô hình đơn giản hơn nhưng khớp với dữ liệu kém hơn. Mặc dù BIC giảm từ 311.47 xuống 295.29 do số biến ít hơn, việc loại bỏ `age` không giúp cải thiện chất lượng mô hình.
+
+Vì vậy,\* `age` được giữ lại trong mô hình chính thức. Dù có hiện tượng tải lên hai nhân tố, biến này vẫn cung cấp thông tin hữu ích và góp phần phản ánh đầy đủ hơn cấu trúc của dữ liệu. Vì vậy giữ lại biến age thay vì bỏ đi để phân tích
+
+### C.11: Điểm nhân tố (Factor scores)
+
+```{r factor-scores}
+factor_scores <- as.data.frame(efa_final$scores)
+colnames(factor_scores) <- c("F_GiacNgu_CangThang", "F_SinhLy_HuyetAp", "F_VanDong")
+data_with_scores <- bind_cols(data, factor_scores)
+kable(head(data_with_scores %>%
+             select(sleep_disorder, F_GiacNgu_CangThang, F_VanDong, F_SinhLy_HuyetAp), 6),
+      digits = 2, caption = "Ví dụ điểm nhân tố (factor scores) gắn với dữ liệu gốc")
+```
+
+**Nhận xét:**
+
+-   Hai dòng đầu thuộc nhóm `None` có điểm `F_GiacNgu_CangThang` lần lượt là -0.96 và -1.23. Mặc dù đều có điểm nhân tố này thấp hơn trung bình, điểm `F_VanDong` lại khác nhau đáng kể (-1.66 và 1.88), cho thấy các cá nhân không có rối loạn giấc ngủ vẫn có sự khác biệt về mức độ vận động.
+
+-   Ba dòng cuối đều có cùng điểm nhân tố: `F_GiacNgu_CangThang = -2.58`, `F_VanDong = -2.56` và `F_SinhLy_HuyetAp = 1.15`. Cả ba đều thuộc nhóm có rối loạn giấc ngủ (`Sleep Apnea` hoặc `Insomnia`), cho thấy những người này thường có điểm nhân tố về giấc ngủ và vận động thấp hơn, trong khi điểm nhân tố về sinh lý và huyết áp cao hơn.
+
+-   Tuy nhiên, dù có cùng điểm nhân tố, ba cá nhân này vẫn thuộc hai nhóm `Sleep Apnea` và `Insomnia` khác nhau. Điều này cho thấy ba nhân tố trên giúp nhận diện tình trạng rối loạn giấc ngủ nói chung, nhưng chưa đủ để phân biệt rõ từng loại rối loạn.
+
+------------------------------------------------------------------------
+
+## **Phụ lục D: Phương pháp so sánh/đối chiếu: ONE-WAY MANOVA**
+
+### D.1: Kiểm tra giả định MANOVA — Kiểm định Levene
+
+MANOVA yêu cầu các giả định:
+
+-   Giả định 1: các biến phụ thuộc xấp xỉ phân phối chuẩn đa biến trong từng nhóm
+
+-   Giả định 2: ma trận hiệp phương sai đồng nhất giữa các nhóm (Box's M test hoặc kiểm tra bằng `car::leveneTest` cho từng biến),
+
+-   Giả định 3: không có đa cộng tuyến hoàn hảo giữa các biến phụ thuộc.
+
+Để kiểm tra Giả định 2, ta sử dụng kiểm định Levene cho từng biến phụ thuộc với các giả thuyết sau:
+
+**Giả thuyết**
+
+$H_0$: $\sigma_{\text{None}}^2 = \sigma_{\text{Insomnia}}^2 = \sigma_{\text{Sleep Apnea}}^2$.
+
+*(Phương sai của chỉ số sức khỏe hoặc lối sống là như nhau giữa ba nhóm rối loạn giấc ngủ, tức giả định đồng nhất phương sai được thỏa mãn).*
+
+$H_1$: Tồn tại ít nhất một cặp nhóm có phương sai khác nhau.
+*(Phương sai của chỉ số sức khỏe hoặc lối sống không đồng nhất giữa các nhóm rối loạn giấc ngủ, tức giả định đồng nhất phương sai bị vi phạm.)*
+
+```{r manova-assump}
+dv_scaled <- data_scaled %>%
+  select(sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps, age)
+group <- data_scaled$sleep_disorder
+
+levene_list <- map_dfr(names(dv_scaled), function(v) {
+  res <- leveneTest(dv_scaled[[v]] ~ group)
+  tibble(bien = v, F = res$`F value`[1], p_value = res$`Pr(>F)`[1])
+})
+kable(levene_list, digits = 3, 
+      caption = "Kiểm định Levene - đồng nhất phương sai theo nhóm sleep_disorder")
+```
+
+**Nhận xét:** Kết quả cho thấy 8/9 biến có p-value \< 0.001, gồm `sleep_duration`,, `quality_of_sleep`, `physical_activity_level`, `stress_level`, `systolic_bp`, `heart_rate`, `daily_steps` và `age`. Điều này cho thấy giả định đồng nhất phương sai bị vi phạm ở hầu hết các biến. Chỉ có `diastolic_bp` đáp ứng giả định này với p-value = 0.637.
+
+### D.2: Phân tích ANOVA đơn biến (chi tiết)
+
+**Giả thuyết đối với mỗi biến phụ thuộc**
+
+$H_0$: $\mu_{\text{None}} = \mu_{\text{Insomnia}} = \mu_{\text{Sleep Apnea}}$.
+*(Giá trị trung bình của biến phụ thuộc là như nhau giữa ba nhóm `sleep_disorder`)*
+
+$H_1$: Tồn tại ít nhất một cặp nhóm có giá trị trung bình khác nhau.
+Trong đó, $\mu_{\text{None}}$, $\mu_{\text{Insomnia}}$ và $\mu_{\text{Sleep Apnea}}$ lần lượt là giá trị trung bình của biến phụ thuộc trong ba nhóm `sleep_disorder`.
+
+```{r manova-followup}
+manova_model <- manova(
+  cbind(sleep_duration, quality_of_sleep, physical_activity_level,
+        stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps, age)
+  ~ sleep_disorder,
+  data = data_scaled
+)
+summary.aov(manova_model)
+```
+
+### D.3: Eta-squared (chi tiết)
+
+```{r effect-size}
+dv_names <- c("sleep_duration", "quality_of_sleep", "physical_activity_level",
+              "stress_level", "systolic_bp", "diastolic_bp", "heart_rate",
+              "daily_steps", "age")
+eta_tbl <- map_dfr(dv_names, function(v) {
+  aov_res <- aov(as.formula(paste(v, "~ sleep_disorder")), data = data_scaled)
+  es <- rstatix::eta_squared(aov_res)
+  tibble(bien = v, eta_sq = as.numeric(es))
+}) %>% arrange(desc(eta_sq))
+kable(eta_tbl, digits = 3, 
+      caption = "Eta-squared (độ lớn ảnh hưởng) của sleep_disorder lên từng biến")
+```
+
+**Nhận xét:**
+
+-   Nhóm biến sinh lý và huyết áp (`diastolic_bp`, `systolic_bp`, `age`) có khả năng phân biệt mạnh nhất giữa ba nhóm bệnh lý thuộc biến `sleep_disorder`. Chỉ số eta-squared của nhóm này cao hơn hẳn các biến còn lại; trong đó `diastolic_bp` và `systolic_bp` giải thích được hơn một nửa phương sai khác biệt giữa các nhóm.
+
+-   Ngược lại, `stress_level` có eta-squared thấp nhất (0.034), cho thấy khả năng phân biệt giữa các nhóm `sleep_disorder` còn hạn chế. Mức độ khác biệt của biến này giữa các nhóm thấp hơn so với các biến còn lại.
+
+**Đối chiếu với các nhân tố từ EFA:**
+
+-   **Nhân tố Sinh lý và Huyết áp** (chứa `systolic_bp`, `diastolic_bp`, `age`) đóng vai trò quan trọng nhất trong việc phân tách các nhóm bệnh lý.
+
+-   **Nhân tố Giấc ngủ và Căng thẳng** (gồm `sleep_duration`, `quality_of_sleep`, `heart_rate`) có mức độ đóng góp trung bình.
+
+-   **Nhân tố Vận động** (`physical_activity_level`, `daily_steps`) đóng vai trò phân biệt ở mức độ vừa phải.
+
+------------------------------------------------------------------------
+
+## **Phụ lục E: Mô hình dự đoán với 9 biến định lượng gốc + biến phân loại**
+
+```{r load-model-data}
+library(tidyverse)
+library(janitor)
+library(caret)
+library(randomForest)
+library(nnet)
+library(psych)
+library(pROC)
+library(knitr)
+
+data_raw_m <- read.csv("SleepHealthLifestyle.csv") %>% janitor::clean_names()
+sleep_data_cleaned_m <- data_raw_m %>%
+  separate(
+    blood_pressure,
+    into = c("systolic_bp", "diastolic_bp"),
+    sep = "\\s*/\\s*",
+    convert = TRUE
+  ) %>%
+  mutate(
+    gender = as.factor(gender),
+    bmi_category = as.factor(bmi_category),
+    occupation = as.factor(occupation),
+    sleep_disorder = as.factor(ifelse(is.na(sleep_disorder) | sleep_disorder == "",
+                                       "None", sleep_disorder))
+  )
+data_original_m <- sleep_data_cleaned_m %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(bmi_category, levels = c("Normal", "Overweight", "Obese"))
+  ) %>%
+  select(-person_id)
+
+model_data <- data_original_m %>%
+  select(
+    gender, age, occupation, sleep_duration, quality_of_sleep,
+    physical_activity_level, stress_level, bmi_category,
+    systolic_bp, diastolic_bp, heart_rate, daily_steps,
+    sleep_disorder
+  )
+levels(model_data$sleep_disorder) <- make.names(levels(model_data$sleep_disorder))
+
+set.seed(2024)
+train_index <- createDataPartition(model_data$sleep_disorder, p = 0.75, list = FALSE)
+train_data <- model_data[train_index, ]
+test_data  <- model_data[-train_index, ]
+
+numeric_vars <- c("age", "sleep_duration", "quality_of_sleep", "physical_activity_level",
+                   "stress_level", "systolic_bp", "diastolic_bp", "heart_rate", "daily_steps")
+preproc_params <- preProcess(train_data[, numeric_vars], method = c("center", "scale"))
+train_scaled <- train_data
+test_scaled  <- test_data
+train_scaled[, numeric_vars] <- predict(preproc_params, train_data[, numeric_vars])
+test_scaled[, numeric_vars]  <- predict(preproc_params, test_data[, numeric_vars])
+
+train_control <- trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = TRUE,
+  summaryFunction = multiClassSummary,
+  savePredictions = "final"
+)
+
+set.seed(2024)
+model_multinom_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "multinom",
+  trControl = train_control,
+  metric = "Accuracy",
+  trace = FALSE
+)
+
+set.seed(2024)
+model_rf_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "rf",
+  trControl = train_control,
+  metric = "Accuracy",
+  importance = TRUE
+)
+```
+
+### E.1: Dữ liệu chuẩn hóa mẫu
+
+```{r preprocess-sample}
+kable(head(train_scaled[, numeric_vars], 5), digits = 2,
+      caption = "5 dòng đầu của các biến định lượng sau chuẩn hóa (tập train)")
+```
+
+### E.2: Kết quả huấn luyện mô hình chi tiết
+
+#### E.2.1: Multinomial Logistic Regression
+
+```{r model-multinom-full-print}
+model_multinom_full
+```
+
+#### E.2.2: Random Forest
+
+```{r model-rf-full-print}
+model_rf_full
+```
+
+### E.3 So sánh Kappa (5-fold CV)
+
+```{r compare-kappa}
+resamples_full <- resamples(list(
+  Multinomial_Logistic = model_multinom_full,
+  Random_Forest = model_rf_full
+))
+summary_stats_full <- summary(resamples_full)$statistics[c("Accuracy", "Kappa")]
+kable(round(summary_stats_full$Kappa, 4), 
+      caption = "So sánh Kappa (5-fold CV) - Mô hình dùng 9 biến gốc")
+```
+
+```{r compare-dotplot-kappa, fig.width=8, fig.height=4}
+dotplot(resamples_full, metric = "Kappa",
+    main = "So sánh Kappa giữa 2 mô hình (5-fold Cross-Validation) - Dùng 9 biến gốc")
+```
+
+**Nhận xét**:
+
+-   Kết quả cho thấy cả **Multinomial Logistic Regression** và **Random Forest** đều đạt giá trị **Kappa** cao, với trung bình lần lượt là **0.8487** và **0.8559**, phản ánh mức độ đồng thuận tốt giữa kết quả dự đoán và nhãn thực tế. Trung vị Kappa của cả hai mô hình đều bằng **0.8743**, cho thấy hiệu năng khá tương đồng ở hầu hết các lần kiểm chứng chéo.
+
+-   Tuy nhiên, **Random Forest** có Kappa trung bình cao hơn và giá trị thấp nhất cũng lớn hơn (**0.7869** so với **0.7635**), cho thấy mô hình này ổn định hơn giữa các fold. Kết quả trên biểu đồ dotplot cũng thể hiện xu hướng tương tự.
+
+-   Nhìn chung, cả hai mô hình đều phân loại tốt, nhưng **Random Forest** nhỉnh hơn về độ ổn định và khả năng dự đoán.
+
+### E.4: Ma trận nhầm lẫn chi tiết
+
+#### E.4.1: Multinomial Logistic Regression — Tập Test
+
+```{r}
+pred_multinom_full <- predict(model_multinom_full, newdata = test_scaled)
+cm_multinom_full <- confusionMatrix(pred_multinom_full, test_scaled$sleep_disorder)
+cat("Multinomial Logistic Regression - Tập Test\n")
+print(cm_multinom_full)
+```
+
+**Nhận xét**: hiệu năng mô hình Multinomial Logistic Regression trên tập Test
+
+* Mô hình đạt **Accuracy = 85.87%** (KTC 95 % : 77.05 % – 92.26 %), cao hơn đáng kể so với **No Information Rate = 58.70%** (p < 0.001). Chỉ số **Kappa = 0.754** cũng cho thấy mô hình có khả năng phân loại khá tốt.
+
+* Theo từng nhóm, mô hình dự đoán tốt nhất đối với `Sleep Apnea` (Sensitivity = **94.74%**), tiếp đến là `None` (87.04%), trong khi `Insomnia` có Sensitivity thấp nhất (**73.68%**).
+
+* Ma trận nhầm lẫn cho thấy sai số chủ yếu xảy ra giữa hai nhóm `None` và `Insomnia`, còn `Sleep Apnea` hầu như được phân loại chính xác.
+
+#### E.4.2: Random Forest — Tập Test
+
+```{r}
+pred_rf_full <- predict(model_rf_full, newdata = test_scaled)
+cm_rf_full <- confusionMatrix(pred_rf_full, test_scaled$sleep_disorder)
+cat("Random Forest - Tập Test\n")
+print(cm_rf_full)
+```
+
+**Nhận xét**: hiệu năng mô hình Random Forest trên tập Test
+
+* Mô hình **Random Forest** đạt **Accuracy = 88.04%** (KTC 95%: 79.61%–93.88%), cao hơn **No Information Rate = 58.70%** (p < 0.001). Chỉ số **Kappa = 0.7888** cũng cao hơn mô hình Multinomial Logistic Regression, cho thấy khả năng phân loại tốt hơn.
+
+* Theo từng nhóm, mô hình dự đoán tốt nhất đối với `Sleep Apnea`* (Sensitivity = **94.74%**), tiếp đến là `None`(90.74%), trong khi `Insomnia` vẫn có Sensitivity thấp nhất (**73.68%**). Tuy nhiên, Specificity của nhóm `Insomnia` đạt **97.26%**, cao hơn so với mô hình Multinomial Logistic Regression.
+
+* Ma trận nhầm lẫn cho thấy sai số chủ yếu vẫn xảy ra giữa hai nhóm `None` và `Insomnia`, còn `Sleep Apnea` hầu như không bị nhầm lẫn với hai nhóm còn lại.
+
+## **Phụ lục F: Cơ sở lý thuyết về điểm nhân tố (Factor Score)**
+
+Điểm nhân tố (factor score) là **một giá trị số tổng hợp duy nhất**, được tính riêng cho từng quan sát (từng cá nhân trong mẫu), thể hiện vị trí của quan sát đó trên "trục ý nghĩa" của một nhân tố cụ thể. Thay vì phải nhìn vào nhiều biến gốc riêng lẻ để đánh giá một khía cạnh sức khỏe nào đó, điểm nhân tố nén toàn bộ thông tin liên quan lại thành một con số duy nhất, dựa trên đúng tỷ trọng đóng góp (hệ số tải) mà mỗi biến đã thể hiện trong mô hình EFA.
+
+Vì mô hình EFA cuối cùng của báo cáo này trích được 3 nhân tố (Giấc ngủ và Căng thẳng, Sinh lý và Huyết áp, Vận động), mỗi cá nhân trong 374 quan sát sẽ có đúng 3 điểm nhân tố tương ứng.
+
+### F.1: Công thức toán học
+
+**Bước 1. Chuẩn hóa dữ liệu gốc:**
+
+Trước khi tính điểm nhân tố, mỗi biến quan sát $x_j$ được chuyển về dạng chuẩn hóa Z-score (trung bình 0, độ lệch chuẩn 1):
+
+$$ z_{ij} = \frac{x_{ij} - \bar{x}_j}{s_j} $$
+
+trong đó $x_{ij}$ là giá trị của biến $j$ ở quan sát $i$, $\bar{x}_j$ và $s_j$ lần lượt là trung bình và độ lệch chuẩn của biến $j$. Đây chính là bước chuẩn hóa Z-score đã thực hiện ở phần tiền xử lý dữ liệu.
+
+**Bước 2. Tính ma trận hệ số điểm nhân tố (factor score coefficients):**
+
+$$ W = R^{-1} \Lambda $$
+
+trong đó $R^{-1}$ là ma trận nghịch đảo của ma trận tương quan giữa 9 biến gốc, và $\Lambda$ là ma trận hệ số tải nhân tố (chính là bảng loadings đã trình bày ở các bước trước, sau khi xoay Varimax). Đây là phương pháp hồi quy (regression method), cũng là phương pháp mặc định mà hàm `fa()` của gói `psych` sử dụng để tính `$scores`.
+
+**Bước 3. Tính điểm nhân tố:**
+
+$$ F_i = \sum_{j=1}^{9} w_j \cdot z_{ij} $$
+
+Nói cách khác, điểm nhân tố của quan sát $i$ trên một nhân tố nào đó là **tổng có trọng số** của toàn bộ 9 biến đã chuẩn hóa, trong đó trọng số $w_j$ được tính từ hệ số tải và ma trận tương quan (không đơn thuần bằng chính hệ số tải, vì cần hiệu chỉnh qua $R^{-1}$ để loại trừ phần tương quan chồng chéo giữa các biến).
+
+$$ F_{\text{GiacNgu}} \approx 0.89 \times z_{\text{sleep\_duration}} + 0.99 \times z_{\text{quality\_of\_sleep}} - 0.91 \times z_{\text{stress\_level}} - 0.67 \times z_{\text{heart\_rate}} $$
+
+Biến nào có hệ số tải càng lớn (giá trị tuyệt đối càng cao) thì càng đóng góp nhiều vào điểm nhân tố; dấu của hệ số tải quyết định biến đó kéo điểm nhân tố theo chiều dương hay âm.
+
+### F.2: Cách đọc và diễn giải điểm nhân tố
+
+Điểm nhân tố sau khi tính ra cũng có tính chất giống dữ liệu đã chuẩn hóa Z-score: trung bình xấp xỉ 0, độ lệch chuẩn xấp xỉ 1 trên toàn mẫu. Do đó, cách đọc một điểm nhân tố cụ thể của một cá nhân như sau:
+
+1.  **Điểm nhân tố bằng 0**: cá nhân đó có vị trí trung bình so với toàn mẫu trên khía cạnh mà nhân tố đó đại diện, không nổi trội theo hướng nào.
+
+2.  **Điểm nhân tố dương và càng lớn**: cá nhân đó càng nghiêng mạnh về hướng dương của nhân tố. Ví dụ với nhân tố "Giấc ngủ và Căng thẳng" (ML2), điểm càng dương thể hiện cá nhân ngủ càng lâu, chất lượng giấc ngủ càng tốt, đồng thời càng ít căng thẳng và nhịp tim càng thấp (do `stress_level` và `heart_rate` mang dấu âm trong công thức).
+
+3.  **Điểm nhân tố âm và càng nhỏ (càng âm)**: cá nhân đó càng nghiêng mạnh về hướng ngược lại. Vẫn với ví dụ trên, điểm càng âm thể hiện cá nhân ngủ ít, chất lượng giấc ngủ kém, căng thẳng cao và nhịp tim cao, tức là thuộc nhóm có hồ sơ sức khỏe giấc ngủ bất lợi.
+
+4.  Tương tự, đối với nhân tố "Sinh lý và Huyết áp" (ML3), điểm càng dương thể hiện huyết áp và tuổi càng cao; đối với nhân tố "Vận động" (ML1), điểm càng dương thể hiện mức độ vận động và số bước chân càng nhiều.
+
+Vì đơn vị đo của điểm nhân tố là "độ lệch chuẩn so với trung bình mẫu" (tương tự Z-score), không có đơn vị vật lý cụ thể (không phải giờ, không phải mmHg...), nên điểm nhân tố chỉ có ý nghĩa khi **so sánh tương đối** giữa các cá nhân với nhau hoặc giữa các nhóm với nhau (ví dụ so sánh trung bình điểm nhân tố giữa nhóm `Insomnia`, `Sleep Apnea` và `None`), chứ không nên diễn giải theo giá trị tuyệt đối.
+
+### F.3: Ví dụ minh họa cụ thể
+
+Giả sử một cá nhân có điểm nhân tố lần lượt là:
+
+| Nhân tố | Điểm số | Cách đọc |
+|:-----------------------|:----------------------:|:-----------------------|
+| Giấc ngủ và Căng thẳng | -1.5 | Thấp hơn trung bình 1.5 độ lệch chuẩn, thuộc nhóm ngủ kém, căng thẳng cao |
+| Sinh lý và Huyết áp | 0.8 | Cao hơn trung bình 0.8 độ lệch chuẩn, thuộc nhóm huyết áp/tuổi cao hơn mức trung bình |
+| Vận động | 0.1 | Xấp xỉ mức trung bình, không nổi trội về vận động |
+
+Từ ba điểm nhân tố trên, có thể phác họa hồ sơ của cá nhân như sau: người này có nguy cơ về giấc ngủ và căng thẳng (điểm nhân tố âm), đồng thời có các chỉ số sinh lý và huyết áp cao hơn mức trung bình, trong khi mức độ vận động gần tương đương với trung bình.
+
+## **Phụ lục G: Cách diễn giải chỉ số Eta-squared**
+
+Eta-squared là một chỉ số đo **độ lớn ảnh hưởng** (effect size) trong phân tích ANOVA, cho biết bao nhiêu phần trăm tổng biến thiên (phương sai) của biến phụ thuộc được giải thích bởi biến nhóm đang xét, khác với p-value chỉ cho biết sự khác biệt giữa các nhóm có ý nghĩa thống kê hay không mà không nói lên mức độ khác biệt lớn hay nhỏ.
+
+**Công thức tính:**
+
+$$ \eta^2 = \frac{SS_{\text{between}}}{SS_{\text{total}}} = \frac{SS_{\text{between}}}{SS_{\text{between}} + SS_{\text{within}}} $$
+
+trong đó $SS_{\text{between}}$ là tổng bình phương giữa các nhóm (phần biến thiên do sự khác biệt giữa các nhóm `sleep_disorder` gây ra), và $SS_{\text{within}}$ (hay còn gọi là $SS_{\text{residual}}$) là tổng bình phương trong nhóm (phần biến thiên do sai số ngẫu nhiên, không liên quan đến nhóm). Cả hai giá trị này đều có sẵn trong bảng kết quả của `summary.aov()`, ở cột `Sum Sq`.
+
+**Cách diễn giải**
+
+Eta-squared nhận giá trị từ 0 đến 1, giá trị càng gần 1 thì biến nhóm càng giải thích được nhiều phương sai của biến phụ thuộc, tức là các nhóm càng khác biệt rõ rệt. Theo quy ước phổ biến của Cohen, có thể tham khảo các ngưỡng sau khi diễn giải:
+
+| Giá trị \| Mức độ ảnh hưởng \|
+
+\|---\|---\|
+
+| khoảng 0.01 \| Nhỏ \|
+
+| khoảng 0.06 \| Trung bình \|
+
+| khoảng 0.14 trở lên \| Lớn \|
+
+Ví dụ, nếu một biến có eta-squared bằng 0.591, có thể diễn giải rằng khoảng 59.1% biến thiên của biến đó được giải thích bởi sự khác biệt giữa các nhóm `sleep_disorder`, đây là một mức ảnh hưởng rất lớn theo quy ước trên. Các giá trị eta-squared được trình bày song song với p-value, trong khi p-value cho biết sự khác biệt có ý nghĩa thống kê hay không, còn eta-squared cho biết mức độ khác biệt đó lớn hay nhỏ trong thực tế. Hai chỉ số này thường bổ sung thông tin cho nhau và tránh tình trạng chỉ dựa vào p-value có ý nghĩa (khi cỡ mẫu lớn) để kết luận rằng một biến có ảnh hưởng đến mô hình hay không.
+
+## **Phụ lục H: Tổng hợp mã nguồn R**
+
+#### Đọc dữ liệu và tiền xử lý
+
+```{r F01, eval=FALSE, echo=TRUE}
+data_raw <- read.csv("SleepHealthLifestyle.csv") %>% janitor::clean_names()
+
+sleep_data_cleaned <- data_raw %>%
+  separate(
+    blood_pressure,
+    into = c("systolic_bp", "diastolic_bp"),
+    sep = "\\s*/\\s*",
+    convert = TRUE
+  ) %>%
+  mutate(
+    gender = as.factor(gender),
+    bmi_category = as.factor(bmi_category),
+    occupation = as.factor(occupation),
+    sleep_disorder = as.factor(ifelse(is.na(sleep_disorder) | sleep_disorder == "",
+                                       "None", sleep_disorder))
+  )
+
+data <- sleep_data_cleaned %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(bmi_category, levels = c("Normal", "Overweight", "Obese"))
+  ) %>%
+  select(-person_id)
+
+data_original <- data
+```
+
+#### Kiểm tra giá trị khuyết
+
+```{r F02, eval=FALSE, echo=TRUE}
+vis_miss(data)
+```
+
+#### Kiểm tra dữ liệu trùng lặp
+
+```{r F03, eval=FALSE, echo=TRUE}
+n_trung <- data %>%
+  select(-person_id) %>%
+  duplicated() %>%
+  sum()
+n_trung
+```
+
+#### Chuẩn hóa nhãn biến phân loại `bmi_category`
+
+```{r F04, eval=FALSE, echo=TRUE}
+str(data$bmi_category)
+levels(data$bmi_category)
+```
+
+```{r F05, eval=FALSE, echo=TRUE}
+data <- data %>%
+  mutate(
+    bmi_category = case_when(
+      bmi_category %in% c("Normal Weight", "Normal") ~ "Normal",
+      TRUE ~ as.character(bmi_category)
+    ),
+    bmi_category = factor(
+      bmi_category,
+      levels = c("Normal", "Overweight", "Obese")
+    )
+  )
+```
+
+#### Thống kê mô tả
+
+```{r F06, eval=FALSE, echo=TRUE}
+data <- data %>% select(-person_id)
+str(data)
+summary(data)
+```
+
+#### Biểu đồ Boxplot
+
+```{r F07, eval=FALSE, echo=TRUE}
+bien_so <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+
+bien_so %>%
+  pivot_longer(everything(), names_to = "bien", values_to = "gia_tri") %>%
+  ggplot(aes(x = bien, y = gia_tri)) +
+  geom_boxplot(fill = "lightblue", outlier.color = "red") +
+  facet_wrap(~ bien, scales = "free", ncol = 3) +
+  coord_flip() +
+  labs(
+    title = "Boxplot các biến định lượng (chưa chuẩn hóa)",
+    x = NULL, y = "Giá trị"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+```
+
+#### Kiểm tra ngoại lai IQR
+
+```{r F08, eval=FALSE, echo=TRUE}
+dem_outlier_iqr <- function(x) {
+  q1 <- quantile(x, 0.25)
+  q3 <- quantile(x, 0.75)
+  iqr <- q3 - q1
+  sum(x < (q1 - 1.5  * iqr) | x > (q3 + 1.5 * iqr))
+}
+sapply(bien_so, dem_outlier_iqr)
+```
+
+```{r F09, eval=FALSE, echo=TRUE}
+library(dplyr)
+q1 <- quantile(data$heart_rate, 0.25, na.rm = TRUE)
+q3 <- quantile(data$heart_rate, 0.75, na.rm = TRUE)
+iqr <- q3 - q1
+lower <- q1 - 1.5 * iqr
+upper <- q3 + 1.5 * iqr
+
+hr_out <- data %>%
+  mutate(is_outlier_hr = heart_rate < lower | heart_rate > upper) %>%
+  filter(is_outlier_hr)
+
+hr_out %>%
+  summarise(
+    n_outliers = n(),
+    min_hr = min(heart_rate, na.rm = TRUE),
+    q1_hr = quantile(heart_rate, 0.25, na.rm = TRUE),
+    median_hr = median(heart_rate, na.rm = TRUE),
+    q3_hr = quantile(heart_rate, 0.75, na.rm = TRUE),
+    max_hr = max(heart_rate, na.rm = TRUE)
+  )
+```
+
+#### Chuẩn hóa các biến định lượng
+
+```{r F10, eval=FALSE, echo=TRUE}
+data <- data %>%
+  mutate(across(c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+                  stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps),
+                ~ as.numeric(scale(.))))
+
+bien_so <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+
+bien_so %>%
+  pivot_longer(everything(), names_to = "bien", values_to = "gia_tri") %>%
+  ggplot(aes(x = bien, y = gia_tri)) +
+  geom_boxplot(fill = "lightblue", outlier.color = "red") +
+  coord_flip() +
+  labs(title = "Boxplot các biến định lượng (đã chuẩn hóa)",
+       x = NULL, y = "Giá trị chuẩn hóa") +
+  theme_minimal()
+
+data_scaled <- data %>%
+  mutate(across(
+    c(age, sleep_duration, quality_of_sleep, physical_activity_level,
+      stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps),
+    ~ as.numeric(scale(.))
+  ))
+```
+
+#### Kiểm tra ngoại lai Z-score
+
+```{r F11, eval=FALSE, echo=TRUE}
+bien_so_scaled <- scale(bien_so)
+univariate_outliers <- which(abs(bien_so_scaled) > 3, arr.ind = TRUE)
+if (nrow(univariate_outliers) > 0) {
+  cat(
+    "Phát hiện", nrow(univariate_outliers),
+    "điểm dữ liệu ngoại lai đơn biến vượt ngưỡng |Z| > 3.\n"
+  )
+  print(univariate_outliers)
+} else {
+  cat("Không tìm thấy outlier đơn biến nào vượt ngưỡng |Z| > 3.\n")
+}
+```
+
+#### Kiểm tra ngoại lai Mahalanobis
+
+```{r F12, eval=FALSE, echo=TRUE}
+mu <- colMeans(bien_so)
+s_matrix <- cov(bien_so)
+p <- ncol(bien_so)
+
+d2 <- mahalanobis(x = bien_so, center = mu, cov = s_matrix)
+
+threshold <- qchisq(p = 1 - 0.001, df = p)
+cat("Ngưỡng Chi-bình phương (alpha = 0.001, df =", p, "):", round(threshold, 3), "\n")
+
+mv_outlier_index <- which(d2 > threshold)
+cat("Phát hiện", length(mv_outlier_index), "quan sát là outlier đa biến.\n")
+bien_so[mv_outlier_index, ]
+```
+
+#### Bộ dữ liệu sau tiền xử lý
+
+```{r F13, eval=FALSE, echo=TRUE}
+str(data)
+summary(data)
+```
+
+#### Ma trận tương quan và kiểm tra điều kiện PCA/EFA
+
+```{r F14, eval=FALSE, echo=TRUE}
+library(dplyr)
+library(psych)
+library(corrplot)
+
+bien_so <- data %>%
+  select(age, sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps)
+```
+
+```{r F15, eval=FALSE, echo=TRUE}
+library(dplyr)
+library(ggcorrplot)
+cor_mat <- cor(bien_so, use = "pairwise.complete.obs", method = "pearson")
+
+ggcorrplot(
+  cor_mat,
+  hc.order = TRUE,
+  type = "lower",
+  lab = TRUE,
+  lab_size = 3,
+  colors = c("#6D9EC1", "white", "#E46726"),
+  title = "Ma trận tương quan giữa các biến định lượng",
+  ggtheme = theme_minimal()
+)
+```
+
+#### KMO và Bartlett
+
+```{r F16, eval=FALSE, echo=TRUE}
+bartlett_res <- cortest.bartlett(cor_mat, n = nrow(bien_so))
+bartlett_res
+
+kmo_res <- KMO(cor_mat)
+kmo_res
+```
+
+#### Scree plot / Parallel Analysis
+
+```{r F17, eval=FALSE, echo=TRUE}
+ev <- eigen(cor_mat)$values
+scree_df <- tibble(
+  component = 1:length(ev),
+  eigenvalue = ev
+)
+
+ggplot(scree_df, aes(x = component, y = eigenvalue)) +
+  geom_line(color = "steelblue") +
+  geom_point(size = 2, color = "steelblue") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  scale_x_continuous(breaks = 1:length(ev)) +
+  labs(
+    title = "Scree plot - Eigenvalue của các thành phần",
+    x = "Thành phần (Component)", y = "Eigenvalue"
+  ) +
+  theme_minimal()
+
+fa.parallel(bien_so, fa = "both", n.iter = 100,
+            main = "Parallel Analysis - PCA & EFA")
+```
+
+#### PCA
+
+```{r F18, eval=FALSE, echo=TRUE}
+pca_result <- prcomp(bien_so, center = TRUE, scale. = TRUE)
+summary(pca_result)
+```
+
+```{r F19, eval=FALSE, echo=TRUE}
+eig_tbl <- as.data.frame(factoextra::get_eigenvalue(pca_result))
+colnames(eig_tbl) <- c("Eigenvalue", "% Phuong sai", "% Phuong sai tich luy")
+kable(eig_tbl, digits = 3,
+      caption = "Eigenvalue và tỷ lệ phương sai giải thích của 9 thành phần chính (PCA)")
+```
+
+```{r F20, eval=FALSE, echo=TRUE}
+fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 45),
+         barfill = "steelblue", barcolor = "steelblue",
+         main = "Scree Plot - Phần trăm phương sai giải thích theo từng thành phần",
+         xlab = "Thành phần chính", ylab = "% Phương sai giải thích")
+```
+
+```{r F21, eval=FALSE, echo=TRUE}
+var_pca <- factoextra::get_pca_var(pca_result)
+loadings_pca <- as.data.frame(var_pca$coord)
+colnames(loadings_pca) <- paste0("PC", 1:ncol(loadings_pca))
+kable(round(loadings_pca[, 1:3], 3),
+      caption = "Hệ số tải (loadings/coordinates) của 9 biến lên 3 thành phần chính (PCA)")
+```
+
+```{r F22, eval=FALSE, echo=TRUE}
+library(factoextra)
+library(gridExtra)
+
+p1 <- fviz_contrib(pca_result, choice = "var", axes = 1, top = 9,
+                   title = "Mức đóng góp vào PC1")
+p2 <- fviz_contrib(pca_result, choice = "var", axes = 2, top = 9,
+                   title = "Mức đóng góp vào PC2")
+p3 <- fviz_contrib(pca_result, choice = "var", axes = 3, top = 9,
+                   title = "Mức đóng góp vào PC3")
+grid.arrange(p1, p2, p3, ncol = 3)
+```
+
+```{r F23, eval=FALSE, echo=TRUE}
+fviz_pca_var(pca_result, col.var = "contrib",
+             gradient.cols = c("#2E86C1", "#F4D03F", "#E74C3C"),
+             repel = TRUE,
+             title = "Biểu đồ vòng tròn tương quan (Correlation Circle) - PCA")
+```
+
+#### K-means
+
+```{r F24, eval=FALSE, echo=TRUE}
+set.seed(123)
+fviz_nbclust(bien_so, kmeans, method = "wss", k.max = 8) +
+  labs(title = "Phương pháp Elbow - Xác định số cụm tối ưu (K-means)")
+```
+
+```{r F25, eval=FALSE, echo=TRUE}
+set.seed(123)
+km_res <- kmeans(bien_so, centers = 3, nstart = 25)
+
+fviz_pca_biplot(
+  pca_result, axes = c(1, 2),
+  geom.ind = "point",
+  col.ind = factor(km_res$cluster),
+  palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+  addEllipses = TRUE,
+  label = "var",
+  col.var = "black",
+  repel = TRUE,
+  legend.title = "Cum K-means",
+  title = "Biplot PCA (PC1-PC2) kết hợp phân cụm K-means (k=3)"
+)
+```
+
+```{r F26, eval=FALSE, echo=TRUE}
+cluster_table <- table(Cum = km_res$cluster, Sleep_Disorder = data$sleep_disorder)
+kable(as.data.frame.matrix(cluster_table),
+      caption = "Đối chiếu cụm K-means với nhóm sleep_disorder thực tế")
+```
+
+#### EFA - Varimax
+
+```{r F27, eval=FALSE, echo=TRUE}
+efa_varimax <- fa(bien_so, nfactors = 3, rotate = "varimax", fm = "ml")
+print(efa_varimax$loadings, digits = 3, cut = 0.3, sort = TRUE)
+```
+
+#### EFA - Oblimin
+
+```{r F28, eval=FALSE, echo=TRUE}
+efa_oblimin <- fa(bien_so, nfactors = 3, rotate = "oblimin", fm = "ml")
+print(efa_oblimin$loadings, digits = 3, cut = 0.3, sort = TRUE)
+
+kable(round(efa_oblimin$Phi, 2),
+      caption = "Ma trận tương quan giữa các nhân tố (Phi) - Xoay Oblimin")
+```
+
+#### EFA - Promax
+
+```{r F29, eval=FALSE, echo=TRUE}
+efa_promax <- fa(bien_so, nfactors = 3, rotate = "promax", fm = "ml")
+print(efa_promax$loadings, digits = 3, cut = 0.3, sort = TRUE)
+
+kable(round(efa_promax$Phi, 2),
+      caption = "Ma trận tương quan giữa các nhân tố (Phi) - Xoay Promax")
+```
+
+#### So sánh chỉ số phù hợp giữa các phép xoay
+
+```{r F30, eval=FALSE, echo=TRUE}
+cat("So sánh chỉ số phù hợp mô hình (bất biến qua phép xoay):\n")
+cat("Varimax : RMSEA =", round(efa_varimax$RMSEA[1],3),
+    " TLI =", round(efa_varimax$TLI,3),
+    " BIC =", round(efa_varimax$BIC,2), "\n")
+cat("Oblimin : RMSEA =", round(efa_oblimin$RMSEA[1],3),
+    " TLI =", round(efa_oblimin$TLI,3),
+    " BIC =", round(efa_oblimin$BIC,2), "\n")
+cat("Promax  : RMSEA =", round(efa_promax$RMSEA[1],3),
+    " TLI =", round(efa_promax$TLI,3),
+    " BIC =", round(efa_promax$BIC,2), "\n")
+```
+
+#### Cải thiện mô hình (loại bỏ biến age)
+
+```{r F31, eval=FALSE, echo=TRUE}
+bien_so_noage <- bien_so %>% select(-age)
+efa_noage <- fa(bien_so_noage, nfactors = 3, rotate = "varimax", fm = "ml")
+print(efa_noage$loadings, digits = 3, cut = 0.3, sort = TRUE)
+
+cat("RMSEA =", round(efa_noage$RMSEA[1],3),
+    " TLI =", round(efa_noage$TLI,3),
+    " BIC =", round(efa_noage$BIC,2), "\n")
+```
+
+#### Mô hình EFA cuối cùng
+
+```{r F32, eval=FALSE, echo=TRUE}
+efa_final <- efa_varimax
+final_loadings <- as.data.frame(unclass(efa_final$loadings))
+colnames(final_loadings) <- c("Van_dong (ML1)", 
+                              "GiacNgu_CangThang (ML2)", "SinhLy_HuyetAp (ML3)")
+kable(round(final_loadings, 2),
+      caption = "Bảng hệ số tải nhân tố - Mô hình EFA cuối cùng (3 nhân tố, Varimax)")
+
+kable(round(data.frame(Communality = efa_final$communality), 3),
+      caption = "Communality (h²) của từng biến trong mô hình EFA cuối cùng")
+```
+
+#### Điểm nhân tố
+
+```{r F33, eval=FALSE, echo=TRUE}
+factor_scores <- as.data.frame(efa_final$scores)
+colnames(factor_scores) <- c("F_GiacNgu_CangThang", "F_SinhLy_HuyetAp", "F_VanDong")
+data_with_scores <- bind_cols(data, factor_scores)
+
+kable(head(data_with_scores %>%
+             select(sleep_disorder, F_GiacNgu_CangThang, F_VanDong, F_SinhLy_HuyetAp), 6),
+      digits = 2, caption = "Ví dụ điểm nhân tố (factor scores) gắn với dữ liệu gốc")
+```
+
+#### MANOVA - Kiểm tra giả định (Levene)
+
+```{r F34, eval=FALSE, echo=TRUE}
+dv_scaled <- data_scaled %>%
+  select(sleep_duration, quality_of_sleep, physical_activity_level,
+         stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps, age)
+group <- data_scaled$sleep_disorder
+
+levene_list <- map_dfr(names(dv_scaled), function(v) {
+  res <- leveneTest(dv_scaled[[v]] ~ group)
+  tibble(bien = v, F = res$`F value`[1], p_value = res$`Pr(>F)`[1])
+})
+kable(levene_list, digits = 3,
+      caption = "Kiểm định Levene - đồng nhất phương sai theo nhóm sleep_disorder")
+```
+
+#### MANOVA - Mô hình
+
+```{r F35, eval=FALSE, echo=TRUE}
+manova_model <- manova(
+  cbind(sleep_duration, quality_of_sleep, physical_activity_level,
+        stress_level, systolic_bp, diastolic_bp, heart_rate, daily_steps, age)
+  ~ sleep_disorder,
+  data = data_scaled
+)
+summary(manova_model, test = "Pillai")
+```
+
+```{r F36, eval=FALSE, echo=TRUE}
+summary.aov(manova_model)
+```
+
+#### Eta-squared
+
+```{r F37, eval=FALSE, echo=TRUE}
+dv_names <- c("sleep_duration", "quality_of_sleep", "physical_activity_level",
+              "stress_level", "systolic_bp", "diastolic_bp", "heart_rate",
+              "daily_steps", "age")
+eta_tbl <- map_dfr(dv_names, function(v) {
+  aov_res <- aov(as.formula(paste(v, "~ sleep_disorder")), data = data_scaled)
+  es <- rstatix::eta_squared(aov_res)
+  tibble(bien = v, eta_sq = as.numeric(es))
+}) %>% arrange(desc(eta_sq))
+kable(eta_tbl, digits = 3,
+      caption = "Eta-squared (độ lớn ảnh hưởng) của sleep_disorder lên từng biến")
+```
+
+#### Trực quan hóa điểm nhân tố theo nhóm
+
+```{r F38, eval=FALSE, echo=TRUE}
+data_with_scores %>%
+  select(sleep_disorder, F_GiacNgu_CangThang, F_VanDong, F_SinhLy_HuyetAp) %>%
+  pivot_longer(-sleep_disorder, names_to = "nhan_to", values_to = "diem") %>%
+  ggplot(aes(x = sleep_disorder, y = diem, fill = sleep_disorder)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~nhan_to, scales = "free_y") +
+  labs(title = "Phân bố điểm nhân tố theo nhóm Sleep Disorder",
+       x = "Nhóm rối loạn giấc ngủ", y = "Điểm nhân tố") +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+#### Hậu kiểm Games-Howell
+
+```{r F39, eval=FALSE, echo=TRUE}
+games_howell <- function(x, group) {
+  group <- factor(group)
+  lv <- levels(group)
+  k <- length(lv)
+  means <- tapply(x, group, mean, na.rm = TRUE)
+  vars  <- tapply(x, group, var,  na.rm = TRUE)
+  ns    <- tapply(x, group, length)
+  res <- data.frame()
+  for (i in 1:(k - 1)) {
+    for (j in (i + 1):k) {
+      m1 <- means[i]; m2 <- means[j]
+      v1 <- vars[i];  v2 <- vars[j]
+      n1 <- ns[i];    n2 <- ns[j]
+      se <- sqrt(v1 / n1 + v2 / n2)
+      md <- m1 - m2
+      df <- (v1 / n1 + v2 / n2)^2 /
+        ((v1 / n1)^2 / (n1 - 1) + (v2 / n2)^2 / (n2 - 1))
+      t_stat <- abs(md) / se
+      p_val  <- ptukey(t_stat * sqrt(2), nmeans = k, df = df, lower.tail = FALSE)
+      ci_mult  <- qtukey(0.95, nmeans = k, df = df) / sqrt(2)
+      ci_lower <- md - ci_mult * se
+      ci_upper <- md + ci_mult * se
+      res <- rbind(res, data.frame(
+        Nhom_1 = lv[i], Nhom_2 = lv[j],
+        Chenh_lech_trung_binh = round(md, 3),
+        CI_95_duoi = round(ci_lower, 3),
+        CI_95_tren = round(ci_upper, 3),
+        p_value_hieu_chinh = round(p_val, 4)
+      ))
+    }
+  }
+  res
+}
+
+bien_can_hau_kiem <- c("systolic_bp", "diastolic_bp", "age", "physical_activity_level")
+gh_results <- lapply(bien_can_hau_kiem, function(v) {
+  res <- games_howell(data_scaled[[v]], data_scaled$sleep_disorder)
+  res$Bien <- v
+  res
+})
+gh_all <- do.call(rbind, gh_results)
+gh_all <- gh_all[, c("Bien", "Nhom_1", "Nhom_2", "Chenh_lech_trung_binh",
+                      "CI_95_duoi", "CI_95_tren", "p_value_hieu_chinh")]
+knitr::kable(gh_all, 
+  caption = "Kết quả hậu kiểm Games-Howell cho các biến có eta-squared cao nhất")
+```
+
+#### Mô hình dự đoán - Chuẩn bị thư viện và dữ liệu
+
+```{r F40, eval=FALSE, echo=TRUE}
+library(tidyverse)
+library(janitor)
+library(caret)
+library(randomForest)
+library(nnet)
+library(psych)
+library(pROC)
+library(knitr)
+```
+
+#### Chọn biến và chia tập Train/Test
+
+```{r F41, eval=FALSE, echo=TRUE}
+model_data <- data_original %>%
+  select(
+    gender, age, occupation, sleep_duration, quality_of_sleep,
+    physical_activity_level, stress_level, bmi_category,
+    systolic_bp, diastolic_bp, heart_rate, daily_steps,
+    sleep_disorder
+  )
+levels(model_data$sleep_disorder) <- make.names(levels(model_data$sleep_disorder))
+str(model_data)
+
+set.seed(2024)
+train_index <- createDataPartition(model_data$sleep_disorder, p = 0.75, list = FALSE)
+train_data <- model_data[train_index, ]
+test_data  <- model_data[-train_index, ]
+
+cat("Số quan sát tập train:", nrow(train_data), "\n")
+cat("Số quan sát tập test :", nrow(test_data), "\n")
+
+split_check <- bind_rows(
+  train_data %>% count(sleep_disorder) %>% mutate(Tap = "Train"),
+  test_data  %>% count(sleep_disorder) %>% mutate(Tap = "Test")
+) %>% pivot_wider(names_from = Tap, values_from = n)
+```
+
+#### Chuẩn hóa dữ liệu cho mô hình
+
+```{r F42, eval=FALSE, echo=TRUE}
+numeric_vars <- c("age", "sleep_duration", "quality_of_sleep", "physical_activity_level",
+                   "stress_level", "systolic_bp", "diastolic_bp", "heart_rate", "daily_steps")
+preproc_params <- preProcess(train_data[, numeric_vars], method = c("center", "scale"))
+train_scaled <- train_data
+test_scaled  <- test_data
+train_scaled[, numeric_vars] <- predict(preproc_params, train_data[, numeric_vars])
+test_scaled[, numeric_vars]  <- predict(preproc_params, test_data[, numeric_vars])
+
+kable(head(train_scaled[, numeric_vars], 5), digits = 2,
+      caption = "5 dòng đầu của các biến định lượng sau chuẩn hóa (tập train)")
+```
+
+#### Thiết lập Cross-Validation
+
+```{r F43, eval=FALSE, echo=TRUE}
+train_control <- trainControl(
+  method = "cv",
+  number = 5,
+  classProbs = TRUE,
+  summaryFunction = multiClassSummary,
+  savePredictions = "final"
+)
+```
+
+#### Multinomial Logistic Regression
+
+```{r F44, eval=FALSE, echo=TRUE}
+set.seed(2024)
+model_multinom_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "multinom",
+  trControl = train_control,
+  metric = "Accuracy",
+  trace = FALSE
+)
+
+model_multinom_full
+```
+
+#### Random Forest
+
+```{r F45, eval=FALSE, echo=TRUE}
+set.seed(2024)
+model_rf_full <- train(
+  sleep_disorder ~ ., data = train_scaled,
+  method = "rf",
+  trControl = train_control,
+  metric = "Accuracy",
+  importance = TRUE
+)
+
+model_rf_full
+```
+
+#### So sánh 2 mô hình
+
+```{r F46, eval=FALSE, echo=TRUE}
+resamples_full <- resamples(list(
+  Multinomial_Logistic = model_multinom_full,
+  Random_Forest = model_rf_full
+))
+summary_stats_full <- summary(resamples_full)$statistics[c("Accuracy", "Kappa")]
+
+kable(round(summary_stats_full$Accuracy, 4),
+      caption = "So sánh Accuracy (5-fold CV) - Mô hình dùng 9 biến gốc")
+
+dotplot(resamples_full, metric = "Accuracy",
+        main = "So sánh Accuracy giữa 2 mô hình (5-fold Cross-Validation) - Dùng 9 biến gốc")
+
+kable(round(summary_stats_full$Kappa, 4),
+      caption = "So sánh Kappa (5-fold CV) - Mô hình dùng 9 biến gốc")
+
+dotplot(resamples_full, metric = "Kappa",
+        main = "So sánh Kappa giữa 2 mô hình (5-fold Cross-Validation) - Dùng 9 biến gốc")
+```
+
+#### Đánh giá trên tập Test
+
+```{r F47, eval=FALSE, echo=TRUE}
+pred_multinom_full <- predict(model_multinom_full, newdata = test_scaled)
+cm_multinom_full <- confusionMatrix(pred_multinom_full, test_scaled$sleep_disorder)
+
+pred_rf_full <- predict(model_rf_full, newdata = test_scaled)
+cm_rf_full <- confusionMatrix(pred_rf_full, test_scaled$sleep_disorder)
+
+cat("Multinomial Logistic Regression - Tập Test\n")
+print(cm_multinom_full)
+
+cat("Random Forest - Tập Test\n")
+print(cm_rf_full)
+```
+
+```{r F48, eval=FALSE, echo=TRUE}
+prob_multinom_full <- predict(model_multinom_full, newdata = test_scaled, type = "prob")
+roc_multinom_full <- multiclass.roc(test_scaled$sleep_disorder, prob_multinom_full)
+
+prob_rf_full <- predict(model_rf_full, newdata = test_scaled, type = "prob")
+roc_rf_full <- multiclass.roc(test_scaled$sleep_disorder, prob_rf_full)
+
+cat("Multi-class AUC (Multinomial Logistic, tập test):",
+    round(as.numeric(roc_multinom_full$auc), 4), "\n")
+cat("Multi-class AUC (Random Forest, tập test)       :",
+    round(as.numeric(roc_rf_full$auc), 4), "\n")
+```
+
+#### Mức độ quan trọng của biến (Random Forest)
+
+```{r F49, eval=FALSE, echo=TRUE}
+var_importance_full <- varImp(model_rf_full)
+plot(var_importance_full, top = 12,
+     main = "Mức độ quan trọng của biến - Random Forest (Top 12, dùng 9 biến gốc)")
+```
+
+\baibox{Bài 2: Dataset "StudentHabitsPerformance.csv"}
+
+## **Phụ lục A: Giới thiệu bộ dữ liệu**
+
+Bộ dữ liệu **"StudentHabitsPerformance.csv"** được lấy từ nguồn Kaggle. Bộ dữ liệu này được xây dựng nhằm mục đích nghiên cứu mối quan hệ giữa các thói quen sinh hoạt, lối sống và kết quả học tập của sinh viên.
+
+Bộ dữ liệu bao gồm 1000 quan sát và 16 biến. Dưới đây là thông tin chi tiết của từng biến trong tập dữ liệu:
+
+1.  **student_id**: Mã định danh sinh viên.
+2.  **age**: Tuổi.
+3.  **gender**: Giới tính.
+4.  **study_hours_per_day**: Thời gian học trung bình mỗi ngày (giờ).
+5.  **social_media_hours**: Thời gian sử dụng mạng xã hội mỗi ngày (giờ).
+6.  **netflix_hours**: Thời gian xem Netflix mỗi ngày (giờ).
+7.  **part_time_job**: Sinh viên có làm thêm hay không (Yes/No).
+8.  **attendance_percentage**: Tỷ lệ chuyên cần (%).
+9.  **sleep_hours**: Thời gian ngủ trung bình mỗi ngày (giờ).
+10. **diet_quality**: Chất lượng chế độ ăn uống.
+11. **exercise_frequency**: Tần suất tập thể dục (buổi/tuần).
+12. **parental_education_level**: Trình độ học vấn của cha mẹ.
+13. **internet_quality**: Chất lượng kết nối Internet.
+14. **mental_health_rating**: Mức độ sức khỏe tinh thần (Thang điểm 1–10).
+15. **extracurricular_participation**: Tham gia hoạt động ngoại khóa (Yes/No).
+16. **exam_score**: Điểm thi cuối kỳ của sinh viên.
+
+## **Phụ lục B: Khám phá và tiền xử lí dữ liệu**
+
+```{r}
+load("Nhom4_DoAnCuoiKi.RData")
+```
+
+### B.1: Kiểm tra cấu trúc dữ liệu
+
+```{r}
+str(data)
+```
+
+**Nhận xét:**
+
+-   **Biến định danh (Identifier):** `student_id`. Biến này chỉ dùng để định danh, không mang ý nghĩa thống kê nên ta sẽ loại bỏ khỏi mô hình trong quá trình phân tích.
+
+-   **Nhóm biến định lượng:** `age`, `study_hours_per_day`, `social_media_hours`, `netflix_hours`, `attendance_percentage`, `sleep_hours`, `exercise_frequency`, `mental_health_rating`, và `exam_score`.
+
+-   **Nhóm biến định tính:** `gender`, `part_time_job`, `diet_quality`, `parental_education_level`, `internet_quality`, `extracurricular_participation`.
+
+### B.2: Box-plot dữ liệu gốc và dữ liệu sau chuẩn hóa
+
+```{r, echo = FALSE}
+numeric_vars <- data_clean %>%
+  select(where(is.numeric))
+
+# Chuẩn hóa
+numeric_vars_scaled <- scale(numeric_vars)
+numeric_vars_scaled <- as.data.frame(numeric_vars_scaled)
+
+par(mfrow = c(1, 2), mar = c(8, 4, 4, 2))
+
+# Trước chuẩn hóa
+boxplot(numeric_vars,
+        main = "Trước chuẩn hóa",
+        col = "lightcoral",
+        las = 2,
+        cex.axis = 0.8)
+
+# Sau chuẩn hóa
+boxplot(numeric_vars_scaled,
+        main = "Sau chuẩn hóa (Z-score)",
+        col = "lightgreen",
+        las = 2,
+        cex.axis = 0.8)
+
+par(mfrow = c(1,1))
+```
+
+**Nhận xét:** Boxplot cho thấy trước khi chuẩn hóa, các biến có thang đo rất khác nhau. Các biến như `attendance_percentage` và `exam_score` có khoảng giá trị lớn hơn đáng kể so với các biến còn lại, khiến sự phân bố của các biến nhỏ khó quan sát và có thể làm chúng bị chi phối trong các phương pháp dựa trên phương sai như PCA và EFA.
+
+Sau khi chuẩn hóa bằng **Z-score**, tất cả các biến đều được đưa về cùng thang đo với trung bình bằng 0 và độ lệch chuẩn bằng 1, giúp việc so sánh giữa các biến trở nên trực quan hơn và đảm bảo mỗi biến có mức độ đóng góp công bằng trong quá trình phân tích. Bên cạnh đó, một số giá trị ngoại lai vẫn được giữ lại ở các biến như `study_hours_per_day`, `social_media_hours`, `netflix_hours`, `attendance_percentage`, `sleep_hours` và `exam_score`. Điều này là phù hợp vì chuẩn hóa chỉ thay đổi thang đo của dữ liệu, không làm thay đổi vị trí tương đối hay loại bỏ các giá trị ngoại lai.
+
+### B.3: Kiểm tra và xử lí ngoại lai đơn biến:
+
+Ngoại lai đơn biến là những giá trị cực đoan khi xét trên từng biến riêng lẻ. Để phát hiện, ta sử dụng điểm chuẩn hóa Z-score, các quan sát có điểm chuẩn hóa vượt quá ngưỡng $|Z| > 3$ sẽ được đánh dấu là ngoại lai đơn biến.
+
+```{r}
+numeric_vars <- data_clean %>%
+  select(where(is.numeric))
+
+# Chuẩn hóa
+numeric_vars_scaled <- scale(numeric_vars)
+numeric_vars_scaled <- as.data.frame(numeric_vars_scaled)
+univariate_outliers <- which(abs(numeric_vars_scaled) > 3, arr.ind = TRUE)
+# Hiển thị kết quả kiểm tra
+if (nrow(univariate_outliers) > 0) {
+  cat("Phát hiện", nrow(univariate_outliers), 
+      "điểm dữ liệu ngoại lai đơn biến vượt ngưỡng |Z| > 3.\n")
+  print(univariate_outliers)
+} else {
+  cat("Không tìm thấy outlier đơn biến nào vượt ngưỡng |Z| > 3.\n")
+}
+```
+
+**Nhận xét:** Kết quả phát hiện 8 giá trị ngoại lai đơn biến vượt ngưỡng (\|Z\|\>3), chiếm tỷ lệ rất nhỏ (0.8%) trong tổng số 1.000 quan sát. Các điểm ngoại lai xuất hiện rải rác ở các biến `study_hours_per_day`, `social_media_hours`, `netflix_hours` và `exam_score`, phản ánh một số sinh viên có hành vi hoặc kết quả học tập khác biệt đáng kể so với mặt bằng chung.
+
+Do dữ liệu về hành vi con người thường có tính đa dạng cao, các giá trị này vẫn có thể là những quan sát thực tế và không nhất thiết là sai lệch dữ liệu. Vì vậy, nhóm tạm thời giữ lại các quan sát này và sẽ tiếp tục đánh giá ngoại lai đa biến bằng khoảng cách Mahalanobis trước khi đưa ra quyết định loại bỏ cuối cùng.
+
+### B.4: Kiểm tra và xử lí ngoại lai đa biến
+
+```{r}
+# Tính vector trung bình (mu) và ma trận hiệp phương sai (S) từ dữ liệu gốc
+mu <- colMeans(numeric_vars)
+s_matrix <- cov(numeric_vars)
+p <- ncol(numeric_vars) # Số biến định lượng (Bậc tự do)
+
+# Tính khoảng cách Mahalanobis cho từng quan sát
+d2 <- mahalanobis(x = numeric_vars, center = mu, cov = s_matrix)
+
+# Xác định ngưỡng Chi-bình phương với alpha = 0.001
+threshold <- qchisq(p = 1 - 0.001, df = p)
+cat("Ngưỡng Chi-bình phương (alpha = 0.001, df =", p, "):", round(threshold, 3), "\n")
+
+# Tìm các quan sát vượt ngưỡng
+mv_outlier_index <- which(d2 > threshold)
+
+cat("Phát hiện", length(mv_outlier_index), "quan sát là outlier đa biến.\n")
+numeric_vars[mv_outlier_index, ]
+```
+
+**Nhận xét:** Kết quả phân tích khoảng cách Mahalanobis với mức ý nghĩa $\alpha=0.001$ phát hiện 3 quan sát ngoại lai đa biến trong tổng số 1000 quan sát. Sau khi kiểm tra chi tiết các quan sát này, nhận thấy các giá trị của từng biến đều nằm trong phạm vi hợp lý và không có dấu hiệu sai sót hoặc nhập liệu bất thường. Các quan sát bị phát hiện chủ yếu do sở hữu tổ hợp đặc điểm học tập và sinh hoạt nổi bật (thời gian học cao, tỷ lệ chuyên cần cao, sức khỏe tinh thần tốt và điểm thi đạt mức tối đa), khiến chúng khác biệt so với phần lớn sinh viên còn lại trong không gian đa chiều. Do số lượng ngoại lai rất nhỏ (0,3% tổng mẫu) và vẫn mang ý nghĩa thực tiễn, nhóm quyết định giữ lại các quan sát này để đảm bảo phản ánh đầy đủ sự đa dạng của dữ liệu và tránh làm mất các trường hợp có giá trị nghiên cứu.
+
+### B.5: Ma trận tương quan
+
+```{r, echo = FALSE}
+numeric_vars <- data_clean %>%
+  select(where(is.numeric))
+numeric_vars_final <- data_final %>% select(where(is.numeric))
+
+# Tính toán ma trận tương quan
+cor_matrix <- cor(numeric_vars_final)
+
+# Vẽ ma trận tương quan
+corrplot(cor_matrix, 
+         method = "circle", 
+         type = "upper", 
+         tl.col = "black", 
+         tl.srt = 45, 
+         tl.cex = 0.8,
+         addCoef.col = "black", # Hiển thị hệ số tương quan
+         number.cex = 0.6,      # Kích thước chữ của hệ số
+         col = colorRampPalette(c("red", "white", "blue"))(200),
+         title = "Ma trận tương quan giữa các biến định lượng", 
+         mar = c(0, 0, 1, 0))
+```
+
+**Nhận xét:** Ma trận tương quan cho thấy phần lớn các biến định lượng có mức tương quan rất yếu với nhau, với hệ số tương quan chủ yếu dao động quanh 0. Điều này cho thấy các khía cạnh về thói quen sinh hoạt của sinh viên (tuổi, thời gian sử dụng mạng xã hội, thời gian xem Netflix, thời gian ngủ, tần suất tập thể dục,...) tương đối độc lập và không có mối liên hệ tuyến tính mạnh.
+
+Tuy nhiên, một số mối tương quan đáng chú ý vẫn xuất hiện. Biến **study_hours_per_day** có tương quan dương rất mạnh với **exam_score** (r = 0.83), cho thấy thời gian học tập hàng ngày có mối liên hệ chặt chẽ với kết quả học tập. Bên cạnh đó, **mental_health_rating** có tương quan dương mức trung bình với **exam_score** (r = 0.32), trong khi **social_media_hours** và **netflix_hours** có tương quan âm yếu với **exam_score** (r ≈ -0.17). Điều này cho thấy sinh viên dành nhiều thời gian hơn cho học tập và có sức khỏe tinh thần tốt thường đạt kết quả học tập cao hơn, trong khi thời gian dành cho giải trí trực tuyến có xu hướng làm giảm kết quả học tập.
+
+Nhìn chung, ma trận tương quan chưa cho thấy sự tồn tại rõ ràng của các nhóm biến có tương quan mạnh với nhau. Do đó, cần thực hiện thêm các kiểm định chuyên biệt như **KMO** và **Bartlett's Test** để đánh giá mức độ phù hợp của dữ liệu trước khi quyết định có nên PCA hoặc EFA.
+
+### B.6: Kiểm định Bartlett
+
+**Đặt giả thuyết:**
+
+-   $H_0$**:** Ma trận tương quan là ma trận đơn vị (Các biến hoàn toàn độc lập, không có tương quan)
+
+-   $H_1$**:** Ma trận tương quan khác ma trận đơn vị (Các biến có tương quan với nhau)
+
+```{r}
+cortest.bartlett(cor(numeric_vars),
+                 n = nrow(numeric_vars))
+```
+
+**Nhận xét:** Kết quả kiểm định Bartlett cho giá trị thống kê χ² = **2314.715** với **df = 36** và **p-value ≈ 0** (nhỏ hơn 0.05 rất nhiều).
+
+Do p-value \< 0.05, bác bỏ giả thuyết H₀ rằng ma trận tương quan là ma trận đơn vị. Điều này cho thấy giữa các biến tồn tại tương quan tuyến tính có ý nghĩa thống kê và dữ liệu không hoàn toàn độc lập.
+
+Nói cách khác, xét riêng theo kiểm định Bartlett, dữ liệu đáp ứng điều kiện cần để xem xét áp dụng PCA hoặc EFA.
+
+### B.7: Kiểm định KMO
+
+```{r}
+KMO(cor(numeric_vars))
+```
+
+**Nhận xét:** Kết quả kiểm định KMO cho thấy hệ số KMO tổng thể (Overall MSA) chỉ đạt 0.17, thấp hơn rất nhiều so với ngưỡng chấp nhận tối thiểu 0.5. Đồng thời, hầu hết các biến đều có chỉ số MSA riêng nhỏ hơn 0.5, cho thấy các biến định lượng trong bộ dữ liệu hầu như không chia sẻ phương sai chung và mức độ tương quan giữa chúng là rất thấp.
+
+Mặc dù kiểm định Bartlett có ý nghĩa thống kê, kết quả này có thể chịu ảnh hưởng bởi cỡ mẫu lớn (N=1000), khiến kiểm định nhạy với cả những tương quan rất nhỏ. Theo tiêu chuẩn của Kaiser, KMO = 0.17 được xếp vào mức "không thể chấp nhận", cho thấy dữ liệu không phù hợp để thực hiện phân tích nhân tố.
+
+Vì lý do này, **nhóm quyết định không áp dụng cả Phân tích nhân tố khám phá (EFA) lẫn Phân tích thành phần chính (PCA) cho tập dữ liệu này**. Cụ thể:
+
+-   **Đối với EFA:** Dữ liệu không có cấu trúc tương quan đủ mạnh để trích xuất các nhân tố tiềm ẩn có ý nghĩa.
+
+-   **Đối với PCA:** Mức độ tương quan thấp giữa các biến khiến việc giảm chiều dữ liệu không đạt hiệu quả.
+
+### B.8: Trực quan hóa bằng Scree-plot
+
+```{r, echo = FALSE}
+# Tính ma trận tương quan 
+numeric_vars_final <- data_final %>% select(where(is.numeric))
+r_matrix <- cor(numeric_vars_final)
+
+# Phân rã Eigenvalue (Trị riêng) từ ma trận tương quan
+eigen_decomp <- eigen(r_matrix)
+eigenvalues <- eigen_decomp$values
+
+# Vẽ biểu đồ Scree Plot
+plot(eigenvalues, type = "b", 
+     main = "Biểu đồ Scree Plot xác định số lượng nhân tố", 
+     xlab = "Số lượng nhân tố (Components)", 
+     ylab = "Trị riêng (Eigenvalue)", 
+     pch = 19, col = "#2166AC", lwd = 1.5)
+
+# Đường tham chiếu cho ngưỡng Kaiser (Eigenvalue = 1)
+abline(h = 1, lty = 2, col = "red", lwd = 2)
+legend("topright", legend = "Ngưỡng Kaiser (Eigenvalue = 1)", 
+       lty = 2, col = "red", lwd = 2, cex = 0.8)
+
+# Bảng giá trị Eigenvalue và tỷ lệ phương sai giải thích
+variance_explained <- eigenvalues / sum(eigenvalues) * 100
+cum_variance <- cumsum(variance_explained)
+
+eigen_table <- data.frame(
+  Nhan_to = 1:length(eigenvalues),
+  Eigenvalue = round(eigenvalues, 3),
+  Phuong_sai_pct = round(variance_explained, 2),
+  Tich_luy_pct = round(cum_variance, 2)
+)
+print(eigen_table)
+```
+
+**Nhận xét:** Biểu đồ Scree Plot không xuất hiện **điểm khuỷu (elbow)** rõ ràng, cho thấy không có một số ít thành phần chính nổi trội để đại diện cho toàn bộ dữ liệu. Theo tiêu chuẩn **Kaiser**, cần giữ lại **5 thành phần chính** (Eigenvalue \> 1), với tổng phương sai tích lũy đạt **67.88%**, nghĩa là vẫn phải duy trì hơn một nửa số chiều ban đầu.
+
+Bên cạnh đó, các Eigenvalue từ **PC2 đến PC8** có giá trị khá gần nhau, phản ánh lượng thông tin giữa các thành phần này không khác biệt đáng kể. Điều này cho thấy cấu trúc tương quan của dữ liệu chưa đủ mạnh để PCA giảm chiều hiệu quả, do đó **PCA không phải là phương pháp tối ưu đối với bộ dữ liệu này**.
+
+## **Phụ lục C: Bài toán One-way Manova**
+
+### C.1: Sàng lọc và xác định biến nghiên cứu
+
+Bộ dữ liệu bao gồm nhiều biến phân loại có khả năng ảnh hưởng đến kết quả học tập của sinh viên, bao gồm: `gender`; `part_time_job`; `diet_quality`; `parental_education_level`; `internet_quality`; `extracurricular_participation`. Trước khi xây dựng mô hình MANOVA chính thức, nhóm thực hiện bước khảo sát sơ bộ nhằm đánh giá mức độ ảnh hưởng của từng biến phân loại đến bộ ba chỉ tiêu học tập gồm: `study_hours_per_day`; `attendance_percentage`; `exam_score`. Đối với từng biến phân loại, nhóm thực hiện một kiểm định One-way MANOVA độc lập.
+
+Do nghiên cứu thực hiện đồng thời sáu kiểm định MANOVA, việc sử dụng cùng mức ý nghĩa ( $\alpha = 0.05$) cho từng kiểm định riêng lẻ có thể làm gia tăng xác suất mắc sai lầm loại I trên toàn bộ họ kiểm định (Family-Wise Error Rate – FWER). Để kiểm soát sai lầm loại I tích lũy, nghiên cứu áp dụng hiệu chỉnh Bonferroni với mức ý nghĩa: $\alpha^*=\frac{0.05}{6}=0.0083.$
+
+#### C.1.1: Kiểm định MANOVA sơ bộ cho các biến độc lập
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Biến độc lập đang xét không ảnh hưởng đến vector trung bình của các biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`).
+
+-   $H_1$: Biến độc lập đang xét có ảnh hưởng đến ít nhất một thành phần của vector trung bình trên.
+
+```{r, echo = FALSE}
+library(knitr)
+
+factor_vars <- c(
+  "gender",
+  "part_time_job",
+  "diet_quality",
+  "parental_education_level",
+  "internet_quality",
+  "extracurricular_participation"
+)
+
+alpha_bonf <- 0.05 / length(factor_vars)
+
+result <- data.frame()
+
+for(v in factor_vars){
+
+  fit <- manova(
+    as.formula(
+      paste(
+        "cbind(study_hours_per_day,
+               attendance_percentage,
+               exam_score) ~", v
+      )
+    ),
+    data = data_final
+  )
+
+  pillai <- summary(fit, test = "Pillai")$stats
+  wilks  <- summary(fit, test = "Wilks")$stats
+
+  p_wilks <- wilks[1, "Pr(>F)"]
+
+  result <- rbind(
+    result,
+    data.frame(
+      `Biến độc lập` = v,
+      `Pillai's Trace` = round(pillai[1, "Pillai"], 4),
+      `p-value (Pillai)` = round(pillai[1, "Pr(>F)"], 4),
+      `Wilks' Lambda` = round(wilks[1, "Wilks"], 4),
+      `p-value (Wilks)` = round(p_wilks, 4),
+      `Kết luận` = ifelse(
+        p_wilks < alpha_bonf,
+        "Bác bỏ H₀",
+        "Không bác bỏ H₀"
+      ),
+      check.names = FALSE
+    )
+  )
+}
+
+kable(
+  result,
+  align = c("l","c","c","c","c","c"),
+  digits = 4,
+  caption = paste0(
+    "Kết quả kiểm định MANOVA sơ bộ (mức ý nghĩa hiệu chỉnh Bonferroni α* = ",
+    round(alpha_bonf, 4), ")"
+  )
+)
+```
+
+**Nhận xét:**
+
+Với mức ý nghĩa hiệu chỉnh Bonferroni ( $\alpha^*=0.0083$). Kết quả kiểm định MANOVA sơ bộ theo **Pillai's Trace** và **Wilks' Lambda** cho thấy hai thống kê đều đưa ra kết luận nhất quán. Trong sáu biến độc lập được xem xét, chỉ có **`parental_education_level`** có ảnh hưởng có ý nghĩa thống kê đến vector trung bình của ba biến phụ thuộc (`study_hours_per_day`, `attendance_percentage`, `exam_score`) với **p-value = 0.0062 \< 0.0083**. Các biến còn lại đều có **p-value \> 0.0083**, nên chưa có đủ bằng chứng để kết luận rằng chúng ảnh hưởng đến vector trung bình của các biến phụ thuộc.
+
+### C.2: Kiểm tra phân phối chuẩn 1 chiều
+
+**Đặt giả thuyết:**
+
+-   $H_0$: Dữ liệu của biến đang xét trong nhóm tuân theo phân phối chuẩn.
+
+-   $H_1$: Dữ liệu của biến đang xét trong nhóm không tuân theo phân phối chuẩn.
+
+```{r}
+kiem_dinh_1_chieu <- manova_data %>%
+  group_by(parental_education_level) %>%
+  shapiro_test(
+    study_hours_per_day,
+    attendance_percentage,
+    exam_score
+  ) %>%
+  arrange(variable)
+
+print(kiem_dinh_1_chieu, n = 20)
+```
+
+**Nhận xét:** Kết quả kiểm định Shapiro–Wilk cho thấy biến **study_hours_per_day** có p-value lớn hơn 0.05 ở cả bốn nhóm trình độ học vấn của cha mẹ, do đó chưa có bằng chứng cho thấy biến này vi phạm giả định phân phối chuẩn một chiều.
+
+-   Đối với biến **attendance_percentage**, p-value của cả bốn nhóm đều nhỏ hơn 0.05, cho thấy phân phối của biến này khác phân phối chuẩn.
+
+-   Đối với biến **exam_score**, hai nhóm Bachelor và High School có p-value nhỏ hơn 0.05, trong khi hai nhóm Master và None có p-value lớn hơn 0.05.
+
+Như vậy, giả định phân phối chuẩn một chiều không được thỏa mãn hoàn toàn ở tất cả các biến và nhóm. Tuy nhiên, kết quả kiểm định Shapiro–Wilk nhiều chiều cho thấy dữ liệu không vi phạm giả định phân phối chuẩn nhiều chiều. Đồng thời, cỡ mẫu của các nhóm đều tương đối lớn (n ≥ 91), nên theo **Định lý giới hạn trung tâm**, phân phối mẫu của các thống kê vẫn xấp xỉ chuẩn, giúp giảm mức độ ảnh hưởng của sai lệch chuẩn hóa đơn biến. Vì vậy, MANOVA vẫn có thể được áp dụng ở các bước tiếp theo.
+
+## **Phụ lục D: Hồi quy tuyến tính bội**
+
+### D.1: Mã hóa dữ liệu
+
+Đối với các biến định tính, mô hình hồi quy tuyến tính không thể sử dụng trực tiếp nên các biến này được chuyển đổi thành biến giả (dummy variables). Các biến cần mã hóa bao gồm:
+
+-   `gender`
+
+-   `parental_education_level`
+
+-   `diet_quality`
+
+-   `internet_quality`
+
+-   `part_time_job`
+
+```{r}
+str(data)
+```
+
+**Nhận xét:** Các biến định tính đã được chuyển sang kiểu `factor` để R tự động mã hóa thành các biến giả (dummy variables) khi xây dựng mô hình hồi quy tuyến tính bội.
+
+### D.2: Thống kê mô tả
+
+```{r}
+summary(data)
+```
+
+**Nhận xét:** Các biến định lượng như `study_hours_per_day`, `attendance_percentage`, `sleep_hours`, `social_media_hours`, `netflix_hours`, `mental_health_rating` và `exam_score` đều có độ biến thiên tương đối lớn, cho thấy sự khác biệt giữa các sinh viên và phù hợp để phân tích hồi quy. Bên cạnh đó, các biến định tính như `gender`, `parental_education_level`, `diet_quality`, `internet_quality` và `part_time_job` có sự phân bố ở nhiều nhóm, tạo điều kiện để đánh giá ảnh hưởng của từng nhóm thông qua các biến giả.
+
+### D.3: Xây dựng mô hình hồi quy tuyến tính bội
+
+Mô hình hồi quy tổng quát được biểu diễn như sau:
+
+$$ \begin{aligned} \text{exam\_score} &= \beta_0 + \beta_1(\text{age}) + \beta_2(\text{gender}) + \beta_3(\text{study\_hours\_per\_day}) \\ &\quad + \beta_4(\text{social\_media\_hours}) + \beta_5(\text{netflix\_hours}) + \beta_6(\text{attendance\_percentage}) \\ &\quad + \beta_7(\text{sleep\_hours}) + \beta_8(\text{diet\_quality}) + \beta_9(\text{exercise\_frequency}) \\ &\quad + \beta_{10}(\text{mental\_health\_rating}) + \beta_{11}(\text{extracurricular\_participation}) \\ &\quad + \beta_{12}(\text{parental\_education\_level}) + \beta_{13}(\text{internet\_quality}) + \beta_{14}(\text{part\_time\_job}) + \varepsilon. \end{aligned} $$
+
+Trong đó:
+
+-   $\beta_0$: hệ số chặn.
+-   $\beta_i$: hệ số hồi quy của các biến độc lập.
+-   $\varepsilon$: sai số ngẫu nhiên.
+
+### D.4: Kiểm tra đa cộng tuyến
+
+```{r}
+vif(model_full)
+```
+
+**Nhận xét:** Kết quả kiểm tra hệ số phóng đại phương sai (VIF) cho thấy tất cả các biến độc lập đều có giá trị GVIF\^(1/(2\*Df) xấp xỉ 1 và đều nhỏ hơn 5. Điều này cho thấy không có hiện tượng đa cộng tuyến đáng kể giữa các biến độc lập. Do đó, các hệ số hồi quy có thể được ước lượng ổn định và toàn bộ các biến độc lập được giữ lại để tiếp tục phân tích.
+
+### D.5: Kiểm tra phân phối chuẩn của phần dư (Normality of Residuals)
+
+**Giả thuyết**
+
+$H_0$: Phần dư tuân theo phân phối chuẩn.
+
+$H_1$: Phần dư không tuân theo phân phối chuẩn.
+
+```{r}
+# Lấy phần dư
+res <- residuals(model_full)
+
+# Histogram
+hist(res,
+     main = "Histogram of Residuals",
+     xlab = "Residuals")
+
+# QQ Plot
+qqnorm(res)
+qqline(res, col = "red")
+
+# Shapiro-Wilk Test
+shapiro.test(res)
+```
+
+**Nhận xét:** Histogram của phần dư có dạng gần giống phân phối chuẩn, tập trung quanh giá trị 0 và có dạng chuông tương đối đối xứng. Biểu đồ Q-Q Plot cho thấy hầu hết các điểm nằm sát đường thẳng tham chiếu, chỉ xuất hiện một số sai lệch nhẹ ở hai đuôi phân phối. Mặc dù kiểm định Shapiro–Wilk cho kết quả p=0.001841\<0.05, cho thấy phần dư không hoàn toàn tuân theo phân phối chuẩn, nhưng với cỡ mẫu lớn (n=1000), kiểm định này rất nhạy với những sai lệch nhỏ. Do đó, dựa trên hai biểu đồ trực quan, có thể kết luận giả định phân phối chuẩn của phần dư được **thỏa mãn ở mức chấp nhận được**, đủ điều kiện để tiếp tục phân tích hồi quy.
+
+### D.6: Kiểm tra phương sai không đổi (Homoscedasticity)
+
+**Giả thuyết:**
+
+$H_0$: Phương sai của sai số là không đổi
+
+$H_1$: Phương sai của sai số thay đổi
+
+```{r}
+plot(model_full, which = 1)
+
+# Breusch-Pagan Test
+library(lmtest)
+
+bptest(model_full)
+```
+
+**Nhận xét:** Biểu đồ **Residuals vs Fitted** cho thấy phần dư phân bố ngẫu nhiên xung quanh đường ngang tại giá trị 0, không xuất hiện dạng hình phễu hay xu hướng rõ rệt. Mặc dù có một số điểm ngoại lệ ở vùng giá trị dự đoán lớn, nhưng chúng không làm thay đổi đáng kể xu hướng chung của phần dư. Bên cạnh đó, kiểm định **Breusch–Pagan** cho kết quả p=0.6972\>0.05, nên không có đủ bằng chứng để bác bỏ giả thuyết phương sai sai số không đổi. Do đó, có thể kết luận giả định **đồng nhất phương sai (homoscedasticity)** của mô hình được thỏa mãn.
+
+Đáng chú ý, phần dư có xu hướng lệch trái nhẹ và biểu đồ Residuals vs Fitted (Kiểm tra phương sai không đổi) cho thấy các điểm dự đoán vượt quá 100 trong khi exam_score bị giới hạn trần ở giá trị 100. Đây chính là nguồn gốc của một số phần dư âm lớn: đối với các sinh viên đã đạt điểm tối đa (exam_score = 100, trùng khớp với 3 quan sát ngoại lai đa biến ở Phụ lục B.5), mô hình tuyến tính vẫn dự đoán điểm cao hơn 100, dẫn đến phần dư âm bất thường. Đây là hạn chế mang tính cấu trúc của mô hình hồi quy tuyến tính khi áp dụng cho biến phụ thuộc bị chặn (censored), hơn là một sai lệch ngẫu nhiên đơn thuần.
+
+### D.7: Kiểm tra tính độc lập của sai số (Independence of Errors)
+
+**Giả thuyết:**
+
+$H_0$: Không có sự tương quan giữa các sai số
+
+$H_1$: Có sự tương quan giữa các sai số
+
+```{r}
+set.seed(123)
+durbinWatsonTest(model_full)
+```
+
+**Nhận xét:** Kiểm định **Durbin–Watson** cho kết quả thống kê DW=1.969, xấp xỉ 2, cùng với p=0.59\>0.05. Do đó, không có đủ bằng chứng để bác bỏ giả thuyết $H_0$ về việc không tồn tại tự tương quan giữa các sai số. Có thể kết luận rằng giả định **độc lập của sai số** được thỏa mãn.
+
+\baibox{Bài 3: Dataset "ESS ERIC"}
+
+## **Phụ lục A: Giới thiệu bộ dữ liệu**
+
+Các biến cụ thể:
+
+-   idno: Mã định danh người trả lời (Respondent ID).
+
+-   cntry: Mã quốc gia. Giá trị: Chuỗi ký tự 2 chữ cái (VD: "DE" = Đức, "GB" = Anh).
+
+-   essround: Vòng khảo sát ESS. Giá trị: Số nguyên (VD: 11 cho khảo sát năm 2023).
+
+-   gndr: Giới tính. Giá trị: 1 (Nam), 2 (Nữ), 9 (Không trả lời).
+
+-   agea: Độ tuổi thực tế. Giá trị: Từ 15 đến 100+ (tuổi).
+
+-   domicil: Môi trường sống (Khu vực thành thị / Nông thôn).
+
+    -   1: Thành phố lớn
+
+    -   2: Vùng ngoại ô hoặc rìa thành phố lớn
+
+    -   3: Thị trấn hoặc thành phố nhỏ
+
+    -   4: Làng quê
+
+    -   5: Nông trại hoặc nhà ở vùng hẻo lánh
+
+-   hinctnta: Mức thu nhập hộ gia đình (chia theo 10 phân vị của quốc gia). Giá trị: 1 (Thu nhập thuộc 10% thấp nhất) đến 10 (Thu nhập thuộc 10% cao nhất).
+
+-   eduyrs: Tổng số năm đi học toàn thời gian. Giá trị: Số năm thực tế (từ 0 đến khoảng 20+).
+
+-   wkhtot: Tổng số giờ làm việc thực tế mỗi tuần (bao gồm cả làm thêm giờ). Giá trị: Số giờ thực tế (VD: 40).
+
+-   tvtot: Thời gian xem tivi vào một ngày bình thường.
+
+    -   0: Hoàn toàn không xem
+
+    -   1 đến 7: Tăng dần từ "Dưới 30 phút" đến "Hơn 3 giờ".
+
+-   hhmmb: Số lượng người cùng sống thường xuyên trong hộ gia đình. Giá trị: Số nguyên (VD: 1, 2, 3...).
+
+-   Các biến thang đo Schwartz. Thang đo này hỏi xem mô tả về một người nào đó có "giống với bản thân người trả lời" hay không. Mã hóa chung (Likert 6 điểm): 1 (Rất giống tôi), 2 (Giống tôi), 3 (Hơi giống tôi), 4 (Hơi không giống tôi), 5 (Không giống tôi), 6 (Hoàn toàn không giống tôi).
+
+    -   ipcrtiv (Tự quyết - Sáng tạo): Quan trọng việc nghĩ ra ý tưởng mới và sáng tạo.
+
+    -   ipadvnt (Kích thích - Phiêu lưu): Quan trọng việc tìm kiếm sự mạo hiểm và có cuộc sống thú vị.
+
+    -   ipgdtim (Hưởng thụ): Quan trọng việc có thời gian vui vẻ, chiều chuộng bản thân.
+
+    -   ipsuces (Thành tựu): Quan trọng việc đạt thành công và được công nhận.
+
+    -   imprich (Quyền lực - Giàu có): Quan trọng việc có nhiều tiền và đồ đắt tiền.
+
+    -   impsafe (An toàn): Quan trọng việc được sống ở nơi an ninh, an toàn.
+
+    -   imptrad (Truyền thống): Quan trọng việc tuân theo các phong tục, truyền thống.
+
+    -   ipfrule (Tuân thủ): Quan trọng việc tuân thủ luật lệ và làm theo chỉ dẫn.
+
+    -   iphlppl (Nhân ái): Quan trọng việc giúp đỡ người xung quanh.
+
+    -   ipeqopt (Phổ quát - Bình đẳng): Quan trọng việc mọi người có cơ hội ngang nhau.
+
+-   Các biến tiếp theo:
+
+    -   trstplc (Niềm tin vào Cảnh sát): Thang điểm từ 0 (Hoàn toàn không tin) đến 10 (Hoàn toàn tin tưởng).
+
+    -   trstplt (Niềm tin vào Chính trị gia): Thang điểm từ 0 đến 10.
+
+    -   trstlgl (Niềm tin vào Hệ thống pháp luật): Thang điểm từ 0 đến 10.
+
+    -   polintr (Mức độ quan tâm đến chính trị):
+
+        -   1: Rất quan tâm
+
+        -   2: Khá quan tâm
+
+        -   3: Rất ít quan tâm.
+
+        -   4: Hoàn toàn không quan tâm
+
+    -   bctprd (Từng tẩy chay một sản phẩm nào đó trong 12 tháng qua): 1 (Có), 2 (Không).
+
+    -   sgnptit (Từng ký vào một kiến nghị/thỉnh nguyện thư trong 12 tháng qua): 1 (Có), 2 (Không).
+
+    -   stflife (Hài lòng với cuộc sống): Thang điểm từ 0 (Cực kỳ không hài lòng) đến 10 (Cực kỳ hài lòng).
+
+    -   happy (Mức độ hạnh phúc): Thang điểm từ 0 (Cực kỳ không hạnh phúc) đến 10 (Cực kỳ hạnh phúc).
+
+    -   health (Đánh giá sức khỏe tổng quan): 1 (Rất tốt), 2 (Tốt), 3 (Bình thường), 4 (Kém), 5 (Rất kém).
+
+    -   sclmeet (Tần suất gặp gỡ bạn bè/người thân): 1 (Không bao giờ) đến 7 (Mỗi ngày).
+
+    -   sclact (Mức độ tham gia hoạt động xã hội so với người cùng tuổi): 1 (Ít hơn rất nhiều), 2 (Ít hơn), 3 (Bằng nhau), 4 (Nhiều hơn), 5 (Nhiều hơn rất nhiều).
+
+    -   rlgblg (Có thuộc về tôn giáo/tín ngưỡng nào không): 1 (Có), 2 (Không).
+
+    -   rlgdgr (Mức độ sùng đạo): Thang điểm từ 0 (Hoàn toàn không sùng đạo) đến 10 (Rất sùng đạo).
+
+    -   pray (Tần suất cầu nguyện ngoài các buổi lễ): 1 (Mỗi ngày), 2 (Hơn 1 lần/tuần), 3 (1 lần/tuần), 4 (Ít nhất 1 lần/tháng), 5 (Chỉ vào các dịp lễ), 6 (Hiếm khi), 7 (Không bao giờ).
+
+    -   rlgatnd (Tần suất tham gia các buổi lễ tôn giáo): Coding tương tự như biến pray từ 1 đến 7.
+
+## **Phụ lục B: Thống kê mô tả**
+
+```{r, echo = FALSE}
+ESS <- read.csv("essUKandGer.csv")
+glimpse(ESS)
+```
+
+```{r, echo = FALSE, results = 'hide'}
+ESS <- ESS %>%
+  rename(
+    # 
+    id = idno, country = cntry, gender = gndr, age = agea, 
+    incomeLevel = hinctnta, livingArea = domicil, surveyRound = essround,
+    #
+    eduYears = eduyrs, workHours = wkhtot, tvHours = tvtot, famSize = hhmmb,
+    #
+    creative = ipcrtiv, adventure = ipadvnt, hedonism = ipgdtim,
+    success = ipsuces, rich = imprich, safety = impsafe, tradition = imptrad,
+    rules = ipfrule, helpful = iphlppl, equality = ipeqopt,
+    # 
+    tPolice = trstplc, tPolitician = trstplt, tLegal = trstlgl,
+    polInterest = polintr, boycott = bctprd, signed = sgnptit,
+    # 
+    lifeSatis = stflife, happy = happy, health = health,
+    socialMeet = sclmeet, socialAct = sclact,
+    # 
+    religBelong = rlgblg, levelRelig = rlgdgr, pray = pray, religAttd = rlgatnd
+  )
+names(ESS)
+
+any(is.na(ESS))
+
+ESS <- ESS %>%
+  mutate(
+    across(c(polInterest, health, socialAct, livingArea,
+             creative, adventure, hedonism, success, rich, 
+             safety, tradition, rules, helpful, equality,
+             boycott, signed, religBelong, gender), 
+           ~ ifelse(. > 6, NA, .))) %>% 
+  na.omit()
+dim(ESS)
+
+ESS <- ESS %>%
+  mutate(
+    across(c(socialMeet, pray, religAttd, tvHours), 
+           ~ ifelse(. > 7, NA, .)),
+    across(c(tPolice, tPolitician, tLegal, lifeSatis, happy, levelRelig, 
+             incomeLevel), 
+           ~ ifelse(. > 10, NA, .))
+  ) %>%
+na.omit()
+
+table(ESS$age)
+
+ESS <- ESS %>%
+  mutate(
+    across(age, 
+           ~ ifelse(. == 999, NA, .)),
+    across(workHours, 
+           ~ ifelse(. > 168, NA, .))
+  ) %>%
+na.omit()
+dim(ESS)
+
+ESS <- ESS %>%
+  mutate(
+    # Thang 4
+    polInterest = 5 - polInterest,
+    # Thang 5
+    health = 6 - health,
+    # Thang 6 (10 biến Schwartz)
+    across(c(creative, adventure, hedonism, success, rich, 
+             safety, tradition, rules, helpful, equality), 
+           ~ 7 - .), 
+    # Thang 7 
+    pray = 8 - pray,
+    religAttd = 8 - religAttd
+  )
+dim(ESS)
+
+ESS <- ESS %>%
+  mutate(
+    gender = factor(gender, levels = c(1, 2), labels = c("Man", "Woman")),
+    boycott = factor(boycott, levels = c(1, 2), labels = c("Yes", "No")),
+    signed = factor(signed, levels = c(1, 2), labels = c("Yes", "No")),
+    religBelong = factor(religBelong, levels = c(1, 2), labels = c("Yes", "No")),
+    livingArea = factor(livingArea, levels = c(1, 2, 3, 4, 5), 
+      labels = c("BigCity", "Suburbs", "Town", "Village", "Farm")),
+    country = as.factor(country)
+  )
+str(ESS %>% select(gender, boycott, signed, religBelong, livingArea, country))
+```
+
+### B.1: Thống kê mô tả cho giới tính, quốc gia và khu vực sống
+
+```{r, echo = TRUE}
+ggplot(ESS, aes(x = gender, fill = gender)) +
+  geom_bar(width = 0.3, alpha = 0.8) +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = 1.5, size = 5,
+            fontface = "bold") +
+  scale_fill_manual(values = c("#4C72B0", "#C44E52")) + 
+  labs(title = "Phân bố mẫu nghiên cứu theo Giới tính",
+       x = "Giới tính",
+       y = "Số Người") +
+  theme_bw()
+```
+
+**Nhận xét:** Tỷ lệ giới tính tham gia khảo sát rất đồng đều.
+
+```{r, echo = TRUE}
+ggplot(ESS, aes(x = reorder(livingArea, table(livingArea)[livingArea]), 
+                fill = livingArea)) +
+  geom_bar(alpha = 0.85) +
+  coord_flip() + 
+  geom_text(stat = 'count', aes(label = ..count..), hjust = 1, size = 4, 
+            fontface = "bold") +
+  scale_fill_brewer(palette = "Set3") + 
+  labs(title = "Hình 2: Phân bố mẫu nghiên cứu theo Khu vực sinh sống",
+       x = "Khu vực",
+       y = "Số lượng (Người)") +
+  theme_bw()
+```
+
+**Nhận xét:** Hầu hết người tham gia khảo sát tại các thị trấn và làng quê (6607 và 4086 người), thường là những khu vực ít được tiếp cận các thiết bị hiện đại, ít nhiều sẽ ảnh hưởng đến cách họ trả lời những câu hỏi khảo sát. Người khảo sát đến từ vùng rìa thành phố hoặc những thành phố lớn ít hơn, nhưng vẫn nhiều hơn số người ở vùng nông trại hay vùng quê hẻo lánh.
+
+```{r, echo = TRUE}
+df_country <- ESS %>%
+  count(country) %>%
+  mutate(pct = n / sum(n),
+         label = percent(pct, accuracy = 0.1)) 
+
+ggplot(df_country, aes(x = "", y = pct, fill = country)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(country, "\n", label)), 
+            position = position_stack(vjust = 0.5), size = 5, 
+            color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("#55A868", "#F1948A")) + 
+  labs(title = "Tỷ lệ người khảo sát theo Quốc gia") +
+  theme_void(base_size = 14)
+```
+
+**Nhận xét:** Trong bộ dữ liệu sau khi xử lý, tỷ lệ người khảo sát thuộc Đức nhiều hơn người Anh. Tuy nhiên, tỷ lệ vẫn không quá chênh lệch giữa 2 quốc gia.
+
+### B.2: Thống kê mô tả cho khu vực sống
+
+```{r, echo = FALSE}
+ESS %>%
+  group_by(livingArea) %>%
+  summarise(Mean_LifeSatis = mean(lifeSatis, na.rm = TRUE)) %>%
+  ggplot(aes(x = reorder(livingArea, Mean_LifeSatis), y = Mean_LifeSatis, 
+             fill = livingArea)) +
+  geom_col() +
+  coord_flip(ylim = c(6, 7.65)) + 
+  labs(title = "Mức độ Hài lòng cuộc sống trung bình theo Khu vực sống",
+       x = "Khu vực sống",
+       y = "Hài lòng cuộc sống (Mean)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Nhận xét:** Dựa vào biểu đồ, ta thấy:
+
+-   Trung bình mức độ hài lòng cuộc sống của những người thuộc nhóm Nông trại (`Farm`) là cao nhất, sau đó tới nhóm Làng quê (`village`). Thật vậy, những người sống ở những vùng quê nhỏ thường có xu hướng an phận, họ sống một cuộc đời yên bình chứ không cần quá thịnh vượng hay giàu có, do đó việc họ hài lòng với cuộc sống của họ là điều dễ hiểu.
+
+-   3 nhóm Thị trấn, Vùng ngoại ô rìa thành phố và Thành phố lớn có chỉ số trung bình mức độ hài lòng cuộc sống là khá ngang nhau. So với 2 vùng ở trên, những người ở vùng này có xu hướng muốn tìm kiếm những mục tiêu lớn lao hơn. Tuy nhiên, thành phố đông đúc sẽ thường cạnh tranh hơn so với những vùng hẻo lánh, do đó áp lực cũng trở nên nhiều và dồn nén hơn, dẫn đến việc mức độ hài lòng cuộc sống của các nhóm này thường thấp hơn so với 2 nhóm trên.
+
+-   Tuy nhiên, số lượng người tham gia khảo sát ở vùng Nông trại (`Farm`) chỉ có khoảng hơn 400 người, khá ít so với tổng cỡ mẫu. Do những người ở vùng này ít có điều kiện tiếp cận phương tiện hiện đại, do đó nên số người tham gia khảo sát ít hơn so với những vùng còn lại, nên đây cũng là 1 vấn đề cần lưu ý khi cỡ mẫu giữa các vùng là chênh lệch nhau.
+
+## **Phụ lục C: Kiểm tra giả định và đánh giá tính phù hợp của dữ liệu đối với phương pháp đã chọn**
+
+### C.1. Kiểm định tính chuẩn
+
+**Phát biểu giả thuyết cho từng biến:**
+
+-   $H_0$: Biến đang xét tuân theo phân phối chuẩn tại nhóm tương ứng.
+
+-   $H_1$: Biến đang xét không tuân theo phân phối chuẩn tại nhóm tương ứng.
+
+Sử dụng mức ý nghĩa $\alpha = 0.05$. Ta bác bỏ $H_0$ nếu giá trị $p\text{-value} < 0.05$.
+
+```{r}
+shapiro_res <- ESS %>%
+  dplyr::select(religBelong, all_of(bien_manova)) %>%
+  pivot_longer(cols = -religBelong, names_to = "Ten_Bien", values_to = "value") %>%
+  group_by(religBelong, Ten_Bien) %>%
+  sample_n(size = min(n(), 4900)) %>% 
+  shapiro_test(value)
+
+shapiro_res %>% 
+  arrange(Ten_Bien, religBelong) %>%
+  print(n = Inf)
+```
+
+### C.2. Kiểm định tính đồng nhất phương sai
+
+Gọi $\sigma_{i,Yes}^2$ và $\sigma_{i,No}^2$ lần lượt là phương sai tổng thể của biến thứ $i$ đối với nhóm nhân viên nghỉ việc (Yes) và nhóm ở lại (No).
+
+-   $H_0 : \sigma_{i,Yes}^2 = \sigma_{i,No}^2$ (Phương sai của biến quan sát giữa hai nhóm là bằng nhau).
+-   $H_1 : \sigma_{i,Yes}^2 \neq \sigma_{i,No}^2$ (Phương sai của biến quan sát giữa hai nhóm không bằng nhau).
+
+Với $\alpha = 0.05$. Nếu $p$-value \> $0.05$, ta không đủ cơ sở để bác bỏ $H_0$, qua đó kết luận phương sai của biến đó là đồng nhất.
+
+```{r}
+options(scipen = 999) 
+levene_res <- ESS %>%
+  select(religBelong, all_of(bien_manova)) %>%
+  pivot_longer(cols = -religBelong, names_to = "Ten_Bien", values_to = "value") %>%
+  group_by(Ten_Bien) %>%
+  levene_test(value ~ religBelong)
+
+print(levene_res, n = Inf)
+```
+
+## **Phụ lục D: Hạn chế và đề xuất những phương pháp phù hợp**
+
+### D.1: Phân tích Nhân tố Khẳng định (CFA)
+
+```{r, echo = FALSE}
+ESS_pca <- ESS %>% dplyr::select( 
+         hedonism, adventure, success, rich, 
+         safety, rules, helpful, equality,
+         tPolice, tPolitician, tLegal, levelRelig, pray, religAttd)
+```
+
+
+```{r}
+library(lavaan)
+set.seed(123)
+n <- nrow(ESS_pca)
+idx <- sample(seq_len(n), size = floor(n / 2))
+ 
+data_efa_check <- ESS_pca[idx, ]
+data_cfa       <- ESS_pca[-idx, ]
+efa_check <- fa(data_efa_check, nfactors = 5, rotate = "varimax", fm = "minres")
+ 
+cfa_syntax <- '
+  Religiosity   =~ levelRelig + pray + religAttd
+  Aspiration    =~ adventure + success + rich + hedonism 
+  Institutional =~ tPolice + tPolitician + tLegal
+  Stability     =~ safety + rules 
+  Community     =~ helpful + equality
+'
+fit_cfa <- cfa(cfa_syntax, data = data_cfa, std.lv = TRUE)
+fitMeasures(fit_cfa, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea",
+                        "rmsea.ci.lower", "rmsea.ci.upper", "srmr"))
+```
+
+**Nhận xét:** Các chỉ số CFI và TLI đều vượt ngưỡng 0.9, cùng với khoảng tin cậy dành cho RMSEA < 0.06 và chỉ số SRMR cũng bé hơn 0.6. cho thấy mô hình 5 nhân tố được khám phá ở bước EFA vẫn giữ được cấu trúc ổn định khi kiểm định trên một mẫu độc lập. Điều này củng cố độ tin cậy của cấu trúc lý thuyết đã đề xuất.
+
+Ta sẽ xem xét hệ số tải chuẩn hóa để đối chiếu với EFA:
+
+```{r}
+standardizedSolution(fit_cfa) %>% filter(op == "=~")
+```
+
+**Nhận xét:** Hệ số tải của từng biến trong CFA đều có tương đồng về độ lớn và ý nghĩa thống kê (p<0.05) so với hệ số tải EFA ban đầu hay không, đây là bằng chứng trực tiếp cho thấy tính ổn định của thang đo.
+
+### D.2: Hồi quy Logistic dự báo từ các nhân tố
+
+
+```{r}
+library(pscl)
+efa_model <- fa(ESS_pca, nfactors = 5, rotate = "varimax", fm = "minres")
+factor_scores <- as.data.frame(efa_model$scores)
+colnames(factor_scores) <- c("Religiosity", "Institutional", "Aspiration",
+                              "Stability", "Community")
+ 
+ESS_logit <- bind_cols(ESS, factor_scores)
+ 
+ESS_logit$religBelong <- relevel(ESS_logit$religBelong, ref = "No")
+ 
+model_relig <- glm(
+  religBelong ~ Religiosity + Aspiration + Institutional + Stability + Community +
+    gender + age,
+  data = ESS_logit,
+  family = binomial(link = "logit")
+)
+
+summary(model_relig)
+exp(cbind(OR = coef(model_relig), confint(model_relig)))
+pR2(model_relig)
+```
+
+
+**Giải thích:**
+
+- Ở cột OR, là chỉ số Odds Ratio có thể được diễn giải như sau:
+
+  - Nếu OR > 1: Biến độc lập làm tăng khả năng thuộc về nhóm tôn giáo.
+
+  - Nếu OR < 1: Biến độc lập làm giảm khả năng thuộc về nhóm tôn giáo.
+
+  - Nếu OR = 1: Biến độc lập không có tác động gì.
+
+- Trong hồi quy Logistic, không có $R^2$ truyền thống. Ta dùng McFadden's $R^2$ để đánh giá độ khít. Giá trị này thường thấp hơn hồi quy tuyến tính nhiều, nhưng McFadden’s $R^2$ từ 0.2 đến 0.4 đã được coi là thể hiện sự phù hợp rất tốt.
+
+**Nhận xét:**
+
+- Hầu hết các biến đều có ý nghĩa thống kê, chỉ trừ nhân tố `Community` do có p-value lớn hơn mức ý nghĩa 0.05.
+
+- Nhìn vào cột OR, những cột có OR > 1 là những biến độc lập làm tăng khả năng thuộc về nhóm tôn giáo, một nhân tố rất đặc biệt có OR cực lớn là biến `Religiosity`, tức là cứ tăng 1 đơn vị điểm nhân tố tôn giáo, odds thuộc nhóm "có tôn giáo" tăng khoảng 10.7 lần. Những cột có OR < 1 là những biến làm giảm khả năng thuộc về nhóm tôn giáo. Ví dụ phụ nữ có odds thấp hơn nam giới khoảng 10%, cho thấy phụ nữ có tỷ lệ tôn giáo/thực hành tôn giáo cao hơn nam giới.
+
+- McFadden $R^2 = 0.391$, Nagelkerke (r2CU) = 0.558 — đây là mức rất cao đối với hồi quy logistic (thường 0.2–0.4 đã được coi là tốt). Residual deviance giảm mạnh so với Null deviance (21626 → 12983) cho thấy mô hình giải thích được phần lớn biến thiên. Tuy nhiên, mức fit này phần lớn đến từ biến Religiosity. 
+
+- Thật vậy, nhân tố `Religiosity` được tạo từ `levelRelig, pray, religAttd` đây là các biến thuộc nhóm tôn giáo. Trong khi đó, biến phụ thuộc religBelong (Có/Không thuộc về một tôn giáo) rất gần với chính nhân tố này, người cầu nguyện thường xuyên và đi lễ thường xuyên thì gần như chắc chắn tự nhận có tôn giáo. Điều này giải thích vì sao McFadden $R^2$ cao như vậy, nhưng phần lớn sức mạnh dự báo đến từ 1 biến Religiosity. Điều này có thể khiến các biến còn lại giải thích sai sự ảnh hưởng của chúng đến việc dự báo một người có thuộc tôn giáo hay không.
+
+Do đó, ta chạy lại mô hình bỏ biến `Religiosity` để xem 4 nhân tố còn lại độc lập giải thích được bao nhiêu:
+
+```{r}
+model_relig_v2 <- glm(
+  religBelong ~ Aspiration + Institutional + Stability + Community + gender + age,
+  data = ESS_logit,
+  family = binomial(link = "logit")
+)
+summary(model_relig_v2)
+pR2(model_relig_v2)
+```
+
+**Nhận xét:** Khi loại bỏ nhân tố `Religiosity` , mô hình logistic cho thấy các nhân tố còn lại chỉ giải thích được một phần rất nhỏ phương sai của việc tự nhận thuộc về tôn giáo (McFadden $R^2$ giảm từ 0.40 xuống còn 0.34). Điều này cho thấy việc một cá nhân có theo tôn giáo hay không được quyết định chủ yếu bởi hành vi thực hành tôn giáo, chứ không phải liên quan đến các giá trị cá nhân hay xã hội của họ. 
+
+Như ta đã nhận xét ở trên, vì các biến này chỉ có tổng phương sai tích lũy khoảng 44.3%, do đó việc đưa ra một kết quả dự báo tốt như vậy chắc hẳn có điểm nghi vấn. Tóm lại, mô hình FA hiện tại đã thành công trong việc khẳng định lý thuyết: hệ giá trị trong thang đó Schwartz có thể được gom lại thành các nhân tố Khát vọng cá nhân, niềm tin tôn giáo, niềm tin thể chế, giá trị bền vững và giá trị cộng đồng. Còn để đưa vào dự báo, cần có thêm những các bi đo lường có tính đại diện tốt hơn cho các nhân tố.
+
